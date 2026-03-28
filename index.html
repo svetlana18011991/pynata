@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Настройка размера и положения</title>
+    <title>Игра "Пиньята" с викториной</title>
     <style>
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #333;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none; /* Запрет выделения текста при перетаскивании */
         }
         
         #game-container {
@@ -21,79 +20,134 @@
             background-repeat: no-repeat;
         }
 
+        /* Обертка для позиционирования пиньяты */
         #piniata-wrapper {
             position: absolute;
-            width: 250px; /* Стартовый размер */
-            cursor: grab;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%); /* Центрирование */
+            /* Координаты и размер с вашего скриншота */
+            width: 470px;
+            left: 46.20%;
+            top: 56.46%;
+            transform: translate(-50%, -50%);
             z-index: 10;
         }
 
-        #piniata-wrapper:active {
-            cursor: grabbing;
-        }
-
+        /* Сама картинка пиньяты (с анимациями) */
         .piniata-image {
             width: 100%;
             height: auto;
             display: block;
-            pointer-events: none;
-        }
-
-        /* Панель инструкций и кнопок изменения размера */
-        .controls {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px 25px;
-            border-radius: 12px;
-            z-index: 90;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            text-align: center;
-        }
-
-        .controls p {
-            margin: 10px 0;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .resize-btn {
-            font-size: 24px;
-            font-weight: bold;
-            width: 45px;
-            height: 45px;
-            margin: 0 5px;
+            transform-origin: 50% 0%; /* Точка вращения - верхний центр (веревка) */
             cursor: pointer;
+            filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.3));
+        }
+
+        /* Анимация спокойного покачивания */
+        .swing {
+            animation: swingAnim 4s ease-in-out infinite;
+        }
+
+        @keyframes swingAnim {
+            0% { transform: rotate(-6deg); }
+            50% { transform: rotate(6deg); }
+            100% { transform: rotate(-6deg); }
+        }
+
+        /* Анимация самого удара */
+        .hit-anim {
+            animation: hitAnim 0.2s ease-out;
+        }
+
+        @keyframes hitAnim {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(0.9) rotate(15deg) translateY(-10px); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        /* Панель викторины */
+        #quiz-panel {
+            position: absolute;
+            left: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 320px;
+            text-align: center;
+            z-index: 50;
+        }
+
+        #question-text {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             background: #ff7e67;
             color: white;
-            transition: 0.1s;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        .resize-btn:hover { background: #ff5a3d; }
-        .resize-btn:active { transform: scale(0.95); }
+        .option-btn:hover {
+            background: #ff5a3d;
+            transform: translateY(-2px);
+        }
 
-        /* Окно вывода координат */
-        #coord-output {
+        .option-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        #feedback-text {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 24px;
+        }
+
+        .text-wrong { color: #d9381e; }
+        .text-correct { color: #28a745; }
+
+        /* Надпись "Молодец" в конце */
+        #win-message {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.85);
-            color: #00ff00;
-            padding: 30px;
-            border-radius: 12px;
-            font-family: monospace;
-            font-size: 20px;
+            font-size: 80px;
+            font-weight: bold;
+            color: #ffca3a;
+            text-shadow: 4px 4px 0px #ff595e, 8px 8px 15px rgba(0,0,0,0.5);
             display: none;
             z-index: 100;
-            border: 2px solid #00ff00;
-            text-align: center;
+            text-transform: uppercase;
+        }
+
+        /* Конфетти */
+        .confetti {
+            position: absolute;
+            top: -20px;
+            z-index: 90;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(720deg); }
         }
     </style>
 </head>
@@ -101,90 +155,180 @@
 
 <div id="game-container">
     
-    <div class="controls">
-        <p>1. Перетащите пиньяту</p>
-        <p>2. Настройте размер:</p>
-        <div>
-            <button id="btn-minus" class="resize-btn">-</button>
-            <button id="btn-plus" class="resize-btn">+</button>
-        </div>
-        <p>3. Нажмите <b>Enter</b></p>
+    <div id="quiz-panel">
+        <div id="question-text">Вопрос загружается...</div>
+        <div id="options-container"></div>
+        <div id="feedback-text"></div>
     </div>
-    
-    <div id="coord-output"></div>
 
+    <div id="win-message">Молодец!</div>
+    
     <div id="piniata-wrapper">
-        <img class="piniata-image" src="1.png" alt="Пиньята">
+        <img class="piniata-image swing" id="piniata-img" src="1.png" alt="Пиньята">
     </div>
 
 </div>
 
 <script>
-    const piniataWrapper = document.getElementById('piniata-wrapper');
-    const coordOutput = document.getElementById('coord-output');
+    // --- НАСТРОЙКИ ВОПРОСОВ ---
+    // Вы можете менять текст вопросов, варианты ответов и указывать правильный (correct).
+    // Важно: отсчет correct начинается с 0 (0 - первый вариант, 1 - второй, 2 - третий).
+    const questions = [
+        { q: "Сколько будет 2 + 2?", options: ["3", "4", "5"], correct: 1 },
+        { q: "Сколько будет 5 + 5?", options: ["9", "10", "11"], correct: 1 },
+        { q: "Сколько будет 3 * 3?", options: ["6", "9", "12"], correct: 1 },
+        { q: "Реши пример: 10 - 4", options: ["5", "6", "7"], correct: 1 },
+        { q: "Сколько месяцев в году?", options: ["10", "12", "24"], correct: 1 }
+    ];
+
+    // Итоговый порядок картинок
+    const images = ['1.png', '2.png', '112.png', '3.png', '4.png', '5.png'];
     
-    // --- НАСТРОЙКА РАЗМЕРА ---
-    let currentWidth = 250; // Стартовая ширина в пикселях
-    const step = 10; // На сколько пикселей менять размер за один клик
+    // Переменные состояния игры
+    let currentStage = 0; // Начинаем с 1.png
+    let canHit = false;   // Разрешение на удар
+    let audioCtx = null;
 
-    document.getElementById('btn-plus').addEventListener('click', () => {
-        currentWidth += step;
-        piniataWrapper.style.width = currentWidth + 'px';
-    });
+    // Элементы
+    const piniataImg = document.getElementById('piniata-img');
+    const quizPanel = document.getElementById('quiz-panel');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const feedbackText = document.getElementById('feedback-text');
+    const winMessage = document.getElementById('win-message');
 
-    document.getElementById('btn-minus').addEventListener('click', () => {
-        if (currentWidth > 50) { // Не даем сделать пиньяту слишком маленькой
-            currentWidth -= step;
-            piniataWrapper.style.width = currentWidth + 'px';
+    // Функция генерации звука удара (глухой стук)
+    function playHitSound() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.15);
+        
+        gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+    }
+
+    // Загрузка вопроса на экран
+    function loadQuestion() {
+        if (currentStage >= questions.length) return; // Вопросы кончились
+        
+        const currentQ = questions[currentStage];
+        questionText.innerText = currentQ.q;
+        optionsContainer.innerHTML = '';
+        feedbackText.innerText = '';
+        feedbackText.className = '';
+        canHit = false;
+
+        currentQ.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(index, currentQ.correct, btn);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    // Проверка ответа
+    function checkAnswer(selectedIndex, correctIndex, btnElement) {
+        if (canHit) return; // Если уже ответил верно, кнопки не жмутся
+
+        if (selectedIndex === correctIndex) {
+            feedbackText.innerText = "Правильно! Ударь пиньяту!";
+            feedbackText.className = 'text-correct';
+            canHit = true; // Разрешаем удар
+            
+            // Блокируем кнопки
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.disabled = true);
+            btnElement.style.background = '#28a745'; // Зеленым подсвечиваем верный
+        } else {
+            feedbackText.innerText = "Промахнулся! Попробуй еще раз.";
+            feedbackText.className = 'text-wrong';
+            
+            // Анимация ошибки на кнопке (тряска)
+            btnElement.style.transform = 'translateX(-5px)';
+            setTimeout(() => btnElement.style.transform = 'translateX(5px)', 50);
+            setTimeout(() => btnElement.style.transform = 'translateX(0)', 100);
+        }
+    }
+
+    // Обработка клика по пиньяте
+    piniataImg.addEventListener('click', () => {
+        if (!canHit) {
+            // Если пытается ударить без правильного ответа
+            if(feedbackText.innerText === "") {
+                feedbackText.innerText = "Сначала ответь на вопрос!";
+                feedbackText.className = 'text-wrong';
+            }
+            return;
+        }
+
+        // 1. Воспроизводим звук
+        playHitSound();
+
+        // 2. Анимация удара
+        piniataImg.classList.remove('swing');
+        piniataImg.classList.add('hit-anim');
+        
+        setTimeout(() => {
+            piniataImg.classList.remove('hit-anim');
+            // Если игра не окончена, продолжаем покачиваться
+            if (currentStage < images.length - 1) {
+                piniataImg.classList.add('swing');
+            }
+        }, 200);
+
+        // 3. Меняем картинку
+        currentStage++;
+        piniataImg.src = images[currentStage];
+
+        // 4. Проверяем финал
+        if (currentStage === images.length - 1) { // Это последняя картинка (5.png)
+            quizPanel.style.display = 'none'; // Прячем викторину
+            winMessage.style.display = 'block'; // Показываем "Молодец"
+            launchConfetti(); // Запускаем конфетти
+        } else {
+            // Иначе грузим следующий вопрос
+            setTimeout(loadQuestion, 500); // Небольшая задержка перед новым вопросом
         }
     });
 
-
-    // --- ПЕРЕТАСКИВАНИЕ ---
-    let isDragging = false;
-    let startX, startY, initialLeft, initialTop;
-
-    piniataWrapper.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        
-        const rect = piniataWrapper.getBoundingClientRect();
-        initialLeft = rect.left + rect.width / 2;
-        initialTop = rect.top + rect.height / 2;
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-        
-        piniataWrapper.style.left = `${initialLeft + dx}px`;
-        piniataWrapper.style.top = `${initialTop + dy}px`;
-    });
-
-    document.addEventListener('mouseup', () => {
-        isDragging = false;
-    });
-
-
-    // --- ФИКСАЦИЯ И ВЫВОД РЕЗУЛЬТАТА ПО ENTER ---
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            const rect = piniataWrapper.getBoundingClientRect();
-            const parentRect = document.getElementById('game-container').getBoundingClientRect();
-
-            // Считаем координаты центра в процентах
-            const leftPerc = ((rect.left + rect.width / 2) / parentRect.width * 100).toFixed(2);
-            const topPerc = ((rect.top + rect.height / 2) / parentRect.height * 100).toFixed(2);
-
-            // Формируем итоговую строку
-            const resultString = `left: '${leftPerc}%', top: '${topPerc}%', width: '${currentWidth}px'`;
-
-            coordOutput.innerHTML = `<b>Готово!</b><br><br><span style="color:#fff;">${resultString}</span><br><br>Скопируйте текст белого цвета и отправьте сюда.`;
-            coordOutput.style.display = 'block';
+    // Функция салюта (конфетти)
+    function launchConfetti() {
+        const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93', '#ff924c'];
+        for (let i = 0; i < 120; i++) {
+            const piece = document.createElement('div');
+            piece.className = 'confetti';
+            
+            // Рандомный размер и цвет
+            const size = 8 + Math.random() * 10;
+            piece.style.width = size + 'px';
+            piece.style.height = (size * 1.5) + 'px';
+            piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            // Рандомная позиция и время падения
+            piece.style.left = Math.random() * 100 + 'vw';
+            piece.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            piece.style.animationDelay = (Math.random() * 1.5) + 's';
+            
+            document.body.appendChild(piece);
         }
-    });
+    }
+
+    // Запуск игры
+    loadQuestion();
+
 </script>
 
 </body>
