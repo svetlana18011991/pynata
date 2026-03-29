@@ -3,1653 +3,406 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Пиньята — PRO Редактор</title>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
-
+  <title>Редактор «Пиньята»</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Neucha&display=swap');
-
-    html, body {
-      height: 100%;
-      margin: 0;
-      overflow: hidden;
-      background: #0f121b;
-      color: #eaf0ff;
-      font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+    html,body{height:100%;margin:0;overflow:hidden;background:#090c16;color:#eaf0ff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    :root{
+      --text:#eaf0ff;--muted:#a9b6e6;--border:rgba(255,255,255,.10);--shadow2:0 12px 34px rgba(0,0,0,.40);
+      --radius:18px;--radius2:22px;--neon:#ffae00;--danger:#ff4d4d;--ok:#2dd27d;
+      --neon-glow:rgba(255,136,0,.55);--bgPanel:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
     }
-
-    * { box-sizing: border-box; }
-
-    :root {
-      --neon: #d6b14a;
-      --bg-panel: rgba(20, 24, 35, 0.95);
-      --border: rgba(255, 255, 255, 0.1);
-      --danger: #ff4d4d;
-      --ok: #2dd27d;
-      --muted: #a9b6e6;
+    *{box-sizing:border-box}
+    body{
+      background:
+        radial-gradient(1100px 700px at 12% 18%, rgba(35,82,200,.28) 0%, rgba(5,8,22,0) 58%),
+        radial-gradient(900px 640px at 88% 16%, rgba(20,160,255,.18) 0%, rgba(5,8,22,0) 62%),
+        radial-gradient(1000px 780px at 55% 112%, rgba(255,174,0,.12) 0%, rgba(5,8,22,0) 58%),
+        linear-gradient(180deg, rgba(4,10,32,.92), rgba(3,6,18,1));
     }
-
-    button {
-      cursor: pointer;
-      border: none;
-      font-weight: 600;
-      border-radius: 8px;
-      transition: 0.2s;
-    }
-    button:active { transform: scale(0.95); }
-
-    .btn-primary {
-      background: var(--neon);
-      color: #000;
-      padding: 10px 16px;
-    }
-    .btn-primary:hover {
-      filter: brightness(1.1);
-      box-shadow: 0 0 15px rgba(214,177,74,0.4);
-    }
-
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: #fff;
-      padding: 8px 12px;
-    }
-    .btn-outline:hover { background: rgba(255,255,255,0.05); }
-
-    .btn-danger {
-      color: var(--danger);
-      border-color: rgba(255,77,77,0.3);
-    }
-    .btn-danger:hover { background: rgba(255,77,77,0.1); }
-
-    input, textarea, select {
-      width: 100%;
-      background: rgba(0,0,0,0.3);
-      border: 1px solid var(--border);
-      color: #fff;
-      padding: 10px 14px;
-      border-radius: 8px;
-      outline: none;
-      font-family: inherit;
-    }
-    input:focus, textarea:focus, select:focus {
-      border-color: var(--neon);
-      background: rgba(0,0,0,0.5);
-    }
-    select { appearance: none; cursor: pointer; }
-
-    #app { display: flex; height: 100vh; width: 100vw; }
-
-    .panel {
-      width: 470px;
-      background: var(--bg-panel);
-      display: flex;
-      flex-direction: column;
-      border-right: 1px solid var(--border);
-      z-index: 10;
-      box-shadow: 5px 0 25px rgba(0,0,0,0.5);
-    }
-
-    .panel-hdr {
-      padding: 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
-      justify-content: space-between;
-    }
-
-    .panel-hdr-main {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .panel-hdr img {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      object-fit: contain;
-      background: rgba(255,255,255,0.05);
-    }
-
-    .panel-hdr h1 { margin: 0; font-size: 18px; }
-    .panel-hdr span { font-size: 12px; color: var(--neon); }
-
-    .panel-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-    }
-
-    .panel-footer {
-      padding: 20px;
-      border-top: 1px solid var(--border);
-      background: rgba(0,0,0,0.2);
-    }
-
-    .section {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 20px;
-    }
-
-    .section-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--neon);
-      margin-bottom: 15px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .field { margin-bottom: 15px; }
-    .field label {
-      display: block;
-      font-size: 13px;
-      color: #a9b6e6;
-      margin-bottom: 6px;
-    }
-
-    .q-item {
-      background: rgba(0,0,0,0.3);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      transition: 0.2s;
-    }
-    .q-item:hover {
-      background: rgba(255,255,255,0.05);
-      border-color: rgba(255,255,255,0.2);
-    }
-
-    .q-item-title {
-      font-size: 14px;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 260px;
-      cursor: pointer;
-    }
-
-    .q-item-sub {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .q-item-actions {
-      display: flex;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-
-    .q-item-actions button {
-      padding: 6px;
-      font-size: 12px;
-    }
-
-    .preview {
-      flex: 1;
-      position: relative;
-      background: #000;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .preview-top {
-      padding: 16px 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.3);
-      z-index: 2;
-    }
-
-    .preview-top .name { font-weight: 800; color: #fff; }
-    .preview-top .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-      background: #111;
-    }
-
-    .preview-stage {
-      flex: 1;
-      min-height: 0;
-    }
-
-    .preview-badge {
-      position: absolute;
-      top: 74px;
-      left: 20px;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(5px);
-      padding: 8px 15px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: bold;
-      color: var(--neon);
-      pointer-events: none;
-      z-index: 100;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(5px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      padding: 20px;
-    }
-    .modal-overlay.active { display: flex; }
-
-    .modal {
-      background: #161925;
-      width: min(900px, 100%);
-      max-height: 90vh;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      box-shadow: 0 20px 60px rgba(0,0,0,.6);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .modal-hdr {
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border);
-      font-weight: 700;
-      font-size: 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-body {
-      padding: 24px;
-      overflow-y: auto;
-      display: flex;
-      gap: 20px;
-    }
-
-    .modal-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      min-width: 0;
-    }
-
-    .modal-ftr {
-      padding: 16px 24px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      background: rgba(0,0,0,0.2);
-      border-radius: 0 0 20px 20px;
-      flex-wrap: wrap;
-    }
-
-    .opt-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .opt-row input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--ok);
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-
-    .color-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-
-    .color-row label {
-      font-size: 13px;
-      color: #a9b6e6;
-      min-width: 120px;
-    }
-
-    .color-row input[type="color"] {
-      width: 50px;
-      height: 34px;
-      padding: 2px;
-      cursor: pointer;
-      border: none;
-      border-radius: 6px;
-      flex-shrink: 0;
-    }
-
-    .color-row input[type="number"] { width: 90px; padding: 6px; }
-    .color-row select { width: 180px; padding: 6px; }
-
-    .export-box {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .export-box input {
-      flex: 1;
-      font-family: monospace;
-      color: var(--ok);
-    }
-
-    .warn-box {
-      margin-top: 10px;
-      display: none;
-      background: rgba(255,77,77,.12);
-      border: 1px solid rgba(255,77,77,.25);
-      color: #ffd3d3;
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 12px;
-      line-height: 1.4;
-    }
-
-    .template-box {
-      background: rgba(214, 177, 74, 0.08);
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid rgba(214,177,74,.35);
-      margin-bottom: 12px;
-    }
-
-    .template-box .head {
-      font-size: 12px;
-      color: var(--neon);
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .template-box .hint {
-      font-size: 11px;
-      color: #a9b6e6;
-      margin-top: 8px;
-      line-height: 1.35;
-    }
-
-    @media (max-width: 1100px) {
-      #app { flex-direction: column; }
-      .panel { width: 100%; height: 55vh; }
-      .preview { height: 45vh; }
-    }
+    body.gameOnly{background:transparent}
+    .app{display:grid;grid-template-columns:460px 1fr;gap:14px;padding:14px;max-width:1540px;margin:0 auto;height:100%}
+    @media (max-width:1020px){.app{display:flex;flex-direction:column;overflow-y:auto}.settings,.preview{height:auto!important;min-height:560px}}
+    .panel{background:var(--bgPanel);border:1px solid var(--neon);border-radius:var(--radius2);box-shadow:0 0 8px rgba(255,136,0,.25),0 0 18px rgba(255,136,0,.18),var(--shadow2);backdrop-filter:blur(10px);overflow:hidden;position:relative}
+    .panel-header,.preview-top{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.10);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .panel-header .h,.preview-top .name{font-weight:950;letter-spacing:.2px;display:flex;align-items:center;gap:10px}
+    .settings{height:100%;display:flex;flex-direction:column;min-height:0}
+    .settings .panel-body{overflow-y:auto;flex:1;min-height:0;padding:14px}
+    .section{padding:12px;border-radius:16px;border:1px solid rgba(255,174,0,.42);background:rgba(20,10,0,.22);margin-bottom:12px;box-shadow:0 0 8px rgba(255,136,0,.18)}
+    .section .title{font-weight:950;font-size:13.5px;margin-bottom:10px;color:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .muted{color:var(--muted);font-size:12.5px;line-height:1.35}
+    label{display:block;font-size:12.5px;color:rgba(255,255,255,.86);margin:10px 0 6px}
+    input[type="text"],input[type="number"],textarea,select{width:100%;border-radius:14px;padding:10px 11px;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.25);color:var(--text);outline:none}
+    textarea{min-height:84px;resize:vertical}
+    input:focus,textarea:focus,select:focus{border-color:var(--neon);box-shadow:0 0 8px var(--neon-glow), inset 0 0 4px rgba(255,136,0,.2)}
+    .row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:170px}
+    .toggle{display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);margin-top:8px}
+    .toggle input{width:18px;height:18px}
+    .btn{padding:11px 12px;border-radius:14px;border:1px solid var(--neon);background:rgba(255,255,255,.06);color:var(--text);cursor:pointer;font-weight:950;font-size:14px;transition:transform .08s ease, background .15s ease, box-shadow .2s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+    .btn:hover{background:rgba(255,136,0,.12);box-shadow:0 0 10px var(--neon-glow)}
+    .btn:active{transform:translateY(1px)}
+    .btn:disabled{opacity:.45;cursor:not-allowed}
+    .btn.primary{background:linear-gradient(90deg, rgba(255,174,0,.34), rgba(255,136,0,.25))}
+    .btn.danger{border-color:rgba(255,77,77,.35);background:rgba(255,77,77,.08)}
+    .btn.small{padding:8px 10px;font-size:12.5px;border-radius:12px}
+    .q-list{display:flex;flex-direction:column;gap:10px}
+    .q-item{padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);display:flex;gap:10px;align-items:center;justify-content:space-between}
+    .q-item .meta{display:flex;flex-direction:column;gap:4px;min-width:0;padding-top:3px}
+    .q-item .meta .t,.q-item .meta .s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.q-item .meta .t{font-weight:900;font-size:13px}.q-item .meta .s{color:var(--muted);font-size:12px}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:999px;font-size:12px;font-weight:900;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.18);color:rgba(255,255,255,.92)}
+    .preview{height:100%;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+    .preview .panel-body{flex:1;display:flex;flex-direction:column;min-height:0;padding:14px}
+    .preview-stage{flex:1;position:relative;border-radius:var(--radius2);border:1px solid rgba(255,255,255,.10);overflow:hidden;background:rgba(0,0,0,.18);box-shadow:var(--shadow2)}
+    .toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.14);color:var(--text);padding:10px 12px;border-radius:14px;backdrop-filter:blur(10px);box-shadow:var(--shadow2);opacity:0;pointer-events:none;transition:opacity .18s ease, transform .18s ease;z-index:999999}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:none;z-index:999998}
+    .modal{position:absolute;top:15px;bottom:15px;left:15px;right:15px;margin:auto;max-width:820px;display:flex;flex-direction:column;border-radius:20px;border:1px solid var(--neon)!important;background:#16110c!important;box-shadow:0 0 12px rgba(255,136,0,.25),0 30px 80px rgba(0,0,0,.7)!important;overflow:hidden}
+    .modal-head{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(255,255,255,.10);flex-shrink:0}
+    .modal-body{padding:14px;overflow-y:auto;flex:1 1 auto;min-height:0}.modal-foot{padding:12px 14px;border-top:1px solid rgba(255,255,255,.10);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;flex-shrink:0}
+    .choiceBlock{border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.14);border-radius:14px;padding:10px;margin-top:10px}
+    .answerRow{display:flex;gap:8px;align-items:center;margin-top:8px}.answerRow input[type="text"]{flex:1;min-width:0}
+    .checkbox{width:18px;height:18px;accent-color:var(--neon);flex:0 0 auto}
+    .gameHost{width:100%;height:100%;min-height:0}.gameHost *{box-sizing:border-box}
+    .sizeBox{display:flex;flex-direction:column;align-items:flex-end;gap:4px}.barWrap{width:88px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);height:6px;border-radius:3px;overflow:hidden}.barFill{width:0%;height:100%;background:var(--ok);transition:width .3s, background .3s}
+    .warning{display:none;background:rgba(255,77,77,.15);color:#ffd6d6;padding:8px 14px;font-size:12px;font-weight:700;border-bottom:1px solid rgba(255,77,77,.3)}
   </style>
 </head>
 <body>
+  <div class="app" id="editorRoot">
+    <div class="panel settings">
+      <div class="panel-header">
+        <div class="h">
+          <div style="display:flex;flex-direction:column;justify-content:center">
+            <span style="font-size:16px;font-weight:900;line-height:1.2">Шкатулка математических интерактивов</span>
+            <span style="font-size:11px;color:rgba(255,255,255,.7);line-height:1.2">Светлана Быкова</span>
+            <span style="font-size:12px;color:var(--neon);font-weight:700;line-height:1.2;margin-top:2px">Редактор «Пиньята»</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <div class="sizeBox">
+            <span id="lblSizeText" style="font-size:11px;font-weight:900;color:var(--ok)">🟢 Код в норме</span>
+            <div class="barWrap"><div id="barSize" class="barFill"></div></div>
+          </div>
+          <button class="btn" id="btnResetAll" type="button">🔄 Сбросить всё</button>
+          <button class="btn primary" id="btnCopyCode" type="button">📋 Скопировать код (iframe)</button>
+        </div>
+      </div>
+      <div id="sizeWarning" class="warning">⚠️ Текста слишком много. Ссылка для iframe может стать слишком длинной.</div>
+      <div class="panel-body">
+        <div class="section">
+          <div class="title">Название</div>
+          <label>Заголовок в игре</label>
+          <input id="inpTitle" type="text" value="Пиньята знаний" />
+        </div>
 
-<div id="app">
-  <div class="panel">
-    <div class="panel-hdr">
-      <div class="panel-hdr-main">
-        <img src="logo.png" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%23d6b14a\' viewBox=\'0 0 24 24\'><path d=\'M12 2L2 22h20L12 2z\'/></svg>'">
+        <div class="section">
+          <div class="title">Оформление</div>
+          <label>Фон игры (ссылка)</label>
+          <div class="row" style="align-items:center;margin-top:6px">
+            <input id="inpBgUrl" type="text" placeholder="https://.../bg.jpg" />
+            <button id="btnResetBg" type="button" class="btn small">↩ Сбросить фон</button>
+          </div>
+          <label>Картинки пиньяты по стадиям (через запятую)</label>
+          <textarea id="inpImages" style="min-height:92px">1.png, 2.png, 112.png, 3.png, 4.png, 5.png</textarea>
+          <div class="muted">Первая картинка — целая пиньята. Последняя — финальная разбитая стадия.</div>
+          <label>Начальная картинка пиньяты</label>
+          <input id="inpStartImage" type="text" value="1.png" />
+          <label>Текст после победы</label>
+          <input id="inpWinText" type="text" value="Молодец!" />
+        </div>
+
+        <div class="section">
+          <div class="title">Стартовый экран</div>
+          <label>Текст инструкции</label>
+          <textarea id="inpInstruction">Ответь на вопрос правильно, а потом ударь по пиньяте. Каждый правильный ответ открывает один удар.</textarea>
+        </div>
+
+        <div class="section">
+          <div class="title">Вопросы <span class="pill" id="pillCount">0</span></div>
+          <div class="row" style="margin-bottom:12px;align-items:center">
+            <button class="btn primary" id="btnAddQ" type="button">➕ Добавить</button>
+            <button class="btn" id="btnClearQs" type="button">🧹 Очистить</button>
+          </div>
+          <div class="muted" style="margin-bottom:8px">Количество вопросов должно быть не меньше количества ударов. Обычно это число стадий минус 1.</div>
+          <div class="q-list" id="qList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel preview">
+      <div class="preview-top">
         <div>
-          <span>Светлана Быкова</span>
-          <h1 id="uiTitleText">Пиньята</h1>
+          <div class="name">Просмотр</div>
+          <div class="muted">Живое превью редактора и игры</div>
         </div>
+        <div class="muted">Пиньята + викторина + финальный экран</div>
       </div>
-      <button class="btn-outline" onclick="resetAll()">Сбросить всё</button>
-    </div>
-
-    <div class="panel-content">
-      <div class="section">
-        <div class="section-title">Основное</div>
-        <div class="field">
-          <label>Название игры</label>
-          <input type="text" id="inpTitle" value="Праздничная Пиньята" oninput="saveAll()">
+      <div class="panel-body">
+        <div class="preview-stage">
+          <iframe id="livePreview" title="Preview" style="width:100%;height:100%;border:0;background:transparent;overflow:hidden" allow="autoplay; fullscreen" allowfullscreen></iframe>
         </div>
-        <div class="field">
-          <label>Инструкция (Стартовый экран)</label>
-          <textarea id="inpInst" rows="3" oninput="saveAll()">Ответь на 5 вопросов правильно, чтобы разбить пиньяту и получить сюрприз!</textarea>
-        </div>
-        <div class="field">
-          <label>Текст при победе</label>
-          <input type="text" id="inpWin" value="Молодец!" oninput="saveAll()">
-        </div>
-        <div class="field" style="display:flex; align-items:center; gap:10px;">
-          <input type="checkbox" id="chkLatex" style="width:auto; height:18px; cursor:pointer;" onchange="saveAll()">
-          <label for="chkLatex" style="margin:0; cursor:pointer;">Включить формулы (LaTeX)</label>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title" style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
-          <span>Вопросы <span id="qCount" style="color:#fff;">(0/5)</span></span>
-          <button class="btn-primary" style="padding:4px 8px; font-size:12px;" id="btnAddQ" type="button">+ Добавить</button>
-        </div>
-
-        <div class="template-box">
-          <div class="head">Настройки новых вопросов</div>
-          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-            <select id="newQTemplate" style="flex:1; min-width:180px;" onchange="saveAll()">
-              <option value="-1">Стандартные (по умолчанию)</option>
-            </select>
-            <button class="btn-outline" type="button" onclick="applyTemplateToAll()">Применить ко всем</button>
-          </div>
-          <div class="hint">
-            Выбранный шаблон применяется к новым вопросам.<br>
-            Кнопка «Применить ко всем» меняет тип ответа и оформление уже созданных вопросов.
-          </div>
-        </div>
-
-        <div id="qList"></div>
-      </div>
-    </div>
-
-    <div class="panel-footer">
-      <div class="export-box">
-        <button class="btn-primary" onclick="window.open($('outLink').value, '_blank')">▶ Играть</button>
-        <input type="text" id="outLink" readonly onclick="this.select()">
-        <button class="btn-outline" onclick="copyIframe()" title="Скопировать код для Genially">&lt;/&gt;</button>
-      </div>
-      <div class="warn-box" id="sizeWarn">
-        Ссылка стала слишком длинной. Включён запасной режим через <b>cfgkey</b>.<br>
-        Для Genially лучше держать вопросы короче, чтобы работал встроенный <b>?game=...</b> формат.
       </div>
     </div>
   </div>
 
-  <div class="preview">
-    <div class="preview-top">
-      <div class="name">Просмотр</div>
-      <div class="hint">Живое превью справа, как в редакторе башни</div>
-    </div>
-    <div class="preview-badge">Live Preview</div>
-    <div class="preview-stage">
-      <iframe id="previewFrame"></iframe>
-    </div>
-  </div>
-</div>
+  <div id="gameRoot" style="display:none"></div>
 
-<div class="modal-overlay" id="qModal">
-  <div class="modal">
-    <div class="modal-hdr">
-      <span id="modalTitle">Редактирование вопроса</span>
-      <button class="btn-outline" style="border:none; padding:5px;" onclick="closeModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-col" style="border-right:1px solid var(--border); padding-right:20px;">
-        <div class="field">
-          <label>Текст вопроса</label>
-          <textarea id="modQText" rows="3"></textarea>
-        </div>
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div class="h" id="modalTitle">Добавить вопрос</div>
+        <button class="btn small danger" id="btnCloseModal" type="button">Закрыть</button>
+      </div>
+      <div class="modal-body">
+        <label>Текст вопроса</label>
+        <textarea id="inpPrompt" placeholder="Введите вопрос..."></textarea>
 
-        <div class="field">
-          <label>URL картинки (необязательно)</label>
-          <input type="text" id="modQImg" placeholder="https://...">
-        </div>
-
-        <div class="field">
-          <label>Тип ответа</label>
-          <select id="modQType" onchange="toggleQType()">
-            <option value="choice">Выбор вариантов</option>
-            <option value="input">Ввод текста</option>
-          </select>
-        </div>
-
-        <div id="modChoiceArea">
-          <label style="font-size:13px; color:#a9b6e6; display:block; margin-bottom:10px;">Варианты (можно отметить несколько правильных)</label>
-          <div id="modOpts"></div>
-          <button class="btn-outline" style="width:100%; border-style:dashed;" type="button" onclick="addModalOpt()">+ Добавить вариант</button>
-        </div>
-
-        <div id="modInputArea" style="display:none;">
-          <label style="font-size:13px; color:#a9b6e6; display:block; margin-bottom:10px;">Правильные ответы</label>
-          <div id="modInputAnswers"></div>
-          <button class="btn-outline" style="width:100%; border-style:dashed;" type="button" onclick="addModalInputAnswer()">+ Добавить правильный ответ</button>
-          <div style="font-size:11px; color:var(--muted); margin-top:5px;">* Регистр букв и пробелы игнорируются при проверке.</div>
+        <div class="choiceBlock">
+          <div style="font-weight:900">Варианты ответа</div>
+          <div class="muted">Минимум 2 варианта. Отметь правильный вариант чекбоксом.</div>
+          <div id="choiceList"></div>
+          <button class="btn small" id="btnAddChoice" type="button" style="margin-top:10px">➕ Добавить вариант</button>
         </div>
       </div>
-
-      <div class="modal-col">
-        <div class="section-title" style="margin-bottom:10px;">Дизайн блока</div>
-        <div class="color-row">
-          <label>Фон плашки</label>
-          <input type="color" id="modBgColor" value="#ffffff">
-        </div>
-        <div class="color-row">
-          <label>Цвет текста</label>
-          <input type="color" id="modTextColor" value="#333333">
-        </div>
-        <div class="color-row">
-          <label>Обводка</label>
-          <input type="color" id="modBorderColor" value="#cccccc">
-        </div>
-        <div class="color-row">
-          <label>Шрифт текста</label>
-          <select id="modFont">
-            <option value="system-ui">Стандартный</option>
-            <option value="'Caveat', cursive">Caveat</option>
-            <option value="'Neucha', cursive">Neucha</option>
-            <option value="Arial">Arial</option>
-            <option value="Courier New">Courier New</option>
-          </select>
-        </div>
-        <div class="color-row">
-          <label>Размер текста</label>
-          <input type="number" id="modFontSize" value="22">
-        </div>
-
-        <div class="section-title" style="margin:20px 0 10px;">Дизайн кнопок / ввода</div>
-        <div class="color-row">
-          <label>Фон</label>
-          <input type="color" id="modBtnBg" value="#ff7e67">
-        </div>
-        <div class="color-row">
-          <label>Цвет текста</label>
-          <input type="color" id="modBtnText" value="#ffffff">
-        </div>
-        <div class="color-row">
-          <label>Шрифт</label>
-          <select id="modBtnFont">
-            <option value="system-ui">Стандартный</option>
-            <option value="'Caveat', cursive">Caveat</option>
-            <option value="'Neucha', cursive">Neucha</option>
-            <option value="Arial">Arial</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    <div class="modal-ftr">
-      <button class="btn-outline btn-danger" type="button" onclick="applyCurrentModalStyleToAll()">Применить дизайн из модалки ко всем</button>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn-outline" type="button" onclick="closeModal()">Отмена</button>
-        <button class="btn-primary" type="button" onclick="saveModal()">Сохранить вопрос</button>
+      <div class="modal-foot">
+        <button class="btn" id="btnPreviewDraft" type="button">👁 Показать в превью</button>
+        <button class="btn primary" id="btnSaveQ" type="button">💾 Сохранить</button>
       </div>
     </div>
   </div>
-</div>
+
+  <div class="toast" id="toast">Скопировано</div>
 
 <script>
-  const uid = () => Math.random().toString(36).slice(2, 8);
+(() => {
+  "use strict";
+  var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-=$";var n={compressToEncodedURIComponent:function(r){return n.compress(r,6,function(r){return o.charAt(r)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:r.replace(/ /g,"+"),n.decompress(r.length,32,function(n){return o.indexOf(r.charAt(n))})},compress:function(o,n,t){if(null==o)return"";var e,i,u,s={},c={},a="",p="",f="",l=2,d=3,h=2,v=[],m=0,g=0,w;for(u=0;u<o.length;u+=1)if(a=o.charAt(u),Object.prototype.hasOwnProperty.call(s,a)||(s[a]=d++,c[a]=!0),p=f+a,Object.prototype.hasOwnProperty.call(s,p))f=p;else{if(Object.prototype.hasOwnProperty.call(c,f)){if(256>f.charCodeAt(0)){for(e=0;h>e;e++)m=m<<1,g==n-1?(g=0,v.push(t(m)),m=0):g++;for(i=f.charCodeAt(0),e=0;8>e;e++)m=m<<1|1&i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i>>=1}else{for(i=1,e=0;h>e;e++)m=m<<1|i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i=0;for(i=f.charCodeAt(0),e=0;16>e;e++)m=m<<1|1&i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i>>=1}l--,0==l&&(l=Math.pow(2,h),h++),delete c[f]}else for(i=s[f],e=0;h>e;e++)m=m<<1|1&i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i>>=1;l--,0==l&&(l=Math.pow(2,h),h++),s[p]=d++,f=String(a)}if(""!==f){if(Object.prototype.hasOwnProperty.call(c,f)){if(256>f.charCodeAt(0)){for(e=0;h>e;e++)m=m<<1,g==n-1?(g=0,v.push(t(m)),m=0):g++;for(i=f.charCodeAt(0),e=0;8>e;e++)m=m<<1|1&i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i>>=1}else{for(i=1,e=0;h>e;e++)m=m<<1|i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i=0;for(i=f.charCodeAt(0),e=0;16>e;e++)m=m<<1|1&i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i>>=1}l--,0==l&&(l=Math.pow(2,h),h++),delete c[f]}else for(i=s[f],e=0;h>e;e++)m=m<<1|1&i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i>>=1;l--,0==l&&(l=Math.pow(2,h),h++)}for(i=2,e=0;h>e;e++)m=m<<1|1&i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i>>=1;for(;;)if(m<<=1,g==n-1){v.push(t(m));break}else g++;return v.join("")},decompress:function(o,n,t){var e,i,u,s,c,a,p,f=[],l=4,d=4,h=3,v="",m=[],g={val:t(0),position:n,index:1};for(e=0;3>e;e+=1)f[e]=e;for(u=0,c=Math.pow(2,2),a=1;a!=c;)s=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=t(g.index++)),u|=(s>0?1:0)*a,a<<=1;switch(u){case 0:for(u=0,c=Math.pow(2,8),a=1;a!=c;)s=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=t(g.index++)),u|=(s>0?1:0)*a,a<<=1;p=r(u);break;case 1:for(u=0,c=Math.pow(2,16),a=1;a!=c;)s=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=t(g.index++)),u|=(s>0?1:0)*a,a<<=1;p=r(u);break;case 2:return""}for(f[3]=p,i=p,m.push(p);;){if(g.index>o)return"";for(u=0,c=Math.pow(2,h),a=1;a!=c;)s=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=t(g.index++)),u|=(s>0?1:0)*a,a<<=1;switch(p=u){case 0:for(u=0,c=Math.pow(2,8),a=1;a!=c;)s=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=t(g.index++)),u|=(s>0?1:0)*a,a<<=1;f[d++]=r(u),p=d-1,l--;break;case 1:for(u=0,c=Math.pow(2,16),a=1;a!=c;)s=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=t(g.index++)),u|=(s>0?1:0)*a,a<<=1;f[d++]=r(u),p=d-1,l--;break;case 2:return m.join("")}if(0==l&&(l=Math.pow(2,h),h++),f[p])v=f[p];else{if(p!==d)return null;v=i+i.charAt(0)}m.push(v),f[d++]=i+v.charAt(0),l--,i=v,0==l&&(l=Math.pow(2,h),h++)}}};return n}();
+
   const $ = id => document.getElementById(id);
-  const SAVE_KEY = 'pinata_pro_save_v6';
+  const uid = () => Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4);
+  const toastEl = $("toast");
+  function toast(msg){ toastEl.textContent = msg; toastEl.classList.add("show"); clearTimeout(window.__toastTid); window.__toastTid = setTimeout(()=>toastEl.classList.remove("show"), 1600); }
+  function deepClone(x){ return JSON.parse(JSON.stringify(x)); }
+  function escapeHtml(s){ return String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
+  function selfPageUrl(){ return location.origin + location.pathname; }
+  async function copyToClipboard(text){ try{ await navigator.clipboard.writeText(text); return true; }catch(e){ try{ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); const ok=document.execCommand('copy'); ta.remove(); return ok; }catch(_){ return false; } } }
 
-  const DEFAULT_STYLE = {
-    bg: '#ffffff',
-    text: '#333333',
-    border: '#cccccc',
-    font: 'system-ui',
-    size: 22,
-    btnBg: '#ff7e67',
-    btnText: '#ffffff',
-    btnFont: 'system-ui'
-  };
+  function normalizeQuestion(q){
+    const options = Array.isArray(q?.options) ? q.options.map(x=>String(x||"")) : ["",""];
+    let correctIndex = Number(q?.correctIndex);
+    if(!Number.isFinite(correctIndex) || correctIndex < 0 || correctIndex >= options.length) correctIndex = 0;
+    return { id: q?.id || uid(), prompt: String(q?.prompt || ""), options, correctIndex };
+  }
 
-  function normalizeEditor(data) {
-    const safe = data && typeof data === 'object' ? data : {};
-    const qs = Array.isArray(safe.questions) ? safe.questions : [];
-
+  function normalizeCfg(raw){
+    const cfg = raw && typeof raw === 'object' ? raw : {};
+    const images = Array.isArray(cfg.images) ? cfg.images.map(x=>String(x||"").trim()).filter(Boolean) : ["1.png","2.png","112.png","3.png","4.png","5.png"];
     return {
-      title: safe.title || 'Праздничная Пиньята',
-      useLatex: !!safe.useLatex,
-      instText: safe.instText || 'Ответь на 5 вопросов правильно, чтобы разбить пиньяту и получить сюрприз!',
-      winText: safe.winText || 'Молодец!',
-      questions: qs.map(q => {
-        const type = q?.type === 'input' ? 'input' : 'choice';
-        const options = Array.isArray(q?.options) ? q.options.map(String) : [];
-        const correctIndices = Array.isArray(q?.correctIndices)
-          ? q.correctIndices.filter(Number.isFinite)
-          : (typeof q?.correctIdx === 'number' ? [q.correctIdx] : [0]);
-        const inputAnswers = Array.isArray(q?.inputAnswers)
-          ? q.inputAnswers.map(String).filter(v => v.trim())
-          : (q?.inputText ? [String(q.inputText)] : []);
-
-        return {
-          id: q?.id || uid(),
-          q: q?.q || '',
-          img: q?.img || '',
-          type,
-          options,
-          correctIndices,
-          inputAnswers,
-          style: { ...DEFAULT_STYLE, ...(q?.style || {}) }
-        };
-      })
+      title: String(cfg.title || "Пиньята знаний"),
+      bgDataUrl: String(cfg.bgDataUrl || ""),
+      startImage: String(cfg.startImage || images[0] || "1.png"),
+      images,
+      winText: String(cfg.winText || "Молодец!"),
+      instruction: { text: cfg.instruction?.text !== undefined ? String(cfg.instruction.text) : "Ответь на вопрос правильно, а потом ударь по пиньяте." },
+      questions: (Array.isArray(cfg.questions) ? cfg.questions : []).map(normalizeQuestion)
     };
   }
 
-  let Editor = normalizeEditor({
-    questions: [
-      {
-        id: uid(),
-        q: 'Сколько будет 2 + 2?',
-        img: '',
-        type: 'choice',
-        options: ['3', '4', '5'],
-        correctIndices: [1],
-        inputAnswers: [],
-        style: { ...DEFAULT_STYLE }
-      }
-    ]
-  });
+  const DEFAULT_CFG = normalizeCfg({});
+  const Editor = deepClone(DEFAULT_CFG);
+  Editor.draft = null;
+  Editor.editingId = null;
 
-  function selfPageUrl() {
-    return window.location.origin + window.location.pathname;
-  }
+  function packPayload(cfg){ return cfg; }
+  function unpackPayload(cfg){ return normalizeCfg(cfg); }
+  function encodeGameData(payload){ return "~" + LZString.compressToEncodedURIComponent(JSON.stringify(packPayload(payload))); }
+  function decodeGameData(str){ if(str.startsWith("~")){ return unpackPayload(JSON.parse(LZString.decompressFromEncodedURIComponent(str.slice(1)))); } throw new Error("bad payload"); }
+  function buildGameUrl(payload){ return selfPageUrl() + "?game=" + encodeURIComponent(encodeGameData(payload)); }
+  function buildIframeFromUrl(src){ return `<iframe src="${src}" style="width:100%;height:100%;border:0;border-radius:18px;overflow:hidden;background:transparent" allow="autoplay; fullscreen" allowfullscreen loading="lazy"></iframe>`; }
 
-  function encodeGameData(payload) {
-    return LZString.compressToEncodedURIComponent(JSON.stringify(payload));
-  }
+  function setCountPill(){ $("pillCount").textContent = String(Editor.questions.length); }
+  function qSummary(q){ const p = String(q.prompt||"").trim(); return { title: p.length > 52 ? p.slice(0,52)+"…" : p || "(пусто)", sub: `Вариантов: ${(q.options||[]).filter(Boolean).length}, верный: ${(q.correctIndex||0)+1}`}; }
 
-  function decodeGameData(data) {
-    const raw = LZString.decompressFromEncodedURIComponent(data);
-    if (!raw) throw new Error('decode failed');
-    return JSON.parse(raw);
-  }
+  window.delQ = id => { Editor.questions = Editor.questions.filter(x=>x.id!==id); renderList(); updatePreview(false); toast("Удалено"); };
+  window.editQ = idx => openModal(Editor.questions[idx]);
+  window.previewQ = idx => { Editor.draft = deepClone(Editor.questions[idx]); updatePreview(true); toast("Черновик показан"); };
+  window.copyQ = idx => { const q = deepClone(Editor.questions[idx]); q.id = uid(); Editor.questions.splice(idx+1,0,q); renderList(); updatePreview(false); toast("Вопрос скопирован"); };
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const gameParam = urlParams.get('game');
-  const cfgKeyParam = urlParams.get('cfgkey');
-
-  if (gameParam) {
-    document.body.innerHTML = '';
-    try {
-      const cfg = normalizeEditor(decodeGameData(gameParam));
-      document.write(buildGameHTML(cfg, true));
-      document.close();
-    } catch (e) {
-      document.body.innerHTML = '<h2 style="color:red;text-align:center;margin-top:50px;">Ошибка чтения game-параметра</h2>';
-    }
-  } else if (cfgKeyParam) {
-    document.body.innerHTML = '';
-    try {
-      const rawStr = localStorage.getItem(cfgKeyParam) || sessionStorage.getItem(cfgKeyParam);
-      if (!rawStr) throw new Error('cfg not found');
-      document.write(buildGameHTML(normalizeEditor(JSON.parse(rawStr)), true));
-      document.close();
-    } catch (e) {
-      document.body.innerHTML = '<h2 style="color:red;text-align:center;margin-top:50px;">Ошибка загрузки игры</h2>';
-    }
-  } else {
-    initEditor();
-  }
-
-  function initEditor() {
-    try {
-      const saved = localStorage.getItem(SAVE_KEY);
-      if (saved) Editor = normalizeEditor(JSON.parse(saved));
-    } catch (e) {}
-
-    $('inpTitle').value = Editor.title;
-    $('inpInst').value = Editor.instText;
-    $('inpWin').value = Editor.winText;
-    $('chkLatex').checked = !!Editor.useLatex;
-
-    bindUI();
-    renderQList();
-    saveAll();
-  }
-
-  function resetAll() {
-    if (!confirm('Сбросить все настройки редактора?')) return;
-    localStorage.removeItem(SAVE_KEY);
-    Editor = normalizeEditor({
-      questions: [{
-        id: uid(),
-        q: 'Сколько будет 2 + 2?',
-        img: '',
-        type: 'choice',
-        options: ['3', '4', '5'],
-        correctIndices: [1],
-        inputAnswers: [],
-        style: { ...DEFAULT_STYLE }
-      }]
-    });
-    $('inpTitle').value = Editor.title;
-    $('inpInst').value = Editor.instText;
-    $('inpWin').value = Editor.winText;
-    $('chkLatex').checked = !!Editor.useLatex;
-    renderQList();
-    saveAll();
-  }
-
-  function bindUI() {
-    const addBtn = $('btnAddQ');
-    if (addBtn && !addBtn.dataset.bound) {
-      addBtn.dataset.bound = '1';
-      addBtn.addEventListener('click', () => openModal(null));
-    }
-
-    const qList = $('qList');
-    if (qList && !qList.dataset.bound) {
-      qList.dataset.bound = '1';
-      qList.addEventListener('click', (e) => {
-        const editBtn = e.target.closest('[data-edit-id]');
-        if (editBtn) {
-          openModal(editBtn.dataset.editId);
-          return;
-        }
-
-        const delBtn = e.target.closest('[data-del-id]');
-        if (delBtn) {
-          delQ(delBtn.dataset.delId);
-          return;
-        }
-
-        const openArea = e.target.closest('[data-open-id]');
-        if (openArea) {
-          openModal(openArea.dataset.openId);
-        }
-      });
-    }
-  }
-
-  function questionTypeLabel(q) {
-    if (q.type === 'input') return 'Ввод';
-    return (q.correctIndices || []).length > 1 ? 'Множественный выбор' : 'Выбор';
-  }
-
-  function renderQList() {
-    const list = $('qList');
-    list.innerHTML = '';
-
-    Editor.questions.forEach((q, i) => {
-      const item = document.createElement('div');
-      item.className = 'q-item';
-      item.innerHTML = `
-        <div style="min-width:0; flex:1;" class="q-open-area" data-open-id="${q.id}">
-          <div class="q-item-title">${i + 1}. ${escapeHtml(q.q || 'Пустой вопрос')}</div>
-          <div class="q-item-sub">${questionTypeLabel(q)}</div>
+  function renderList(){
+    const list = $("qList"); list.innerHTML = ""; setCountPill();
+    if(Editor.questions.length === 0){ list.innerHTML = '<div class="muted">Пока нет вопросов. Нажми «Добавить» и заполни викторину.</div>'; return; }
+    list.innerHTML = Editor.questions.map((q,i)=>{ const s=qSummary(q); return `
+      <div class="q-item">
+        <div class="meta"><div class="t"><b>#${i+1}</b> ${escapeHtml(s.title)}</div><div class="s">${escapeHtml(s.sub)}</div></div>
+        <div style="display:flex;gap:4px">
+          <button class="btn small" onclick="previewQ(${i})" type="button">👁</button>
+          <button class="btn small" onclick="copyQ(${i})" type="button">📋</button>
+          <button class="btn small" onclick="editQ(${i})" type="button">✏️</button>
+          <button class="btn small danger" onclick="delQ('${q.id}')" type="button">🗑</button>
         </div>
-        <div class="q-item-actions">
-          <button class="btn-outline js-edit-q" type="button" data-edit-id="${q.id}">✏️</button>
-          <button class="btn-outline btn-danger js-del-q" type="button" data-del-id="${q.id}">🗑</button>
-        </div>
-      `;
-      list.appendChild(item);
+      </div>`; }).join('');
+  }
+
+  function showModal(){ $("modalBackdrop").style.display = 'block'; $("modalBackdrop").setAttribute('aria-hidden','false'); }
+  function hideModal(){ $("modalBackdrop").style.display = 'none'; $("modalBackdrop").setAttribute('aria-hidden','true'); }
+  function syncChoiceUI(){ const q = Editor.draft; const list=$("choiceList"); list.innerHTML=''; (q.options||[]).forEach((opt,i)=>{ const row=document.createElement('div'); row.className='answerRow'; row.innerHTML=`<input class="checkbox" type="checkbox" ${q.correctIndex===i?'checked':''} /><input type="text" value="${escapeHtml(opt)}" placeholder="Вариант ${i+1}" /><button class="btn small danger" type="button">✖</button>`; const chk=row.children[0], inp=row.children[1], del=row.children[2]; chk.addEventListener('change',()=>{ if(chk.checked){ q.correctIndex=i; syncChoiceUI(); } else { chk.checked=true; } }); inp.addEventListener('input',()=>{ q.options[i]=inp.value; }); del.addEventListener('click',()=>{ if(q.options.length<=2){ toast('Нужно минимум 2 варианта'); return; } q.options.splice(i,1); if(q.correctIndex >= q.options.length) q.correctIndex = q.options.length-1; syncChoiceUI(); }); list.appendChild(row); }); }
+  function openModal(existing=null){ Editor.editingId = existing?.id || null; Editor.draft = normalizeQuestion(existing || { options:['',''], correctIndex:0 }); $("modalTitle").textContent = existing ? 'Редактировать вопрос' : 'Добавить вопрос'; $("inpPrompt").value = Editor.draft.prompt || ''; syncChoiceUI(); showModal(); setTimeout(()=>$("inpPrompt").focus(),40); }
+  function getDraftFromModal(){ const q = Editor.draft; q.prompt = $("inpPrompt").value || ''; return q; }
+  function validateQuestion(q){ if(!(q.prompt||'').trim()) return 'Введите текст вопроса'; const opts=(q.options||[]).map(x=>String(x||'').trim()).filter(Boolean); if(opts.length < 2) return 'Нужно минимум 2 варианта ответа'; q.options = opts; if(q.correctIndex >= opts.length) q.correctIndex = 0; return ''; }
+
+  function readFormIntoEditor(){
+    Editor.title = $("inpTitle").value.trim() || DEFAULT_CFG.title;
+    Editor.bgDataUrl = $("inpBgUrl").value.trim();
+    Editor.images = $("inpImages").value.split(',').map(x=>x.trim()).filter(Boolean);
+    if(Editor.images.length < 2) Editor.images = deepClone(DEFAULT_CFG.images);
+    Editor.startImage = $("inpStartImage").value.trim() || Editor.images[0];
+    Editor.winText = $("inpWinText").value.trim() || DEFAULT_CFG.winText;
+    Editor.instruction.text = $("inpInstruction").value;
+  }
+  function fillFormFromEditor(){
+    $("inpTitle").value = Editor.title; $("inpBgUrl").value = Editor.bgDataUrl; $("inpImages").value = Editor.images.join(', '); $("inpStartImage").value = Editor.startImage; $("inpWinText").value = Editor.winText; $("inpInstruction").value = Editor.instruction.text;
+  }
+  function buildPayload(previewWithDraft){ readFormIntoEditor(); let questions = Editor.questions.map(normalizeQuestion); if(previewWithDraft && Editor.draft){ const d=normalizeQuestion(Editor.draft); if(questions.length===0) questions=[d]; else questions[0]=d; } return normalizeCfg({ title:Editor.title, bgDataUrl:Editor.bgDataUrl, startImage:Editor.startImage, images:Editor.images, winText:Editor.winText, instruction:Editor.instruction, questions }); }
+  function checkLinkSize(data){ const maxLen=3500, curLen=data.length, pct=Math.min(100,(curLen/maxLen)*100); const bar=$("barSize"), lbl=$("lblSizeText"), warn=$("sizeWarning"); bar.style.width=pct+'%'; if(curLen < maxLen*.75){ bar.style.background='var(--ok)'; lbl.textContent='🟢 Код в норме'; lbl.style.color='var(--ok)'; warn.style.display='none'; } else if(curLen <= maxLen){ bar.style.background='var(--neon)'; lbl.textContent='🟡 Код почти достиг лимита'; lbl.style.color='var(--neon)'; warn.style.display='none'; } else { bar.style.background='var(--danger)'; lbl.textContent='🔴 ПРЕВЫШЕН ЛИМИТ'; lbl.style.color='var(--danger)'; warn.style.display='block'; } }
+  function updatePreview(previewWithDraft){ const payload=buildPayload(previewWithDraft); const data=encodeGameData(payload); checkLinkSize(data); const src=selfPageUrl()+`?preview=1${previewWithDraft?'&autostart=1':''}&game=`+encodeURIComponent(data); $("livePreview").src = src; }
+  let _previewTid=null; function debouncedPreview(){ clearTimeout(_previewTid); _previewTid=setTimeout(()=>updatePreview(false),300); }
+
+  function initEditor(){
+    fillFormFromEditor();
+    ["inpTitle","inpBgUrl","inpImages","inpStartImage","inpWinText","inpInstruction"].forEach(id=>$(id).addEventListener('input',debouncedPreview));
+    $("btnResetBg").addEventListener('click',()=>{ $("inpBgUrl").value=''; debouncedPreview(); });
+    $("btnAddQ").addEventListener('click',()=>openModal(null));
+    $("btnClearQs").addEventListener('click',()=>{ Editor.questions=[]; renderList(); updatePreview(false); toast('Очищено'); });
+    $("btnCloseModal").addEventListener('click',()=>{ Editor.draft=null; Editor.editingId=null; hideModal(); });
+    $("modalBackdrop").addEventListener('click',e=>{ if(e.target === $("modalBackdrop")){ Editor.draft=null; Editor.editingId=null; hideModal(); } });
+    $("btnAddChoice").addEventListener('click',()=>{ Editor.draft.options.push(''); syncChoiceUI(); });
+    $("inpPrompt").addEventListener('input',()=>{ if(Editor.draft) Editor.draft.prompt = $("inpPrompt").value; });
+    $("btnPreviewDraft").addEventListener('click',()=>{ getDraftFromModal(); updatePreview(true); toast('Черновик показан'); });
+    $("btnSaveQ").addEventListener('click',()=>{
+      const q=getDraftFromModal(); const err=validateQuestion(q); if(err){ toast(err); return; }
+      if(Editor.editingId){ const idx=Editor.questions.findIndex(x=>x.id===Editor.editingId); if(idx>=0) Editor.questions[idx]=deepClone(q); }
+      else Editor.questions.push(deepClone(q));
+      Editor.draft=null; Editor.editingId=null; hideModal(); renderList(); updatePreview(false); toast('Сохранено');
+    });
+    $("btnCopyCode").addEventListener('click', async()=>{ const payload=buildPayload(false); const iframeCode=buildIframeFromUrl(buildGameUrl(payload)); const ok=await copyToClipboard(iframeCode); toast(ok ? 'Скопировано ✅' : 'Не удалось скопировать'); });
+    $("btnResetAll").addEventListener('click',()=>{ Object.assign(Editor, deepClone(DEFAULT_CFG)); Editor.questions=[]; Editor.draft=null; Editor.editingId=null; fillFormFromEditor(); renderList(); updatePreview(false); toast('Сброшено'); });
+    renderList(); updatePreview(false);
+  }
+
+  function runGame(cfg, mount){
+    mount.innerHTML = `
+      <style>
+        html,body{height:100%;margin:0;overflow:hidden;font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;background:#333}
+        #game-container{position:relative;width:100vw;height:100vh;background-size:cover;background-position:center;background-repeat:no-repeat;overflow:hidden}
+        #start-screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center, rgba(0,0,0,.25), rgba(0,0,0,.65));z-index:120}
+        #start-card{width:min(720px, calc(100% - 24px));background:rgba(20,22,30,.82);border:1px solid rgba(255,255,255,.12);border-radius:24px;box-shadow:0 18px 60px rgba(0,0,0,.38);padding:22px;text-align:center;color:#fff}
+        #start-card h1{margin:0 0 8px;font-size:30px} #start-card p{font-size:18px;line-height:1.45;opacity:.95;white-space:pre-line}
+        #start-btn{padding:12px 18px;border-radius:14px;border:1px solid rgba(255,174,0,.55);background:linear-gradient(90deg, rgba(255,174,0,.34), rgba(255,136,0,.25));color:#fff;font-weight:900;cursor:pointer}
+        #quiz-panel{position:absolute;left:5%;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.95);padding:25px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.3);width:320px;text-align:center;z-index:50}
+        #question-text{font-size:22px;font-weight:bold;margin-bottom:20px;color:#333}
+        .option-btn{display:block;width:100%;margin:10px 0;padding:12px;font-size:18px;font-weight:bold;border:none;border-radius:10px;background:#ff7e67;color:white;cursor:pointer;transition:.2s;box-shadow:0 4px 6px rgba(0,0,0,.1)}
+        .option-btn:hover{background:#ff5a3d;transform:translateY(-2px)} .option-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;box-shadow:none}
+        #feedback-text{margin-top:15px;font-size:18px;font-weight:bold;min-height:24px} .text-wrong{color:#d9381e}.text-correct{color:#28a745}
+        #win-message{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;font-weight:bold;color:#ffca3a;text-shadow:4px 4px 0 #ff595e,8px 8px 15px rgba(0,0,0,.5);display:none;z-index:100;text-transform:uppercase;text-align:center;padding:0 20px}
+        #piniata-wrapper{position:absolute;width:min(310px, 32vw);left:68.35%;top:54.59%;transform:translate(-50%,-50%);z-index:10}
+        .piniata-image{width:100%;height:auto;display:block;transform-origin:50% 0%;cursor:pointer;filter:drop-shadow(0 10px 15px rgba(0,0,0,.3))}
+        .swing{animation:swingAnim 4s ease-in-out infinite} @keyframes swingAnim{0%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}100%{transform:rotate(-6deg)}}
+        .hit-anim{animation:hitAnim .2s ease-out} @keyframes hitAnim{0%{transform:scale(1) rotate(0deg)}50%{transform:scale(.9) rotate(15deg) translateY(-10px)}100%{transform:scale(1) rotate(0deg)}}
+        .confetti{position:absolute;top:-20px;z-index:90;animation:fall linear forwards} @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+        @media (max-width:980px){#quiz-panel{left:50%;top:auto;bottom:16px;transform:translateX(-50%);width:min(92vw,420px)}#piniata-wrapper{left:50%;top:32%;width:min(260px,48vw)}#win-message{font-size:50px}}
+      </style>
+      <div id="game-container">
+        <div id="start-screen"><div id="start-card"><h1></h1><p></p><button id="start-btn">▶ Начать</button></div></div>
+        <div id="quiz-panel" style="display:none"><div id="question-text">Вопрос загружается...</div><div id="options-container"></div><div id="feedback-text"></div></div>
+        <div id="win-message"></div>
+        <div id="piniata-wrapper"><img class="piniata-image swing" id="piniata-img" src="" alt="Пиньята"></div>
+      </div>`;
+
+    const gameContainer = mount.querySelector('#game-container');
+    const startScreen = mount.querySelector('#start-screen');
+    const startTitle = mount.querySelector('#start-card h1');
+    const startText = mount.querySelector('#start-card p');
+    const startBtn = mount.querySelector('#start-btn');
+    const quizPanel = mount.querySelector('#quiz-panel');
+    const questionText = mount.querySelector('#question-text');
+    const optionsContainer = mount.querySelector('#options-container');
+    const feedbackText = mount.querySelector('#feedback-text');
+    const winMessage = mount.querySelector('#win-message');
+    const piniataImg = mount.querySelector('#piniata-img');
+
+    const questions = (cfg.questions || []).map(q => ({ q:q.prompt, options:q.options, correct:q.correctIndex }));
+    const images = (cfg.images && cfg.images.length >= 2) ? cfg.images : [cfg.startImage || '1.png','2.png','112.png','3.png','4.png','5.png'];
+    let currentStage = 0, canHit = false, audioCtx = null;
+
+    gameContainer.style.backgroundImage = cfg.bgDataUrl ? `url('${cfg.bgDataUrl.replaceAll("'","%27")}')` : "url('bg (2).png')";
+    startTitle.textContent = cfg.title || 'Пиньята знаний';
+    startText.textContent = cfg.instruction?.text || 'Ответь на вопрос правильно, а потом ударь по пиньяте.';
+    winMessage.textContent = cfg.winText || 'Молодец!';
+    piniataImg.src = cfg.startImage || images[0] || '1.png';
+
+    function playHitSound(){
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if(audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+      osc.type='square'; osc.frequency.setValueAtTime(120, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.6, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+      osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+    }
+
+    function launchConfetti(){
+      const colors=['#ff595e','#ffca3a','#8ac926','#1982c4','#6a4c93','#ff924c'];
+      for(let i=0;i<120;i++){
+        const piece=document.createElement('div'); piece.className='confetti';
+        const size = 8 + Math.random()*10; piece.style.width=size+'px'; piece.style.height=(size*1.5)+'px'; piece.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];
+        piece.style.left=Math.random()*100+'vw'; piece.style.animationDuration=(Math.random()*3+2)+'s'; piece.style.animationDelay=(Math.random()*1.5)+'s';
+        mount.appendChild(piece);
+      }
+    }
+
+    function loadQuestion(){
+      if(currentStage >= questions.length) return;
+      const currentQ = questions[currentStage];
+      questionText.innerText = currentQ.q; optionsContainer.innerHTML=''; feedbackText.innerText=''; feedbackText.className=''; canHit=false;
+      currentQ.options.forEach((opt,index)=>{ const btn=document.createElement('button'); btn.className='option-btn'; btn.innerText=opt; btn.onclick=()=>checkAnswer(index,currentQ.correct,btn); optionsContainer.appendChild(btn); });
+    }
+
+    function checkAnswer(selectedIndex, correctIndex, btnElement){
+      if(canHit) return;
+      if(selectedIndex === correctIndex){
+        feedbackText.innerText = 'Правильно! Ударь пиньяту!'; feedbackText.className='text-correct'; canHit=true;
+        optionsContainer.querySelectorAll('.option-btn').forEach(b=>b.disabled=true); if(btnElement) btnElement.style.background='#28a745';
+      } else {
+        feedbackText.innerText = 'Промахнулся! Попробуй еще раз.'; feedbackText.className='text-wrong'; if(btnElement){ btnElement.style.transform='translateX(-5px)'; setTimeout(()=>btnElement.style.transform='translateX(5px)',50); setTimeout(()=>btnElement.style.transform='translateX(0)',100); }
+      }
+    }
+
+    piniataImg.addEventListener('click',()=>{
+      if(startScreen.style.display !== 'none') return;
+      if(!canHit){ if(feedbackText.innerText === ''){ feedbackText.innerText='Сначала ответь на вопрос!'; feedbackText.className='text-wrong'; } return; }
+      playHitSound(); piniataImg.classList.remove('swing'); piniataImg.classList.add('hit-anim');
+      setTimeout(()=>{ piniataImg.classList.remove('hit-anim'); if(currentStage < images.length - 1) piniataImg.classList.add('swing'); },200);
+      currentStage++; piniataImg.src = images[currentStage] || images[images.length-1];
+      if(currentStage === images.length - 1 || currentStage >= questions.length){ quizPanel.style.display='none'; winMessage.style.display='block'; launchConfetti(); }
+      else { setTimeout(loadQuestion,500); }
     });
 
-    $('qCount').innerText = `(${Editor.questions.length}/5)`;
-    $('btnAddQ').style.display = Editor.questions.length >= 5 ? 'none' : 'block';
-    updateTemplateSelect();
+    startBtn.addEventListener('click',()=>{ startScreen.style.display='none'; quizPanel.style.display='block'; loadQuestion(); });
+    if(new URLSearchParams(location.search).get('autostart') === '1'){ startBtn.click(); }
   }
 
-  function updateTemplateSelect() {
-    const sel = $('newQTemplate');
-    if (!sel) return;
-    const prev = sel.value;
-    sel.innerHTML = '<option value="-1">Стандартные (по умолчанию)</option>';
-    Editor.questions.forEach((q, i) => {
-      const title = (q.q || `Вопрос ${i + 1}`).slice(0, 42);
-      sel.innerHTML += `<option value="${i}">Как в #${i + 1}: ${escapeHtml(title)}</option>`;
-    });
-
-    if (prev !== null && sel.querySelector(`option[value="${prev}"]`)) sel.value = prev;
-    else sel.value = '-1';
+  function initGameMode(){
+    document.body.classList.add('gameOnly');
+    $("editorRoot").style.display = 'none';
+    const root=$("gameRoot"); root.style.display='block';
+    const params = new URLSearchParams(location.search);
+    const gameData = params.get('game');
+    if(!gameData){ root.innerHTML='<div style="padding:24px;color:white">Нет данных игры.</div>'; return; }
+    let cfg; try{ cfg = decodeGameData(decodeURIComponent(gameData)); }catch(e){ root.innerHTML='<div style="padding:24px;color:white">Не удалось прочитать конфиг.</div>'; return; }
+    runGame(cfg, root);
   }
 
-  let editingId = null;
-
-  function openModal(id) {
-    editingId = id;
-    $('modOpts').innerHTML = '';
-    $('modInputAnswers').innerHTML = '';
-
-    let q;
-    if (id) {
-      q = Editor.questions.find(x => x.id === id);
-      $('modalTitle').innerText = 'Редактирование вопроса';
-    } else {
-      const tplIdx = parseInt($('newQTemplate')?.value || '-1', 10);
-      const templateQ = tplIdx >= 0 && Editor.questions[tplIdx] ? Editor.questions[tplIdx] : null;
-
-      q = {
-        q: '',
-        img: '',
-        type: templateQ?.type || 'choice',
-        options: ['', ''],
-        correctIndices: [0],
-        inputAnswers: [''],
-        style: templateQ?.style ? { ...templateQ.style } : { ...DEFAULT_STYLE }
-      };
-      $('modalTitle').innerText = 'Новый вопрос';
-    }
-
-    $('modQText').value = q.q || '';
-    $('modQImg').value = q.img || '';
-    $('modQType').value = q.type || 'choice';
-
-    if (q.type === 'choice') {
-      const corrects = Array.isArray(q.correctIndices) ? q.correctIndices : [0];
-      (q.options || []).forEach((opt, idx) => addModalOpt(opt, corrects.includes(idx)));
-      if (!(q.options || []).length) {
-        addModalOpt('', true);
-        addModalOpt('', false);
-      }
-    } else {
-      const answers = Array.isArray(q.inputAnswers) ? q.inputAnswers : [''];
-      if (answers.length) answers.forEach(a => addModalInputAnswer(a));
-      else addModalInputAnswer('');
-    }
-
-    const st = q.style || {};
-    $('modBgColor').value = st.bg || DEFAULT_STYLE.bg;
-    $('modTextColor').value = st.text || DEFAULT_STYLE.text;
-    $('modBorderColor').value = st.border || DEFAULT_STYLE.border;
-    $('modFont').value = st.font || DEFAULT_STYLE.font;
-    $('modFontSize').value = st.size || DEFAULT_STYLE.size;
-    $('modBtnBg').value = st.btnBg || DEFAULT_STYLE.btnBg;
-    $('modBtnText').value = st.btnText || DEFAULT_STYLE.btnText;
-    $('modBtnFont').value = st.btnFont || DEFAULT_STYLE.btnFont;
-
-    toggleQType();
-    $('qModal').classList.add('active');
-  }
-
-  function closeModal() {
-    $('qModal').classList.remove('active');
-  }
-
-  function toggleQType() {
-    const isChoice = $('modQType').value === 'choice';
-    $('modChoiceArea').style.display = isChoice ? 'block' : 'none';
-    $('modInputArea').style.display = isChoice ? 'none' : 'block';
-  }
-
-  function addModalOpt(val = '', isCorrect = false) {
-    const div = document.createElement('div');
-    div.className = 'opt-row';
-    div.innerHTML = `
-      <input type="checkbox" class="modOptCorrect" ${isCorrect ? 'checked' : ''}>
-      <input type="text" class="modOptVal" value="${escapeAttr(val)}" placeholder="Текст варианта">
-      <button class="btn-outline btn-danger" type="button" onclick="this.parentElement.remove()">✕</button>
-    `;
-    $('modOpts').appendChild(div);
-  }
-
-  function addModalInputAnswer(val = '') {
-    const row = document.createElement('div');
-    row.className = 'opt-row';
-    row.innerHTML = `
-      <input type="text" class="modInputAnswerVal" value="${escapeAttr(val)}" placeholder="Правильный ответ">
-      <button class="btn-outline btn-danger" type="button" onclick="this.parentElement.remove()">✕</button>
-    `;
-    $('modInputAnswers').appendChild(row);
-  }
-
-  function saveModal() {
-    const qText = $('modQText').value.trim();
-    if (!qText) return alert('Введите вопрос!');
-
-    const type = $('modQType').value;
-    let options = [];
-    let correctIndices = [];
-    let inputAnswers = [];
-
-    if (type === 'choice') {
-      const rows = Array.from(document.querySelectorAll('#modOpts .opt-row'));
-      if (rows.length < 2) return alert('Нужно минимум 2 варианта!');
-
-      rows.forEach((row, idx) => {
-        const val = row.querySelector('.modOptVal').value.trim();
-        if (val) {
-          const newIndex = options.length;
-          options.push(val);
-          if (row.querySelector('.modOptCorrect').checked) correctIndices.push(newIndex);
-        }
-      });
-
-      if (options.length < 2) return alert('Нужно минимум 2 непустых варианта!');
-      if (correctIndices.length < 1) return alert('Отметьте хотя бы один правильный вариант!');
-    } else {
-      const rows = Array.from(document.querySelectorAll('#modInputAnswers .opt-row'));
-      rows.forEach(row => {
-        const val = row.querySelector('.modInputAnswerVal').value.trim();
-        if (val) inputAnswers.push(val);
-      });
-      if (!inputAnswers.length) return alert('Введите хотя бы один правильный ответ!');
-    }
-
-    const newQ = {
-      id: editingId || uid(),
-      q: qText,
-      img: $('modQImg').value.trim(),
-      type,
-      options,
-      correctIndices,
-      inputAnswers,
-      style: {
-        bg: $('modBgColor').value,
-        text: $('modTextColor').value,
-        border: $('modBorderColor').value,
-        font: $('modFont').value,
-        size: Number($('modFontSize').value) || 22,
-        btnBg: $('modBtnBg').value,
-        btnText: $('modBtnText').value,
-        btnFont: $('modBtnFont').value
-      }
-    };
-
-    if (editingId) {
-      const idx = Editor.questions.findIndex(x => x.id === editingId);
-      if (idx >= 0) Editor.questions[idx] = newQ;
-    } else {
-      if (Editor.questions.length >= 5) return alert('Максимум 5 вопросов!');
-      Editor.questions.push(newQ);
-    }
-
-    closeModal();
-    renderQList();
-    saveAll();
-  }
-
-  function applyCurrentModalStyleToAll() {
-    if (!Editor.questions.length) return;
-    if (!confirm('Применить текущий дизайн из модалки ко всем вопросам?')) return;
-
-    const style = {
-      bg: $('modBgColor').value,
-      text: $('modTextColor').value,
-      border: $('modBorderColor').value,
-      font: $('modFont').value,
-      size: Number($('modFontSize').value) || 22,
-      btnBg: $('modBtnBg').value,
-      btnText: $('modBtnText').value,
-      btnFont: $('modBtnFont').value
-    };
-
-    Editor.questions.forEach(q => {
-      q.style = { ...style };
-    });
-
-    saveAll();
-    alert('Дизайн скопирован на все вопросы');
-  }
-
-  function applyTemplateToAll() {
-    if (!Editor.questions.length) return;
-
-    const tplIdx = parseInt($('newQTemplate')?.value || '-1', 10);
-    const tpl = tplIdx >= 0 && Editor.questions[tplIdx] ? Editor.questions[tplIdx] : null;
-
-    const baseType = tpl?.type || 'choice';
-    const baseStyle = tpl?.style ? { ...tpl.style } : { ...DEFAULT_STYLE };
-
-    if (!confirm('Применить тип вопроса и оформление ко всем вопросам?')) return;
-
-    Editor.questions.forEach(q => {
-      q.style = { ...baseStyle };
-
-      if (q.type !== baseType) {
-        q.type = baseType;
-
-        if (baseType === 'choice') {
-          const ans = Array.isArray(q.inputAnswers) && q.inputAnswers.length ? q.inputAnswers[0] : 'Верный ответ';
-          q.options = [ans, 'Вариант 2'];
-          q.correctIndices = [0];
-          q.inputAnswers = [];
-        } else {
-          let ans = '';
-          if (Array.isArray(q.options) && q.options.length && Array.isArray(q.correctIndices) && q.correctIndices.length) {
-            ans = q.options[q.correctIndices[0]] || '';
-          }
-          q.inputAnswers = [ans || 'Ответ'];
-          q.options = [];
-          q.correctIndices = [];
-        }
-      }
-    });
-
-    renderQList();
-    saveAll();
-    alert('Настройки применены ко всем вопросам');
-  }
-
-  function delQ(id) {
-    Editor.questions = Editor.questions.filter(q => q.id !== id);
-    renderQList();
-    saveAll();
-  }
-
-  let debounceTimer;
-
-  function saveAll() {
-    Editor.title = $('inpTitle').value;
-    Editor.instText = $('inpInst').value;
-    Editor.winText = $('inpWin').value;
-    Editor.useLatex = $('chkLatex').checked;
-
-    $('uiTitleText').innerText = Editor.title || 'Пиньята';
-    localStorage.setItem(SAVE_KEY, JSON.stringify(Editor));
-
-    const payload = normalizeEditor(JSON.parse(JSON.stringify(Editor)));
-    const packed = encodeGameData(payload);
-    const warn = $('sizeWarn');
-
-    if (packed.length < 2500) {
-      $('outLink').value = selfPageUrl() + '?game=' + packed;
-      warn.style.display = 'none';
-    } else {
-      const k = 'pinata_run_' + uid();
-      localStorage.setItem(k, JSON.stringify(payload));
-      sessionStorage.setItem(k, JSON.stringify(payload));
-      $('outLink').value = selfPageUrl() + '?cfgkey=' + encodeURIComponent(k);
-      warn.style.display = 'block';
-    }
-
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      try {
-        const html = buildGameHTML(payload, false);
-        $('previewFrame').srcdoc = html;
-      } catch (err) {
-        $('previewFrame').srcdoc = `<html><body style="margin:0;padding:16px;background:#111;color:#fff;font-family:system-ui"><h3>Ошибка предпросмотра</h3><pre style="white-space:pre-wrap">${escapeHtml(String(err && (err.stack || err.message || err)))}</pre></body></html>`;
-        console.error('Preview build error:', err);
-      }
-    },
-
-  function copyIframe() {
-    const code = `<iframe src="${$('outLink').value}" width="100%" height="600" frameborder="0" allowfullscreen></iframe>`;
-    navigator.clipboard.writeText(code)
-      .then(() => alert('Код iframe скопирован!'))
-      .catch(() => alert('Не удалось скопировать код.'));
-  }
-
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-
-  function escapeAttr(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-  }
-
-  function buildGameHTML(cfg, isStandalone) {
-    const safeCfg = normalizeEditor(cfg);
-
-    let latexScripts = '';
-    if (safeCfg.useLatex) {
-      latexScripts = `
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"><\/script>
-      `;
-    }
-
-    return `<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${escapeHtml(safeCfg.title)}</title>
-  ${latexScripts}
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Neucha&display=swap');
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #333;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    #game-container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      background-image: url('bg (2).png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      overflow: hidden;
-    }
-
-    .game-logo {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      max-height: 80px;
-      max-width: 150px;
-      z-index: 100;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      object-fit: contain;
-    }
-
-    #startOverlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(8px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 99999;
-      text-align: center;
-      padding: 20px;
-    }
-
-    #startOverlay h1 {
-      color: #d6b14a;
-      font-family: 'Caveat', cursive;
-      font-size: clamp(2.5rem, 6vw, 4rem);
-      margin: 0 0 10px;
-      text-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    }
-
-    #startOverlay p {
-      color: #fff;
-      font-size: 1.2rem;
-      max-width: 560px;
-      line-height: 1.5;
-      margin-bottom: 30px;
-      white-space: pre-wrap;
-    }
-
-    #startOverlay button {
-      font-size: 1.2rem;
-      padding: 15px 40px;
-      border-radius: 30px;
-      cursor: pointer;
-      background: #d6b14a;
-      color: #000;
-      border: none;
-      font-weight: bold;
-      transition: 0.2s;
-      box-shadow: 0 4px 15px rgba(214,177,74,0.4);
-    }
-
-    #startOverlay button:hover { transform: scale(1.05); }
-
-    #piniata-wrapper {
-      position: absolute;
-      width: 310px;
-      left: 68.35%;
-      top: 54.59%;
-      transform: translate(-50%, -50%);
-      z-index: 10;
-      display: none;
-    }
-
-    .piniata-image {
-      width: 100%;
-      height: auto;
-      display: block;
-      transform-origin: 50% 0%;
-      cursor: pointer;
-      filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.3));
-    }
-
-    .swing { animation: swingAnim 4s ease-in-out infinite; }
-    @keyframes swingAnim {
-      0% { transform: rotate(-6deg); }
-      50% { transform: rotate(6deg); }
-      100% { transform: rotate(-6deg); }
-    }
-
-    .hit-anim { animation: hitAnim 0.2s ease-out; }
-    @keyframes hitAnim {
-      0% { transform: scale(1) rotate(0deg); }
-      50% { transform: scale(0.9) rotate(15deg) translateY(-10px); }
-      100% { transform: scale(1) rotate(0deg); }
-    }
-
-    #quiz-panel {
-      position: absolute;
-      left: 5%;
-      top: 50%;
-      transform: translateY(-50%);
-      padding: 25px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      width: 380px;
-      text-align: center;
-      z-index: 50;
-      display: none;
-      flex-direction: column;
-      gap: 15px;
-      max-height: 85vh;
-      overflow-y: auto;
-    }
-
-    #q-img {
-      max-width: 100%;
-      border-radius: 10px;
-      display: none;
-      margin: 0 auto;
-      max-height: 160px;
-      object-fit: contain;
-    }
-
-    #question-text-game {
-      font-weight: bold;
-      line-height: 1.3;
-      word-break: break-word;
-    }
-
-    .option-btn {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      font-weight: bold;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: 0.2s;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      margin-bottom: 10px;
-    }
-
-    .option-btn:hover {
-      filter: brightness(0.9);
-      transform: translateY(-2px);
-    }
-
-    .option-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .option-btn.selected {
-      outline: 3px solid rgba(45,210,125,.7);
-      transform: translateY(-1px) scale(0.99);
-    }
-
-    .input-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .input-field {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 2px solid rgba(0,0,0,0.1);
-      font-size: 16px;
-      outline: none;
-      text-align: center;
-      font-weight: bold;
-    }
-
-    #feedback-text-game {
-      font-size: 18px;
-      font-weight: bold;
-      min-height: 24px;
-    }
-
-    #win-message {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: clamp(2.5rem, 7vw, 5rem);
-      font-weight: bold;
-      color: #ffca3a;
-      text-shadow: 4px 4px 0px #ff595e, 8px 8px 15px rgba(0,0,0,0.5);
-      display: none;
-      z-index: 100;
-      text-transform: uppercase;
-      text-align: center;
-      padding: 20px;
-      white-space: pre-wrap;
-    }
-
-    .confetti {
-      position: absolute;
-      top: -20px;
-      z-index: 90;
-      animation: fall linear forwards;
-    }
-
-    @keyframes fall {
-      to { transform: translateY(110vh) rotate(720deg); }
-    }
-
-    @media (max-width: 900px) {
-      #quiz-panel {
-        left: 50%;
-        top: auto;
-        bottom: 20px;
-        transform: translateX(-50%);
-        width: min(92vw, 420px);
-      }
-      #piniata-wrapper {
-        left: 50%;
-        top: 30%;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div id="game-container">
-    <img src="logo.png" class="game-logo" onerror="this.style.display='none'">
-
-    <div id="startOverlay">
-      <h1>${escapeHtml(safeCfg.title)}</h1>
-      <p>${escapeHtml(safeCfg.instText)}</p>
-      <button id="btnStartGame">Начать игру</button>
-    </div>
-
-    <div id="quiz-panel" style="display:none;">
-      <img id="q-img">
-      <div id="question-text-game"></div>
-      <div id="options-container"></div>
-      <div id="feedback-text-game"></div>
-    </div>
-
-    <div id="win-message">${escapeHtml(safeCfg.winText)}</div>
-
-    <div id="piniata-wrapper">
-      <img class="piniata-image swing" id="piniata-img" src="1.png" alt="Пиньята">
-    </div>
-  </div>
-
-  <script>
-    const cfg = ${JSON.stringify(safeCfg)};
-
-    const baseQs = Array.isArray(cfg.questions) && cfg.questions.length
-      ? cfg.questions
-      : [{
-          q: 'Вопросов нет',
-          type: 'choice',
-          options: ['Ок'],
-          correctIndices: [0],
-          inputAnswers: [],
-          style: ${JSON.stringify(DEFAULT_STYLE)}
-        }];
-
-    const gameQs = [];
-    for (let i = 0; i < 5; i++) gameQs.push(baseQs[i % baseQs.length]);
-
-    const images = ['1.png', '2.png', '112.png', '3.png', '4.png', '5.png'];
-    let currentStage = 0;
-    let canHit = false;
-    let audioCtx = null;
-    let multiSelected = new Set();
-
-    const btnStart = document.getElementById('btnStartGame');
-    const overlay = document.getElementById('startOverlay');
-    const piniataImg = document.getElementById('piniata-img');
-    const piniataWrapper = document.getElementById('piniata-wrapper');
-    const quizPanel = document.getElementById('quiz-panel');
-    const qImg = document.getElementById('q-img');
-    const qText = document.getElementById('question-text-game');
-    const optContainer = document.getElementById('options-container');
-    const feedbackText = document.getElementById('feedback-text-game');
-    const winMessage = document.getElementById('win-message');
-
-    btnStart.onclick = () => {
-      overlay.style.display = 'none';
-      piniataWrapper.style.display = 'block';
-      quizPanel.style.display = 'flex';
-      loadQuestion();
-    };
-
-    function playHitSound() {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(130, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.1);
-      gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.1);
-    }
-
-    function renderLatex(el, text) {
-      if (cfg.useLatex && window.katex) {
-        try {
-          katex.render(text, el, { throwOnError: false });
-        } catch (e) {
-          el.innerText = text;
-        }
-      } else {
-        el.innerText = text;
-      }
-    }
-
-    function cleanText(str) {
-      return (str || '').toString().toLowerCase().replace(/\s+/g, ' ').trim();
-    }
-
-    function cleanCompact(str) {
-      return (str || '').toString().toLowerCase().replace(/\s+/g, '');
-    }
-
-    function loadQuestion() {
-      if (currentStage >= 5) return;
-
-      const currentQ = gameQs[currentStage];
-      const st = currentQ.style || {};
-      multiSelected = new Set();
-
-      quizPanel.style.backgroundColor = st.bg || '#ffffff';
-      quizPanel.style.border = '2px solid ' + (st.border || '#cccccc');
-      qText.style.color = st.text || '#333333';
-      qText.style.fontFamily = st.font || 'system-ui';
-      qText.style.fontSize = (st.size || 22) + 'px';
-
-      if (currentQ.img) {
-        qImg.src = currentQ.img;
-        qImg.style.display = 'block';
-      } else {
-        qImg.style.display = 'none';
-      }
-
-      renderLatex(qText, currentQ.q || '');
-      optContainer.innerHTML = '';
-      feedbackText.innerText = '';
-      canHit = false;
-
-      if (currentQ.type === 'choice') {
-        const corrects = Array.isArray(currentQ.correctIndices) && currentQ.correctIndices.length
-          ? currentQ.correctIndices
-          : [0];
-
-        const isMulti = corrects.length > 1;
-
-        currentQ.options.forEach((opt, index) => {
-          const btn = document.createElement('button');
-          btn.className = 'option-btn';
-          renderLatex(btn, opt);
-          btn.style.backgroundColor = st.btnBg || '#ff7e67';
-          btn.style.color = st.btnText || '#ffffff';
-          btn.style.fontFamily = st.btnFont || 'system-ui';
-
-          if (isMulti) {
-            btn.onclick = () => {
-              if (canHit) return;
-              if (multiSelected.has(index)) {
-                multiSelected.delete(index);
-                btn.classList.remove('selected');
-              } else {
-                multiSelected.add(index);
-                btn.classList.add('selected');
-              }
-            };
-          } else {
-            btn.onclick = () => checkChoice([index], corrects, btn);
-          }
-
-          optContainer.appendChild(btn);
-        });
-
-        if (isMulti) {
-          const submit = document.createElement('button');
-          submit.className = 'option-btn';
-          submit.innerText = 'ПРОВЕРИТЬ';
-          submit.style.backgroundColor = st.btnBg || '#ff7e67';
-          submit.style.color = st.btnText || '#ffffff';
-          submit.style.fontFamily = st.btnFont || 'system-ui';
-          submit.onclick = () => checkChoice(Array.from(multiSelected).sort((a,b) => a-b), corrects.sort((a,b) => a-b), submit);
-          optContainer.appendChild(submit);
-        }
-      } else {
-        const wrap = document.createElement('div');
-        wrap.className = 'input-wrapper';
-
-        const inp = document.createElement('input');
-        inp.type = 'text';
-        inp.className = 'input-field';
-        inp.placeholder = 'Ваш ответ...';
-        inp.style.fontFamily = st.btnFont || 'system-ui';
-
-        const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.innerText = 'ОТВЕТИТЬ';
-        btn.style.backgroundColor = st.btnBg || '#ff7e67';
-        btn.style.color = st.btnText || '#ffffff';
-        btn.style.fontFamily = st.btnFont || 'system-ui';
-
-        btn.onclick = () => checkInput(inp.value, currentQ.inputAnswers || [], btn, inp);
-        inp.onkeydown = (e) => { if (e.key === 'Enter') btn.click(); };
-
-        wrap.appendChild(inp);
-        wrap.appendChild(btn);
-        optContainer.appendChild(wrap);
-        setTimeout(() => inp.focus(), 100);
-      }
-    }
-
-    function arraysEqual(a, b) {
-      if (a.length !== b.length) return false;
-      for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
-      return true;
-    }
-
-    function checkChoice(selectedIndices, correctIndices, btnElement) {
-      if (canHit) return;
-
-      const selected = [...selectedIndices].sort((a, b) => a - b);
-      const correct = [...correctIndices].sort((a, b) => a - b);
-
-      if (arraysEqual(selected, correct)) {
-        handleCorrect(btnElement);
-        document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
-      } else {
-        handleWrong(btnElement);
-      }
-    }
-
-    function checkInput(userVal, correctVals, btnElement, inpElement) {
-      if (canHit) return;
-      const user = cleanCompact(userVal);
-      const ok = (correctVals || []).some(v => cleanCompact(v) === user);
-
-      if (ok) {
-        handleCorrect(btnElement);
-        inpElement.disabled = true;
-        btnElement.disabled = true;
-        inpElement.style.borderColor = '#28a745';
-      } else {
-        handleWrong(btnElement);
-      }
-    }
-
-    function handleCorrect(btn) {
-      feedbackText.innerText = 'Правильно! Ударь пиньяту!';
-      feedbackText.style.color = '#28a745';
-      canHit = true;
-      if (btn) {
-        btn.style.backgroundColor = '#28a745';
-        btn.style.color = '#fff';
-      }
-    }
-
-    function handleWrong(btn) {
-      feedbackText.innerText = 'Промахнулся! Попробуй еще раз.';
-      feedbackText.style.color = '#d9381e';
-      if (btn) {
-        btn.style.transform = 'translateX(-5px)';
-        setTimeout(() => btn.style.transform = 'translateX(5px)', 50);
-        setTimeout(() => btn.style.transform = 'translateX(0)', 100);
-      }
-    }
-
-    piniataImg.addEventListener('click', () => {
-      if (!canHit) {
-        if (feedbackText.innerText === '') {
-          feedbackText.innerText = 'Сначала ответь на вопрос!';
-          feedbackText.style.color = '#d9381e';
-        }
-        return;
-      }
-
-      playHitSound();
-      piniataImg.classList.remove('swing');
-      piniataImg.classList.add('hit-anim');
-      currentStage++;
-
-      setTimeout(() => {
-        piniataImg.classList.remove('hit-anim');
-        if (currentStage < 5) piniataImg.classList.add('swing');
-      }, 200);
-
-      piniataImg.src = images[currentStage];
-
-      if (currentStage === 5) {
-        quizPanel.style.display = 'none';
-        winMessage.style.display = 'block';
-        launchConfetti();
-      } else {
-        setTimeout(loadQuestion, 500);
-      }
-    });
-
-    function launchConfetti() {
-      const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93', '#ff924c'];
-      const cont = document.getElementById('game-container');
-      for (let i = 0; i < 120; i++) {
-        const piece = document.createElement('div');
-        piece.className = 'confetti';
-        const size = 8 + Math.random() * 10;
-        piece.style.width = size + 'px';
-        piece.style.height = (size * 1.5) + 'px';
-        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        piece.style.left = Math.random() * 100 + 'vw';
-        piece.style.animationDuration = (Math.random() * 3 + 2) + 's';
-        piece.style.animationDelay = (Math.random() * 1.5) + 's';
-        cont.appendChild(piece);
-      }
-    }
-  <\/script>
-</body>
-</html>`;
-  }
+  if(new URLSearchParams(location.search).has('game')) initGameMode(); else initEditor();
+})();
 </script>
 </body>
 </html>
