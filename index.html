@@ -443,7 +443,7 @@
       <div class="section">
         <div class="section-title" style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
           <span>Вопросы <span id="qCount" style="color:#fff;">(0/5)</span></span>
-          <button class="btn-primary" style="padding:4px 8px; font-size:12px;" id="btnAddQ" onclick="openModal(null)">+ Добавить</button>
+          <button class="btn-primary" style="padding:4px 8px; font-size:12px;" id="btnAddQ" type="button">+ Добавить</button>
         </div>
 
         <div class="template-box">
@@ -704,6 +704,7 @@
     $('inpWin').value = Editor.winText;
     $('chkLatex').checked = !!Editor.useLatex;
 
+    bindUI();
     renderQList();
     saveAll();
   }
@@ -731,6 +732,37 @@
     saveAll();
   }
 
+  function bindUI() {
+    const addBtn = $('btnAddQ');
+    if (addBtn && !addBtn.dataset.bound) {
+      addBtn.dataset.bound = '1';
+      addBtn.addEventListener('click', () => openModal(null));
+    }
+
+    const qList = $('qList');
+    if (qList && !qList.dataset.bound) {
+      qList.dataset.bound = '1';
+      qList.addEventListener('click', (e) => {
+        const editBtn = e.target.closest('[data-edit-id]');
+        if (editBtn) {
+          openModal(editBtn.dataset.editId);
+          return;
+        }
+
+        const delBtn = e.target.closest('[data-del-id]');
+        if (delBtn) {
+          delQ(delBtn.dataset.delId);
+          return;
+        }
+
+        const openArea = e.target.closest('[data-open-id]');
+        if (openArea) {
+          openModal(openArea.dataset.openId);
+        }
+      });
+    }
+  }
+
   function questionTypeLabel(q) {
     if (q.type === 'input') return 'Ввод';
     return (q.correctIndices || []).length > 1 ? 'Множественный выбор' : 'Выбор';
@@ -744,13 +776,13 @@
       const item = document.createElement('div');
       item.className = 'q-item';
       item.innerHTML = `
-        <div style="min-width:0; flex:1;" onclick="openModal('${q.id}')">
+        <div style="min-width:0; flex:1;" class="q-open-area" data-open-id="${q.id}">
           <div class="q-item-title">${i + 1}. ${escapeHtml(q.q || 'Пустой вопрос')}</div>
           <div class="q-item-sub">${questionTypeLabel(q)}</div>
         </div>
         <div class="q-item-actions">
-          <button class="btn-outline" type="button" onclick="openModal('${q.id}')">✏️</button>
-          <button class="btn-outline btn-danger" type="button" onclick="delQ('${q.id}')">🗑</button>
+          <button class="btn-outline js-edit-q" type="button" data-edit-id="${q.id}">✏️</button>
+          <button class="btn-outline btn-danger js-del-q" type="button" data-del-id="${q.id}">🗑</button>
         </div>
       `;
       list.appendChild(item);
@@ -1026,9 +1058,14 @@
 
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
-      $('previewFrame').srcdoc = buildGameHTML(payload, false);
-    }, 250);
-  }
+      try {
+        const html = buildGameHTML(payload, false);
+        $('previewFrame').srcdoc = html;
+      } catch (err) {
+        $('previewFrame').srcdoc = `<html><body style="margin:0;padding:16px;background:#111;color:#fff;font-family:system-ui"><h3>Ошибка предпросмотра</h3><pre style="white-space:pre-wrap">${escapeHtml(String(err && (err.stack || err.message || err)))}</pre></body></html>`;
+        console.error('Preview build error:', err);
+      }
+    },
 
   function copyIframe() {
     const code = `<iframe src="${$('outLink').value}" width="100%" height="600" frameborder="0" allowfullscreen></iframe>`;
