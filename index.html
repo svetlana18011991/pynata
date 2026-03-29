@@ -72,11 +72,14 @@
     <div class="panel settings">
       <div class="panel-header">
         <div class="h">
-          <div style="display:flex;flex-direction:column;justify-content:center">
-            <span style="font-size:16px;font-weight:900;line-height:1.2">Шкатулка математических интерактивов</span>
-            <span style="font-size:11px;color:rgba(255,255,255,.7);line-height:1.2">Светлана Быкова</span>
-            <span style="font-size:12px;color:var(--neon);font-weight:700;line-height:1.2;margin-top:2px">Редактор «Пиньята»</span>
-          </div>
+          <a href="https://t.me/interactiv_matematika" target="_blank" title="Перейти в Telegram-канал" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;transition:opacity .2s" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">
+            <img src="logo.png" alt="Логотип" style="height:42px;width:42px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,174,0,.5);box-shadow:0 0 10px rgba(255,174,0,.35)" onerror="this.style.display='none'" />
+            <div style="display:flex;flex-direction:column;justify-content:center">
+              <span style="font-size:16px;font-weight:900;line-height:1.2">Шкатулка математических интерактивов</span>
+              <span style="font-size:11px;color:rgba(255,255,255,.7);line-height:1.2">Светлана Быкова</span>
+              <span style="font-size:12px;color:var(--neon);font-weight:700;line-height:1.2;margin-top:2px">Редактор «Пиньята»</span>
+            </div>
+          </a>
         </div>
         <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
           <div class="sizeBox">
@@ -97,16 +100,7 @@
 
         <div class="section">
           <div class="title">Оформление</div>
-          <label>Фон игры (ссылка)</label>
-          <div class="row" style="align-items:center;margin-top:6px">
-            <input id="inpBgUrl" type="text" placeholder="https://.../bg.jpg" />
-            <button id="btnResetBg" type="button" class="btn small">↩ Сбросить фон</button>
-          </div>
-          <label>Картинки пиньяты по стадиям (через запятую)</label>
-          <textarea id="inpImages" style="min-height:92px">1.png, 2.png, 112.png, 3.png, 4.png, 5.png</textarea>
-          <div class="muted">Первая картинка — целая пиньята. Последняя — финальная разбитая стадия.</div>
-          <label>Начальная картинка пиньяты</label>
-          <input id="inpStartImage" type="text" value="1.png" />
+          <div class="muted" style="margin-bottom:10px">Фон и картинки пиньяты теперь фиксированные и берутся из файлов рядом с редактором.</div>
           <label>Текст после победы</label>
           <input id="inpWinText" type="text" value="Молодец!" />
         </div>
@@ -196,11 +190,11 @@
 
   function normalizeCfg(raw){
     const cfg = raw && typeof raw === 'object' ? raw : {};
-    const images = Array.isArray(cfg.images) ? cfg.images.map(x=>String(x||"").trim()).filter(Boolean) : ["1.png","2.png","112.png","3.png","4.png","5.png"];
+    const images = ["1.png","2.png","112.png","3.png","4.png","5.png"];
     return {
       title: String(cfg.title || "Пиньята знаний"),
-      bgDataUrl: String(cfg.bgDataUrl || ""),
-      startImage: String(cfg.startImage || images[0] || "1.png"),
+      bgDataUrl: "",
+      startImage: "1.png",
       images,
       winText: String(cfg.winText || "Молодец!"),
       instruction: { text: cfg.instruction?.text !== undefined ? String(cfg.instruction.text) : "Ответь на вопрос правильно, а потом ударь по пиньяте." },
@@ -252,25 +246,23 @@
 
   function readFormIntoEditor(){
     Editor.title = $("inpTitle").value.trim() || DEFAULT_CFG.title;
-    Editor.bgDataUrl = $("inpBgUrl").value.trim();
-    Editor.images = $("inpImages").value.split(',').map(x=>x.trim()).filter(Boolean);
-    if(Editor.images.length < 2) Editor.images = deepClone(DEFAULT_CFG.images);
-    Editor.startImage = $("inpStartImage").value.trim() || Editor.images[0];
+    Editor.bgDataUrl = DEFAULT_CFG.bgDataUrl;
+    Editor.images = deepClone(DEFAULT_CFG.images);
+    Editor.startImage = DEFAULT_CFG.startImage;
     Editor.winText = $("inpWinText").value.trim() || DEFAULT_CFG.winText;
     Editor.instruction.text = $("inpInstruction").value;
   }
   function fillFormFromEditor(){
-    $("inpTitle").value = Editor.title; $("inpBgUrl").value = Editor.bgDataUrl; $("inpImages").value = Editor.images.join(', '); $("inpStartImage").value = Editor.startImage; $("inpWinText").value = Editor.winText; $("inpInstruction").value = Editor.instruction.text;
+    $("inpTitle").value = Editor.title; $("inpWinText").value = Editor.winText; $("inpInstruction").value = Editor.instruction.text;
   }
-  function buildPayload(previewWithDraft){ readFormIntoEditor(); let questions = Editor.questions.map(normalizeQuestion); if(previewWithDraft && Editor.draft){ const d=normalizeQuestion(Editor.draft); if(questions.length===0) questions=[d]; else questions[0]=d; } return normalizeCfg({ title:Editor.title, bgDataUrl:Editor.bgDataUrl, startImage:Editor.startImage, images:Editor.images, winText:Editor.winText, instruction:Editor.instruction, questions }); }
+  function buildPayload(previewWithDraft){ readFormIntoEditor(); let questions = Editor.questions.map(normalizeQuestion); if(previewWithDraft && Editor.draft){ const d=normalizeQuestion(Editor.draft); if(questions.length===0) questions=[d]; else questions[0]=d; } return normalizeCfg({ title:Editor.title, winText:Editor.winText, instruction:Editor.instruction, questions }); }
   function checkLinkSize(data){ const maxLen=3500, curLen=data.length, pct=Math.min(100,(curLen/maxLen)*100); const bar=$("barSize"), lbl=$("lblSizeText"), warn=$("sizeWarning"); bar.style.width=pct+'%'; if(curLen < maxLen*.75){ bar.style.background='var(--ok)'; lbl.textContent='🟢 Код в норме'; lbl.style.color='var(--ok)'; warn.style.display='none'; } else if(curLen <= maxLen){ bar.style.background='var(--neon)'; lbl.textContent='🟡 Код почти достиг лимита'; lbl.style.color='var(--neon)'; warn.style.display='none'; } else { bar.style.background='var(--danger)'; lbl.textContent='🔴 ПРЕВЫШЕН ЛИМИТ'; lbl.style.color='var(--danger)'; warn.style.display='block'; } }
   function updatePreview(previewWithDraft){ const payload=buildPayload(previewWithDraft); const data=encodeGameData(payload); checkLinkSize(data); const src=selfPageUrl()+`?preview=1${previewWithDraft?'&autostart=1':''}&game=`+encodeURIComponent(data); $("livePreview").src = src; }
   let _previewTid=null; function debouncedPreview(){ clearTimeout(_previewTid); _previewTid=setTimeout(()=>updatePreview(false),300); }
 
   function initEditor(){
     fillFormFromEditor();
-    ["inpTitle","inpBgUrl","inpImages","inpStartImage","inpWinText","inpInstruction"].forEach(id=>$(id).addEventListener('input',debouncedPreview));
-    $("btnResetBg").addEventListener('click',()=>{ $("inpBgUrl").value=''; debouncedPreview(); });
+    ["inpTitle","inpWinText","inpInstruction"].forEach(id=>$(id).addEventListener('input',debouncedPreview));
     $("btnAddQ").addEventListener('click',()=>openModal(null));
     $("btnClearQs").addEventListener('click',()=>{ Editor.questions=[]; renderList(); updatePreview(false); toast('Очищено'); });
     $("btnCloseModal").addEventListener('click',()=>{ Editor.draft=null; Editor.editingId=null; hideModal(); });
@@ -304,12 +296,12 @@
         .option-btn:hover{background:#ff5a3d;transform:translateY(-2px)} .option-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;box-shadow:none}
         #feedback-text{margin-top:15px;font-size:18px;font-weight:bold;min-height:24px} .text-wrong{color:#d9381e}.text-correct{color:#28a745}
         #win-message{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;font-weight:bold;color:#ffca3a;text-shadow:4px 4px 0 #ff595e,8px 8px 15px rgba(0,0,0,.5);display:none;z-index:100;text-transform:uppercase;text-align:center;padding:0 20px}
-        #piniata-wrapper{position:absolute;width:310px;left:68.35%;top:54.59%;transform:translate(-50%,-50%);z-index:10}
+        #piniata-wrapper{position:absolute;width:min(310px, 32vw);left:68.35%;top:54.59%;transform:translate(-50%,-50%);z-index:10}
         .piniata-image{width:100%;height:auto;display:block;transform-origin:50% 0%;cursor:pointer;filter:drop-shadow(0 10px 15px rgba(0,0,0,.3))}
         .swing{animation:swingAnim 4s ease-in-out infinite} @keyframes swingAnim{0%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}100%{transform:rotate(-6deg)}}
         .hit-anim{animation:hitAnim .2s ease-out} @keyframes hitAnim{0%{transform:scale(1) rotate(0deg)}50%{transform:scale(.9) rotate(15deg) translateY(-10px)}100%{transform:scale(1) rotate(0deg)}}
         .confetti{position:absolute;top:-20px;z-index:90;animation:fall linear forwards} @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
-        @media (max-width:980px){#quiz-panel{left:50%;top:auto;bottom:16px;transform:translateX(-50%);width:min(92vw,420px)}#win-message{font-size:50px}}
+        @media (max-width:980px){#quiz-panel{left:50%;top:auto;bottom:16px;transform:translateX(-50%);width:min(92vw,420px)}#piniata-wrapper{left:50%;top:32%;width:min(260px,48vw)}#win-message{font-size:50px}}
       </style>
       <div id="game-container">
         <div id="start-screen"><div id="start-card"><h1></h1><p></p><button id="start-btn">▶ Начать</button></div></div>
@@ -331,14 +323,14 @@
     const piniataImg = mount.querySelector('#piniata-img');
 
     const questions = (cfg.questions || []).map(q => ({ q:q.prompt, options:q.options, correct:q.correctIndex }));
-    const images = (cfg.images && cfg.images.length >= 2) ? cfg.images : [cfg.startImage || '1.png','2.png','112.png','3.png','4.png','5.png'];
+    const images = ['1.png','2.png','112.png','3.png','4.png','5.png'];
     let currentStage = 0, canHit = false, audioCtx = null;
 
-    gameContainer.style.backgroundImage = cfg.bgDataUrl ? `url('${cfg.bgDataUrl.replaceAll("'","%27")}')` : "url('bg (2).png')";
+    gameContainer.style.backgroundImage = "url('bg (2).png')";
     startTitle.textContent = cfg.title || 'Пиньята знаний';
     startText.textContent = cfg.instruction?.text || 'Ответь на вопрос правильно, а потом ударь по пиньяте.';
     winMessage.textContent = cfg.winText || 'Молодец!';
-    piniataImg.src = cfg.startImage || images[0] || '1.png';
+    piniataImg.src = '1.png';
 
     function playHitSound(){
       if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
