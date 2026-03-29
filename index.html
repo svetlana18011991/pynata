@@ -10,21 +10,28 @@
     html,body{height:100%;margin:0;overflow:hidden;background:#090c16;color:#eaf0ff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
     :root{
       --text:#eaf0ff;--muted:#a9b6e6;--border:rgba(255,255,255,.10);--shadow2:0 12px 34px rgba(0,0,0,.40);
-      --radius:18px;--radius2:22px;--neon:#ffae00;--danger:#ff4d4d;--ok:#2dd27d;
-      --neon-glow:rgba(255,136,0,.55);--bgPanel:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      --radius:18px;--radius2:22px;
+      /* Улучшенные цвета неона для редактора */
+      --neon:#ffb703;
+      --neon-glow:rgba(255,183,3,0.65);
+      --neon-border:rgba(255,183,3,0.4);
+      --danger:#ff4d4d;--ok:#2dd27d;
+      --bgPanel:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
     }
     *{box-sizing:border-box}
     body{
       background:
         radial-gradient(1100px 700px at 12% 18%, rgba(35,82,200,.28) 0%, rgba(5,8,22,0) 58%),
         radial-gradient(900px 640px at 88% 16%, rgba(20,160,255,.18) 0%, rgba(5,8,22,0) 62%),
-        radial-gradient(1000px 780px at 55% 112%, rgba(255,174,0,.12) 0%, rgba(5,8,22,0) 58%),
+        radial-gradient(1000px 780px at 55% 112%, rgba(255,183,3,.15) 0%, rgba(5,8,22,0) 58%),
         linear-gradient(180deg, rgba(4,10,32,.92), rgba(3,6,18,1));
     }
     body.gameOnly{background:transparent}
     .app{display:grid;grid-template-columns:460px 1fr;gap:14px;padding:14px;max-width:1540px;margin:0 auto;height:100%}
     @media (max-width:1020px){.app{display:flex;flex-direction:column;overflow-y:auto}.settings,.preview{height:auto!important;min-height:560px}}
-    .panel{background:var(--bgPanel);border:1px solid var(--neon);border-radius:var(--radius2);box-shadow:0 0 8px rgba(255,136,0,.25),0 0 18px rgba(255,136,0,.18),var(--shadow2);backdrop-filter:blur(10px);overflow:hidden;position:relative}
+    
+    /* Красивые неоновые рамки панелей */
+    .panel{background:var(--bgPanel);border:1px solid var(--neon);border-radius:var(--radius2);box-shadow:0 0 15px var(--neon-border), inset 0 0 8px rgba(255,183,3,0.15), var(--shadow2);backdrop-filter:blur(10px);overflow:hidden;position:relative}
     .panel-header,.preview-top{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.10);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
     .panel-header .h,.preview-top .name{font-weight:950;letter-spacing:.2px;display:flex;align-items:center;gap:10px}
     .settings{height:100%;display:flex;flex-direction:column;min-height:0}
@@ -33,26 +40,35 @@
     .settings .panel-body::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 4px; }
     .settings .panel-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
     .settings .panel-body::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
-    .section{padding:12px;border-radius:16px;border:1px solid rgba(255,174,0,.42);background:rgba(20,10,0,.22);margin-bottom:12px;box-shadow:0 0 8px rgba(255,136,0,.18)}
+    
+    /* Неоновые секции */
+    .section{padding:12px;border-radius:16px;border:1px solid rgba(255,183,3,.3);background:rgba(20,10,0,.22);margin-bottom:12px;box-shadow:0 0 10px rgba(255,183,3,.15)}
     .section .title{font-weight:950;font-size:13.5px;margin-bottom:10px;color:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:space-between;gap:8px}
     .muted{color:var(--muted);font-size:12.5px;line-height:1.35}
     label{display:block;font-size:12.5px;color:rgba(255,255,255,.86);margin:10px 0 6px}
-    input[type="text"],input[type="number"],textarea,select{width:100%;border-radius:14px;padding:10px 11px;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.25);color:var(--text);outline:none}
+    input[type="text"],input[type="number"],input[type="color"],textarea,select{width:100%;border-radius:14px;padding:10px 11px;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.25);color:var(--text);outline:none;transition: border-color 0.2s, box-shadow 0.2s}
+    input[type="color"] { padding: 4px; cursor: pointer; height: 38px; }
     textarea{min-height:84px;resize:vertical}
-    input:focus,textarea:focus,select:focus{border-color:var(--neon);box-shadow:0 0 8px var(--neon-glow), inset 0 0 4px rgba(255,136,0,.2)}
-    .row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:170px}
-    .toggle{display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);margin-top:8px}
-    .toggle input{width:18px;height:18px}
+    
+    /* Улучшенное свечение инпутов при фокусе */
+    input:focus,textarea:focus,select:focus{border-color:var(--neon);box-shadow:0 0 12px var(--neon-glow), inset 0 0 5px rgba(255,183,3,.25)}
+    
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}.row>*{flex:1;min-width:150px}
+    .toggle{display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);margin-top:8px;cursor:pointer;transition:background 0.2s, border-color 0.2s}
+    .toggle:hover{background:rgba(255,255,255,.08); border-color:var(--neon-border)}
+    .toggle input{width:18px;height:18px;accent-color:var(--neon);cursor:pointer}
+    .toggle label{margin:0;cursor:pointer;font-weight:bold}
+    
     .btn{padding:11px 12px;border-radius:14px;border:1px solid var(--neon);background:rgba(255,255,255,.06);color:var(--text);cursor:pointer;font-weight:950;font-size:14px;transition:transform .08s ease, background .15s ease, box-shadow .2s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
-    .btn:hover{background:rgba(255,136,0,.12);box-shadow:0 0 10px var(--neon-glow)}
+    .btn:hover{background:rgba(255,183,3,.15);box-shadow:0 0 12px var(--neon-glow)}
     .btn:active{transform:translateY(1px)}
-    .btn:disabled{opacity:.45;cursor:not-allowed;border-color:rgba(255,255,255,0.2)}
-    .btn.primary{background:linear-gradient(90deg, rgba(255,174,0,.34), rgba(255,136,0,.25))}
-    .btn.primary:disabled{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5)}
+    .btn:disabled{opacity:.45;cursor:not-allowed;border-color:rgba(255,255,255,0.2);box-shadow:none!important;background:rgba(255,255,255,0.06)!important}
+    .btn.primary{background:linear-gradient(90deg, rgba(255,183,3,.34), rgba(255,140,0,.25))}
     .btn.danger{border-color:rgba(255,77,77,.35);background:rgba(255,77,77,.08)}
     .btn.small{padding:8px 10px;font-size:12.5px;border-radius:12px}
     .q-list{display:flex;flex-direction:column;gap:10px}
-    .q-item{padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);display:flex;gap:10px;align-items:center;justify-content:space-between}
+    .q-item{padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);display:flex;gap:10px;align-items:center;justify-content:space-between;transition:border-color 0.2s}
+    .q-item:hover{border-color:rgba(255,183,3,.4)}
     .q-item .meta{display:flex;flex-direction:column;gap:4px;min-width:0;padding-top:3px}
     .q-item .meta .t,.q-item .meta .s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.q-item .meta .t{font-weight:900;font-size:13px}.q-item .meta .s{color:var(--muted);font-size:12px}
     .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:999px;font-size:12px;font-weight:900;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.18);color:rgba(255,255,255,.92)}
@@ -63,7 +79,7 @@
     .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
     
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:none;z-index:999998}
-    .modal{position:absolute;top:15px;bottom:15px;left:15px;right:15px;margin:auto;max-width:820px;display:flex;flex-direction:column;border-radius:20px;border:1px solid var(--neon)!important;background:#16110c!important;box-shadow:0 0 12px rgba(255,136,0,.25),0 30px 80px rgba(0,0,0,.7)!important;overflow:hidden}
+    .modal{position:absolute;top:15px;bottom:15px;left:15px;right:15px;margin:auto;max-width:820px;display:flex;flex-direction:column;border-radius:20px;border:1px solid var(--neon)!important;background:#16110c!important;box-shadow:0 0 20px var(--neon-border),0 30px 80px rgba(0,0,0,.7)!important;overflow:hidden}
     .modal-head{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(255,255,255,.10);flex-shrink:0}
     .modal-body{padding:14px;overflow-y:auto;flex:1 1 auto;min-height:0}
     .modal-body::-webkit-scrollbar { width: 8px; }
@@ -73,7 +89,7 @@
     .choiceBlock{border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.14);border-radius:14px;padding:10px;margin-top:10px}
     .answerRow{display:flex;gap:8px;align-items:center;margin-top:8px}
     .answerRow input[type="text"]{flex:1;min-width:0}
-    .checkbox{width:18px;height:18px;accent-color:var(--neon);flex:0 0 auto}
+    .checkbox{width:18px;height:18px;accent-color:var(--neon);flex:0 0 auto;cursor:pointer}
     .gameHost{width:100%;height:100%;min-height:0}.gameHost *{box-sizing:border-box}
     .sizeBox{display:flex;flex-direction:column;align-items:flex-end;gap:4px}.barWrap{width:88px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);height:6px;border-radius:3px;overflow:hidden}.barFill{width:0%;height:100%;background:var(--ok);transition:width .3s, background .3s}
     .warning{display:none;background:rgba(255,77,77,.15);color:#ffd6d6;padding:8px 14px;font-size:12px;font-weight:700;border-bottom:1px solid rgba(255,77,77,.3)}
@@ -108,18 +124,57 @@
           <div class="title">Название</div>
           <label>Заголовок в игре</label>
           <input id="inpTitle" type="text" value="Пиньята знаний" />
+          <div class="row">
+            <div>
+              <label>Шрифт заголовка</label>
+              <select id="inpTitleFont">
+                <option value="" style="font-family: system-ui, sans-serif;">Стандартный</option>
+                <option value="Arial, sans-serif" style="font-family: Arial, sans-serif;">Arial</option>
+                <option value="Verdana, sans-serif" style="font-family: Verdana, sans-serif;">Verdana</option>
+                <option value="Tahoma, sans-serif" style="font-family: Tahoma, sans-serif;">Tahoma</option>
+                <option value="'Trebuchet MS', sans-serif" style="font-family: 'Trebuchet MS', sans-serif;">Trebuchet MS</option>
+                <option value="'Times New Roman', serif" style="font-family: 'Times New Roman', serif;">Times New Roman</option>
+                <option value="Georgia, serif" style="font-family: Georgia, serif;">Georgia</option>
+                <option value="'Courier New', monospace" style="font-family: 'Courier New', monospace;">Courier New</option>
+                <option value="'Caveat', cursive" style="font-family: 'Caveat', cursive;">Caveat (Рукописный 1)</option>
+                <option value="'Neucha', cursive" style="font-family: 'Neucha', cursive;">Neucha (Рукописный 2)</option>
+              </select>
+            </div>
+            <div>
+              <label>Размер (px)</label>
+              <input id="inpTitleFontSize" type="number" min="16" max="80" step="1" value="30" />
+            </div>
+          </div>
         </div>
 
         <div class="section">
           <div class="title">Оформление</div>
           <label>Текст после победы</label>
           <input id="inpWinText" type="text" value="Молодец!" />
+          
+          <label class="toggle">
+            <input type="checkbox" id="chkUseLatex" />
+            <span>Подключить математику (LaTeX)</span>
+          </label>
         </div>
 
         <div class="section">
           <div class="title">Стартовый экран</div>
           <label>Текст инструкции</label>
           <textarea id="inpInstruction">Ответь на вопрос правильно, а потом ударь по пиньяте. Каждый правильный ответ открывает один удар.</textarea>
+          
+          <div class="row" style="margin-top:10px">
+            <div>
+              <label>Цвет рамки</label>
+              <input type="color" id="inpInstColor" value="#ffb703" />
+            </div>
+            <div style="flex:2">
+              <label class="toggle" style="margin-top:28px">
+                <input type="checkbox" id="chkInstGlow" checked />
+                <span>Неоновое свечение рамки</span>
+              </label>
+            </div>
+          </div>
         </div>
 
         <div class="section">
@@ -130,10 +185,10 @@
           </div>
           <div class="muted" style="margin-bottom:8px">Количество вопросов должно быть <b>не больше 5</b>.</div>
 
-          <div style="background: rgba(255, 174, 0, 0.1); padding: 10px; border-radius: 12px; border: 1px solid rgba(255,174,0,.4); margin-bottom: 12px;">
+          <div style="background: rgba(255, 183, 3, 0.1); padding: 10px; border-radius: 12px; border: 1px solid rgba(255,183,3,.4); margin-bottom: 12px;">
             <div style="font-size: 12px; color: var(--neon); font-weight: bold; margin-bottom: 8px;">🎨 Шаблоны настроек (Шрифт, Тип):</div>
             <div style="display:flex; align-items:center; gap:8px; flex-wrap: wrap;">
-              <select id="newQTemplate" style="flex:1; min-width: 160px; border: 1px solid rgba(255,174,0,.4); border-radius: 12px; padding: 6px; font-size: 13px; background: rgba(0,0,0,0.5); color: #fff; outline: none;">
+              <select id="newQTemplate" style="flex:1; min-width: 160px; border: 1px solid rgba(255,183,3,.4); border-radius: 12px; padding: 6px; font-size: 13px; background: rgba(0,0,0,0.5); color: #fff; outline: none;">
                 <option value="-1">Стандартные (по умолчанию)</option>
               </select>
               <button class="btn small" style="background:var(--neon); color:#000; border:none; font-weight:bold; padding: 8px 12px;" id="btnApplyAll" type="button">🔄 Применить ко всем</button>
@@ -181,7 +236,7 @@
         </select>
 
         <label>Текст вопроса</label>
-        <textarea id="inpPrompt" placeholder="Введите вопрос..."></textarea>
+        <textarea id="inpPrompt" placeholder="Введите вопрос... (LaTeX: $x^2$)"></textarea>
 
         <div class="choiceBlock" style="margin-top:10px">
           <div style="font-weight:900">Оформление текста</div>
@@ -285,11 +340,18 @@
     const images = ["1.png","2.png","112.png","3.png","4.png","5.png"];
     return {
       title: String(cfg.title || "Пиньята знаний"),
+      titleFont: String(cfg.titleFont || ""),
+      titleFontSize: Number(cfg.titleFontSize) || 30,
+      useLatex: !!cfg.useLatex,
       bgDataUrl: "",
       startImage: "1.png",
       images,
       winText: String(cfg.winText || "Молодец!"),
-      instruction: { text: cfg.instruction?.text !== undefined ? String(cfg.instruction.text) : "Ответь на вопрос правильно, а потом ударь по пиньяте. Каждый правильный ответ открывает один удар." },
+      instruction: { 
+          text: cfg.instruction?.text !== undefined ? String(cfg.instruction.text) : "Ответь на вопрос правильно, а потом ударь по пиньяте. Каждый правильный ответ открывает один удар.",
+          color: cfg.instruction?.color || "#ffb703",
+          glow: cfg.instruction?.glow !== undefined ? !!cfg.instruction.glow : true
+      },
       questions: (Array.isArray(cfg.questions) ? cfg.questions : []).map(normalizeQuestion)
     };
   }
@@ -477,15 +539,27 @@
 
   function readFormIntoEditor(){
     Editor.title = $("inpTitle").value.trim() || DEFAULT_CFG.title;
+    Editor.titleFont = $("inpTitleFont").value;
+    Editor.titleFontSize = Number($("inpTitleFontSize").value) || 30;
+    Editor.useLatex = $("chkUseLatex").checked;
     Editor.bgDataUrl = DEFAULT_CFG.bgDataUrl;
     Editor.images = deepClone(DEFAULT_CFG.images);
     Editor.startImage = DEFAULT_CFG.startImage;
     Editor.winText = $("inpWinText").value.trim() || DEFAULT_CFG.winText;
     Editor.instruction.text = $("inpInstruction").value;
+    Editor.instruction.color = $("inpInstColor").value;
+    Editor.instruction.glow = $("chkInstGlow").checked;
   }
 
   function fillFormFromEditor(){
-    $("inpTitle").value = Editor.title; $("inpWinText").value = Editor.winText; $("inpInstruction").value = Editor.instruction.text;
+    $("inpTitle").value = Editor.title;
+    $("inpTitleFont").value = Editor.titleFont || "";
+    $("inpTitleFontSize").value = Editor.titleFontSize || 30;
+    $("chkUseLatex").checked = !!Editor.useLatex;
+    $("inpWinText").value = Editor.winText; 
+    $("inpInstruction").value = Editor.instruction.text;
+    $("inpInstColor").value = Editor.instruction.color || "#ffb703";
+    $("chkInstGlow").checked = !!Editor.instruction.glow;
   }
 
   function buildPayload(previewWithDraft){ 
@@ -495,7 +569,10 @@
         const d=normalizeQuestion(Editor.draft); 
         if(questions.length===0) questions=[d]; else questions[0]=d; 
     } 
-    return normalizeCfg({ title:Editor.title, winText:Editor.winText, instruction:Editor.instruction, questions }); 
+    return normalizeCfg({ 
+        title:Editor.title, titleFont:Editor.titleFont, titleFontSize:Editor.titleFontSize, useLatex:Editor.useLatex,
+        winText:Editor.winText, instruction:Editor.instruction, questions 
+    }); 
   }
 
   function checkLinkSize(data){ const maxLen=3500, curLen=data.length, pct=Math.min(100,(curLen/maxLen)*100); const bar=$("barSize"), lbl=$("lblSizeText"), warn=$("sizeWarning"); bar.style.width=pct+'%'; if(curLen < maxLen*.75){ bar.style.background='var(--ok)'; lbl.textContent='🟢 Код в норме'; lbl.style.color='var(--ok)'; warn.style.display='none'; } else if(curLen <= maxLen){ bar.style.background='var(--neon)'; lbl.textContent='🟡 Код почти достиг лимита'; lbl.style.color='var(--neon)'; warn.style.display='none'; } else { bar.style.background='var(--danger)'; lbl.textContent='🔴 ПРЕВЫШЕН ЛИМИТ'; lbl.style.color='var(--danger)'; warn.style.display='block'; } }
@@ -506,13 +583,13 @@
 
   function initEditor(){
     fillFormFromEditor();
-    ["inpTitle","inpWinText","inpInstruction"].forEach(id=>$(id).addEventListener('input',debouncedPreview));
+    ["inpTitle", "inpTitleFont", "inpTitleFontSize", "chkUseLatex", "inpWinText", "inpInstruction", "inpInstColor", "chkInstGlow"]
+        .forEach(id=>$(id).addEventListener('input',debouncedPreview));
+    $("chkUseLatex").addEventListener('change', debouncedPreview);
+    $("chkInstGlow").addEventListener('change', debouncedPreview);
     
     $("btnAddQ").addEventListener('click',()=>{
-        if(Editor.questions.length >= 5) {
-            toast("Достигнут лимит (5 вопросов)");
-            return;
-        }
+        if(Editor.questions.length >= 5) { toast("Достигнут лимит (5 вопросов)"); return; }
         openModal(null);
     });
     
@@ -585,14 +662,27 @@
   }
 
   function runGame(cfg, mount){
+    let mathJaxHtml = '';
+    if (cfg.useLatex) {
+        mathJaxHtml = `
+            <script>window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\\\(', '\\\\)']] } };<\/script>
+            <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"><\/script>
+        `;
+    }
+
+    const startColor = cfg.instruction?.color || '#ffb703';
+    const startGlow = cfg.instruction?.glow !== false;
+    const boxGlowStyle = startGlow ? `0 0 20px ${startColor}, inset 0 0 10px ${startColor}` : `0 18px 60px rgba(0,0,0,.38)`;
+
     mount.innerHTML = `
+      ${mathJaxHtml}
       <style>
         html,body{height:100%;margin:0;overflow:hidden;font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;background:#333}
         #game-container{position:relative;width:100vw;height:100vh;background-size:cover;background-position:center;background-repeat:no-repeat;overflow:hidden}
         #start-screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center, rgba(0,0,0,.25), rgba(0,0,0,.65));z-index:120}
-        #start-card{width:min(720px, calc(100% - 24px));background:rgba(20,22,30,.82);border:1px solid rgba(255,255,255,.12);border-radius:24px;box-shadow:0 18px 60px rgba(0,0,0,.38);padding:22px;text-align:center;color:#fff}
-        #start-card h1{margin:0 0 8px;font-size:30px} #start-card p{font-size:18px;line-height:1.45;opacity:.95;white-space:pre-line}
-        #start-btn{padding:12px 18px;border-radius:14px;border:1px solid rgba(255,174,0,.55);background:linear-gradient(90deg, rgba(255,174,0,.34), rgba(255,136,0,.25));color:#fff;font-weight:900;cursor:pointer}
+        #start-card{width:min(720px, calc(100% - 24px));background:rgba(20,22,30,.82);border:1px solid ${startColor};border-radius:24px;box-shadow:${boxGlowStyle};padding:22px;text-align:center;color:#fff}
+        #start-card h1{margin:0 0 8px;font-size:${cfg.titleFontSize || 30}px; font-family:${cfg.titleFont || 'inherit'};} #start-card p{font-size:18px;line-height:1.45;opacity:.95;white-space:pre-line}
+        #start-btn{padding:12px 18px;border-radius:14px;border:1px solid rgba(255,183,3,.55);background:linear-gradient(90deg, rgba(255,183,3,.34), rgba(255,140,0,.25));color:#fff;font-weight:900;cursor:pointer;margin-top:15px}
         #quiz-panel{position:absolute;left:25%;top:25%;transform:translate(-50%,-50%);background:rgba(255,255,255,.95);padding:25px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.3);width:320px;text-align:center;z-index:50}
         #q-media img{max-width:100%;max-height:160px;border-radius:12px;display:block;margin:0 auto 10px;}
         #q-media audio{width:100%;margin-bottom:10px;height:36px;border-radius:12px;}
@@ -603,7 +693,7 @@
         #ans-input{width:100%;padding:10px;font-size:18px;border-radius:10px;border:2px solid #ccc;outline:none;}
         #ans-input:focus{border-color:#ff7e67;}
         #feedback-text{margin-top:15px;font-size:18px;font-weight:bold;min-height:24px} .text-wrong{color:#d9381e}.text-correct{color:#28a745}
-        #win-message{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;font-weight:bold;color:#ffca3a;text-shadow:4px 4px 0 #ff595e,8px 8px 15px rgba(0,0,0,.5);display:none;z-index:100;text-transform:uppercase;text-align:center;padding:0 20px}
+        #win-message{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;font-weight:bold;color:#ffca3a;text-shadow:4px 4px 0 #ff595e,8px 8px 15px rgba(0,0,0,.5);display:none;z-index:100;text-transform:uppercase;text-align:center;padding:0 20px; font-family:${cfg.titleFont || 'inherit'};}
         #piniata-wrapper{position:absolute;width:310px;left:68.35%;top:54.59%;transform:translate(-50%,-50%);z-index:10}
         .piniata-image{width:100%;height:auto;display:block;transform-origin:50% 0%;cursor:pointer;filter:drop-shadow(0 10px 15px rgba(0,0,0,.3))}
         .swing{animation:swingAnim 4s ease-in-out infinite} @keyframes swingAnim{0%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}100%{transform:rotate(-6deg)}}
@@ -740,11 +830,17 @@
       }
     }
 
+    function renderMath() {
+        if(window.MathJax && window.MathJax.typesetPromise) {
+            window.MathJax.typesetPromise([quizPanel]).catch((err)=>console.log('MathJax error:', err));
+        }
+    }
+
     function loadQuestion(){
       if(currentStage >= questions.length) return;
       const currentQ = questions[currentStage];
       
-      questionText.innerText = currentQ.q; 
+      questionText.innerHTML = currentQ.q; 
       if(currentQ.font) questionText.style.fontFamily = currentQ.font;
       if(currentQ.fontSize) questionText.style.fontSize = currentQ.fontSize + 'px';
       else questionText.style.fontSize = '';
@@ -785,7 +881,7 @@
           inputContainer.style.display = 'none';
           
           currentQ.options.forEach((opt,index)=>{ 
-              const btn=document.createElement('button'); btn.className='option-btn'; btn.innerText=opt; 
+              const btn=document.createElement('button'); btn.className='option-btn'; btn.innerHTML=opt; 
               if(currentQ.font) btn.style.fontFamily = currentQ.font;
               
               btn.onclick=()=> {
@@ -803,6 +899,7 @@
               optionsContainer.appendChild(btn); 
           });
       }
+      renderMath();
     }
 
     piniataImg.addEventListener('click',()=>{
