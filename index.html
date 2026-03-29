@@ -4,86 +4,404 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Пиньята — PRO Редактор</title>
-  
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Neucha&display=swap');
-    
-    html, body { height: 100%; margin: 0; overflow: hidden; background: #0f121b; color: #eaf0ff; font-family: system-ui, -apple-system, Segoe UI, sans-serif; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #0f121b;
+      color: #eaf0ff;
+      font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+    }
+
     * { box-sizing: border-box; }
-    
+
     :root {
       --neon: #d6b14a;
       --bg-panel: rgba(20, 24, 35, 0.95);
       --border: rgba(255, 255, 255, 0.1);
       --danger: #ff4d4d;
       --ok: #2dd27d;
+      --muted: #a9b6e6;
     }
 
-    button { cursor: pointer; border: none; font-weight: 600; border-radius: 8px; transition: 0.2s; }
+    button {
+      cursor: pointer;
+      border: none;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: 0.2s;
+    }
     button:active { transform: scale(0.95); }
-    .btn-primary { background: var(--neon); color: #000; padding: 10px 16px; }
-    .btn-primary:hover { filter: brightness(1.1); box-shadow: 0 0 15px rgba(214,177,74,0.4); }
-    .btn-outline { background: transparent; border: 1px solid var(--border); color: #fff; padding: 8px 12px; }
+
+    .btn-primary {
+      background: var(--neon);
+      color: #000;
+      padding: 10px 16px;
+    }
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      box-shadow: 0 0 15px rgba(214,177,74,0.4);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 8px 12px;
+    }
     .btn-outline:hover { background: rgba(255,255,255,0.05); }
-    .btn-danger { color: var(--danger); border-color: rgba(255,77,77,0.3); }
+
+    .btn-danger {
+      color: var(--danger);
+      border-color: rgba(255,77,77,0.3);
+    }
     .btn-danger:hover { background: rgba(255,77,77,0.1); }
 
-    input, textarea, select { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 10px 14px; border-radius: 8px; outline: none; font-family: inherit; }
-    input:focus, textarea:focus, select:focus { border-color: var(--neon); background: rgba(0,0,0,0.5); }
+    input, textarea, select {
+      width: 100%;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      outline: none;
+      font-family: inherit;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--neon);
+      background: rgba(0,0,0,0.5);
+    }
     select { appearance: none; cursor: pointer; }
 
-    /* LAYOUT */
     #app { display: flex; height: 100vh; width: 100vw; }
-    
-    /* LEFT PANEL */
-    .panel { width: 450px; background: var(--bg-panel); display: flex; flex-direction: column; border-right: 1px solid var(--border); z-index: 10; box-shadow: 5px 0 25px rgba(0,0,0,0.5); }
-    .panel-hdr { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
-    .panel-hdr img { width: 40px; height: 40px; border-radius: 8px; object-fit: contain; background: rgba(255,255,255,0.05); }
+
+    .panel {
+      width: 470px;
+      background: var(--bg-panel);
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      z-index: 10;
+      box-shadow: 5px 0 25px rgba(0,0,0,0.5);
+    }
+
+    .panel-hdr {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .panel-hdr-main {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .panel-hdr img {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: contain;
+      background: rgba(255,255,255,0.05);
+    }
+
     .panel-hdr h1 { margin: 0; font-size: 18px; }
     .panel-hdr span { font-size: 12px; color: var(--neon); }
-    
-    .panel-content { flex: 1; overflow-y: auto; padding: 20px; }
-    .panel-footer { padding: 20px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); }
-    
-    .section { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
-    .section-title { font-size: 14px; font-weight: 700; color: var(--neon); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
-    
+
+    .panel-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .panel-footer {
+      padding: 20px;
+      border-top: 1px solid var(--border);
+      background: rgba(0,0,0,0.2);
+    }
+
+    .section {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--neon);
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
     .field { margin-bottom: 15px; }
-    .field label { display: block; font-size: 13px; color: #a9b6e6; margin-bottom: 6px; }
+    .field label {
+      display: block;
+      font-size: 13px;
+      color: #a9b6e6;
+      margin-bottom: 6px;
+    }
 
-    /* QUESTION LIST */
-    .q-item { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
-    .q-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); }
-    .q-item-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; }
-    .q-item-actions button { padding: 6px; font-size: 12px; }
+    .q-item {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      transition: 0.2s;
+    }
+    .q-item:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.2);
+    }
 
-    /* MODAL */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .q-item-title {
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 260px;
+      cursor: pointer;
+    }
+
+    .q-item-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .q-item-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .q-item-actions button {
+      padding: 6px;
+      font-size: 12px;
+    }
+
+    .preview {
+      flex: 1;
+      position: relative;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .preview-top {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.3);
+      z-index: 2;
+    }
+
+    .preview-top .name { font-weight: 800; color: #fff; }
+    .preview-top .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      background: #111;
+    }
+
+    .preview-stage {
+      flex: 1;
+      min-height: 0;
+    }
+
+    .preview-badge {
+      position: absolute;
+      top: 74px;
+      left: 20px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(5px);
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--neon);
+      pointer-events: none;
+      z-index: 100;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
     .modal-overlay.active { display: flex; }
-    .modal { background: #161925; width: 700px; max-height: 90vh; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow2); display: flex; flex-direction: column; }
-    .modal-hdr { padding: 20px 24px; border-bottom: 1px solid var(--border); font-weight: 700; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
-    .modal-body { padding: 24px; overflow-y: auto; display: flex; gap: 20px; }
-    .modal-col { flex: 1; display: flex; flex-direction: column; gap: 15px; }
-    .modal-ftr { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; background: rgba(0,0,0,0.2); border-radius: 0 0 20px 20px; }
-    
-    .opt-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
-    .opt-row input[type="radio"] { width: 18px; height: 18px; accent-color: var(--ok); cursor: pointer; flex-shrink: 0; }
-    
-    .color-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .color-row label { font-size: 13px; color: #a9b6e6; }
-    .color-row input[type="color"] { width: 40px; height: 30px; padding: 0; cursor: pointer; border: none; border-radius: 4px; }
-    .color-row input[type="number"] { width: 70px; padding: 6px; }
-    .color-row select { width: 120px; padding: 6px; }
 
-    /* RIGHT PANEL (PREVIEW) */
-    .preview { flex: 1; position: relative; background: #000; }
-    iframe { width: 100%; height: 100%; border: none; display: block; }
-    .preview-badge { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; color: var(--neon); pointer-events: none; z-index: 100; border: 1px solid rgba(255,255,255,0.1); }
+    .modal {
+      background: #161925;
+      width: min(900px, 100%);
+      max-height: 90vh;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0,0,0,.6);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-    .export-box { display: flex; gap: 10px; align-items: center; }
-    .export-box input { flex: 1; font-family: monospace; color: var(--ok); }
+    .modal-hdr {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      font-size: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      gap: 20px;
+    }
+
+    .modal-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      min-width: 0;
+    }
+
+    .modal-ftr {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 0 0 20px 20px;
+      flex-wrap: wrap;
+    }
+
+    .opt-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .opt-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--ok);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .color-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .color-row label {
+      font-size: 13px;
+      color: #a9b6e6;
+      min-width: 120px;
+    }
+
+    .color-row input[type="color"] {
+      width: 50px;
+      height: 34px;
+      padding: 2px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .color-row input[type="number"] { width: 90px; padding: 6px; }
+    .color-row select { width: 180px; padding: 6px; }
+
+    .export-box {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .export-box input {
+      flex: 1;
+      font-family: monospace;
+      color: var(--ok);
+    }
+
+    .warn-box {
+      margin-top: 10px;
+      display: none;
+      background: rgba(255,77,77,.12);
+      border: 1px solid rgba(255,77,77,.25);
+      color: #ffd3d3;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .template-box {
+      background: rgba(214, 177, 74, 0.08);
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(214,177,74,.35);
+      margin-bottom: 12px;
+    }
+
+    .template-box .head {
+      font-size: 12px;
+      color: var(--neon);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .template-box .hint {
+      font-size: 11px;
+      color: #a9b6e6;
+      margin-top: 8px;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 1100px) {
+      #app { flex-direction: column; }
+      .panel { width: 100%; height: 55vh; }
+      .preview { height: 45vh; }
+    }
   </style>
 </head>
 <body>
@@ -91,13 +409,16 @@
 <div id="app">
   <div class="panel">
     <div class="panel-hdr">
-      <img src="logo.png" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%23d6b14a\' viewBox=\'0 0 24 24\'><path d=\'M12 2L2 22h20L12 2z\'/></svg>'">
-      <div>
-        <span>Светлана Быкова</span>
-        <h1 id="uiTitleText">Пиньята</h1>
+      <div class="panel-hdr-main">
+        <img src="logo.png" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%23d6b14a\' viewBox=\'0 0 24 24\'><path d=\'M12 2L2 22h20L12 2z\'/></svg>'">
+        <div>
+          <span>Светлана Быкова</span>
+          <h1 id="uiTitleText">Пиньята</h1>
+        </div>
       </div>
+      <button class="btn-outline" onclick="resetAll()">Сбросить всё</button>
     </div>
-    
+
     <div class="panel-content">
       <div class="section">
         <div class="section-title">Основное</div>
@@ -107,7 +428,7 @@
         </div>
         <div class="field">
           <label>Инструкция (Стартовый экран)</label>
-          <textarea id="inpInst" rows="2" oninput="saveAll()">Ответь на 5 вопросов правильно, чтобы разбить пиньяту и получить сюрприз!</textarea>
+          <textarea id="inpInst" rows="3" oninput="saveAll()">Ответь на 5 вопросов правильно, чтобы разбить пиньяту и получить сюрприз!</textarea>
         </div>
         <div class="field">
           <label>Текст при победе</label>
@@ -120,26 +441,51 @@
       </div>
 
       <div class="section">
-        <div class="section-title" style="display:flex; justify-content:space-between;">
+        <div class="section-title" style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
           <span>Вопросы <span id="qCount" style="color:#fff;">(0/5)</span></span>
           <button class="btn-primary" style="padding:4px 8px; font-size:12px;" id="btnAddQ" onclick="openModal(null)">+ Добавить</button>
         </div>
+
+        <div class="template-box">
+          <div class="head">Настройки новых вопросов</div>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <select id="newQTemplate" style="flex:1; min-width:180px;" onchange="saveAll()">
+              <option value="-1">Стандартные (по умолчанию)</option>
+            </select>
+            <button class="btn-outline" type="button" onclick="applyTemplateToAll()">Применить ко всем</button>
+          </div>
+          <div class="hint">
+            Выбранный шаблон применяется к новым вопросам.<br>
+            Кнопка «Применить ко всем» меняет тип ответа и оформление уже созданных вопросов.
+          </div>
+        </div>
+
         <div id="qList"></div>
       </div>
     </div>
-    
+
     <div class="panel-footer">
       <div class="export-box">
         <button class="btn-primary" onclick="window.open($('outLink').value, '_blank')">▶ Играть</button>
         <input type="text" id="outLink" readonly onclick="this.select()">
         <button class="btn-outline" onclick="copyIframe()" title="Скопировать код для Genially">&lt;/&gt;</button>
       </div>
+      <div class="warn-box" id="sizeWarn">
+        Ссылка стала слишком длинной. Включён запасной режим через <b>cfgkey</b>.<br>
+        Для Genially лучше держать вопросы короче, чтобы работал встроенный <b>?game=...</b> формат.
+      </div>
     </div>
   </div>
 
   <div class="preview">
+    <div class="preview-top">
+      <div class="name">Просмотр</div>
+      <div class="hint">Живое превью справа, как в редакторе башни</div>
+    </div>
     <div class="preview-badge">Live Preview</div>
-    <iframe id="previewFrame"></iframe>
+    <div class="preview-stage">
+      <iframe id="previewFrame"></iframe>
+    </div>
   </div>
 </div>
 
@@ -155,10 +501,12 @@
           <label>Текст вопроса</label>
           <textarea id="modQText" rows="3"></textarea>
         </div>
+
         <div class="field">
           <label>URL картинки (необязательно)</label>
           <input type="text" id="modQImg" placeholder="https://...">
         </div>
+
         <div class="field">
           <label>Тип ответа</label>
           <select id="modQType" onchange="toggleQType()">
@@ -166,20 +514,21 @@
             <option value="input">Ввод текста</option>
           </select>
         </div>
-        
+
         <div id="modChoiceArea">
-          <label style="font-size:13px; color:#a9b6e6; display:block; margin-bottom:10px;">Варианты (отметьте верный)</label>
+          <label style="font-size:13px; color:#a9b6e6; display:block; margin-bottom:10px;">Варианты (можно отметить несколько правильных)</label>
           <div id="modOpts"></div>
-          <button class="btn-outline" style="width:100%; border-style:dashed;" onclick="addModalOpt()">+ Добавить вариант</button>
+          <button class="btn-outline" style="width:100%; border-style:dashed;" type="button" onclick="addModalOpt()">+ Добавить вариант</button>
         </div>
-        
+
         <div id="modInputArea" style="display:none;">
-          <label style="font-size:13px; color:#a9b6e6; display:block; margin-bottom:10px;">Правильный ответ (для проверки)</label>
-          <input type="text" id="modInputAns" placeholder="Например: 15">
-          <div style="font-size:11px; color:var(--muted); margin-top:5px;">*Регистр букв и пробелы игнорируются при проверке.</div>
+          <label style="font-size:13px; color:#a9b6e6; display:block; margin-bottom:10px;">Правильные ответы</label>
+          <div id="modInputAnswers"></div>
+          <button class="btn-outline" style="width:100%; border-style:dashed;" type="button" onclick="addModalInputAnswer()">+ Добавить правильный ответ</button>
+          <div style="font-size:11px; color:var(--muted); margin-top:5px;">* Регистр букв и пробелы игнорируются при проверке.</div>
         </div>
       </div>
-      
+
       <div class="modal-col">
         <div class="section-title" style="margin-bottom:10px;">Дизайн блока</div>
         <div class="color-row">
@@ -230,46 +579,114 @@
       </div>
     </div>
     <div class="modal-ftr">
-      <button class="btn-outline btn-danger" id="btnApplyAll" onclick="applySettingsToAll()">Применить дизайн ко всем</button>
-      <div>
-        <button class="btn-outline" onclick="closeModal()">Отмена</button>
-        <button class="btn-primary" onclick="saveModal()">Сохранить вопрос</button>
+      <button class="btn-outline btn-danger" type="button" onclick="applyCurrentModalStyleToAll()">Применить дизайн из модалки ко всем</button>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-outline" type="button" onclick="closeModal()">Отмена</button>
+        <button class="btn-primary" type="button" onclick="saveModal()">Сохранить вопрос</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-  const uid = () => Math.random().toString(36).substr(2, 6);
+  const uid = () => Math.random().toString(36).slice(2, 8);
   const $ = id => document.getElementById(id);
-  
-  // КЛЮЧ АВТОСОХРАНЕНИЯ (обновлен, чтобы избежать конфликтов со старыми кривыми данными)
-  const SAVE_KEY = "pinata_pro_save_v5";
-  
-  // DATA MODEL
-  let Editor = {
-    title: "Праздничная Пиньята", useLatex: false,
-    instText: "Ответь на 5 вопросов правильно, чтобы разбить пиньяту и получить сюрприз!",
-    winText: "Молодец!",
-    questions: [
-      {
-        id: uid(), q: "Сколько будет 2 + 2?", img: "", type: "choice", options: ["3", "4", "5"], correctIdx: 1, inputText: "",
-        style: { bg: "#ffffff", text: "#333333", border: "#cccccc", font: "system-ui", size: 22, btnBg: "#ff7e67", btnText: "#ffffff", btnFont: "system-ui" }
-      }
-    ]
+  const SAVE_KEY = 'pinata_pro_save_v6';
+
+  const DEFAULT_STYLE = {
+    bg: '#ffffff',
+    text: '#333333',
+    border: '#cccccc',
+    font: 'system-ui',
+    size: 22,
+    btnBg: '#ff7e67',
+    btnText: '#ffffff',
+    btnFont: 'system-ui'
   };
 
+  function normalizeEditor(data) {
+    const safe = data && typeof data === 'object' ? data : {};
+    const qs = Array.isArray(safe.questions) ? safe.questions : [];
+
+    return {
+      title: safe.title || 'Праздничная Пиньята',
+      useLatex: !!safe.useLatex,
+      instText: safe.instText || 'Ответь на 5 вопросов правильно, чтобы разбить пиньяту и получить сюрприз!',
+      winText: safe.winText || 'Молодец!',
+      questions: qs.map(q => {
+        const type = q?.type === 'input' ? 'input' : 'choice';
+        const options = Array.isArray(q?.options) ? q.options.map(String) : [];
+        const correctIndices = Array.isArray(q?.correctIndices)
+          ? q.correctIndices.filter(Number.isFinite)
+          : (typeof q?.correctIdx === 'number' ? [q.correctIdx] : [0]);
+        const inputAnswers = Array.isArray(q?.inputAnswers)
+          ? q.inputAnswers.map(String).filter(v => v.trim())
+          : (q?.inputText ? [String(q.inputText)] : []);
+
+        return {
+          id: q?.id || uid(),
+          q: q?.q || '',
+          img: q?.img || '',
+          type,
+          options,
+          correctIndices,
+          inputAnswers,
+          style: { ...DEFAULT_STYLE, ...(q?.style || {}) }
+        };
+      })
+    };
+  }
+
+  let Editor = normalizeEditor({
+    questions: [
+      {
+        id: uid(),
+        q: 'Сколько будет 2 + 2?',
+        img: '',
+        type: 'choice',
+        options: ['3', '4', '5'],
+        correctIndices: [1],
+        inputAnswers: [],
+        style: { ...DEFAULT_STYLE }
+      }
+    ]
+  });
+
+  function selfPageUrl() {
+    return window.location.origin + window.location.pathname;
+  }
+
+  function encodeGameData(payload) {
+    return LZString.compressToEncodedURIComponent(JSON.stringify(payload));
+  }
+
+  function decodeGameData(data) {
+    const raw = LZString.decompressFromEncodedURIComponent(data);
+    if (!raw) throw new Error('decode failed');
+    return JSON.parse(raw);
+  }
+
   const urlParams = new URLSearchParams(window.location.search);
+  const gameParam = urlParams.get('game');
   const cfgKeyParam = urlParams.get('cfgkey');
 
-  if(cfgKeyParam) {
-    document.body.innerHTML = "";
+  if (gameParam) {
+    document.body.innerHTML = '';
+    try {
+      const cfg = normalizeEditor(decodeGameData(gameParam));
+      document.write(buildGameHTML(cfg, true));
+      document.close();
+    } catch (e) {
+      document.body.innerHTML = '<h2 style="color:red;text-align:center;margin-top:50px;">Ошибка чтения game-параметра</h2>';
+    }
+  } else if (cfgKeyParam) {
+    document.body.innerHTML = '';
     try {
       const rawStr = localStorage.getItem(cfgKeyParam) || sessionStorage.getItem(cfgKeyParam);
-      if(!rawStr) throw new Error();
-      document.write(buildGameHTML(JSON.parse(rawStr), true));
+      if (!rawStr) throw new Error('cfg not found');
+      document.write(buildGameHTML(normalizeEditor(JSON.parse(rawStr)), true));
       document.close();
-    } catch(e) {
+    } catch (e) {
       document.body.innerHTML = '<h2 style="color:red;text-align:center;margin-top:50px;">Ошибка загрузки игры</h2>';
     }
   } else {
@@ -277,120 +694,234 @@
   }
 
   function initEditor() {
-    try { const saved = localStorage.getItem(SAVE_KEY); if(saved) Editor = Object.assign(Editor, JSON.parse(saved)); } catch(e){}
-    $("inpTitle").value = Editor.title || "Праздничная Пиньята";
-    $("inpInst").value = Editor.instText || "Ответь на 5 вопросов правильно...";
-    $("inpWin").value = Editor.winText || "Молодец!";
-    $("chkLatex").checked = !!Editor.useLatex;
+    try {
+      const saved = localStorage.getItem(SAVE_KEY);
+      if (saved) Editor = normalizeEditor(JSON.parse(saved));
+    } catch (e) {}
+
+    $('inpTitle').value = Editor.title;
+    $('inpInst').value = Editor.instText;
+    $('inpWin').value = Editor.winText;
+    $('chkLatex').checked = !!Editor.useLatex;
+
     renderQList();
     saveAll();
   }
 
+  function resetAll() {
+    if (!confirm('Сбросить все настройки редактора?')) return;
+    localStorage.removeItem(SAVE_KEY);
+    Editor = normalizeEditor({
+      questions: [{
+        id: uid(),
+        q: 'Сколько будет 2 + 2?',
+        img: '',
+        type: 'choice',
+        options: ['3', '4', '5'],
+        correctIndices: [1],
+        inputAnswers: [],
+        style: { ...DEFAULT_STYLE }
+      }]
+    });
+    $('inpTitle').value = Editor.title;
+    $('inpInst').value = Editor.instText;
+    $('inpWin').value = Editor.winText;
+    $('chkLatex').checked = !!Editor.useLatex;
+    renderQList();
+    saveAll();
+  }
+
+  function questionTypeLabel(q) {
+    if (q.type === 'input') return 'Ввод';
+    return (q.correctIndices || []).length > 1 ? 'Множественный выбор' : 'Выбор';
+  }
+
   function renderQList() {
-    const list = $("qList"); list.innerHTML = "";
+    const list = $('qList');
+    list.innerHTML = '';
+
     Editor.questions.forEach((q, i) => {
-      const item = document.createElement("div"); item.className = "q-item";
+      const item = document.createElement('div');
+      item.className = 'q-item';
       item.innerHTML = `
-        <div class="q-item-title" onclick="openModal('${q.id}')">${i+1}. ${q.q || 'Пустой вопрос'}</div>
+        <div style="min-width:0; flex:1;" onclick="openModal('${q.id}')">
+          <div class="q-item-title">${i + 1}. ${escapeHtml(q.q || 'Пустой вопрос')}</div>
+          <div class="q-item-sub">${questionTypeLabel(q)}</div>
+        </div>
         <div class="q-item-actions">
-          <button class="btn-outline" onclick="openModal('${q.id}')">✏️</button>
-          <button class="btn-outline btn-danger" onclick="delQ('${q.id}')">🗑</button>
+          <button class="btn-outline" type="button" onclick="openModal('${q.id}')">✏️</button>
+          <button class="btn-outline btn-danger" type="button" onclick="delQ('${q.id}')">🗑</button>
         </div>
       `;
       list.appendChild(item);
     });
-    $("qCount").innerText = `(${Editor.questions.length}/5)`;
-    $("btnAddQ").style.display = Editor.questions.length >= 5 ? "none" : "block";
+
+    $('qCount').innerText = `(${Editor.questions.length}/5)`;
+    $('btnAddQ').style.display = Editor.questions.length >= 5 ? 'none' : 'block';
+    updateTemplateSelect();
   }
 
-  // --- MODAL LOGIC ---
+  function updateTemplateSelect() {
+    const sel = $('newQTemplate');
+    if (!sel) return;
+    const prev = sel.value;
+    sel.innerHTML = '<option value="-1">Стандартные (по умолчанию)</option>';
+    Editor.questions.forEach((q, i) => {
+      const title = (q.q || `Вопрос ${i + 1}`).slice(0, 42);
+      sel.innerHTML += `<option value="${i}">Как в #${i + 1}: ${escapeHtml(title)}</option>`;
+    });
+
+    if (prev !== null && sel.querySelector(`option[value="${prev}"]`)) sel.value = prev;
+    else sel.value = '-1';
+  }
+
   let editingId = null;
 
   function openModal(id) {
     editingId = id;
-    $("modOpts").innerHTML = "";
-    
+    $('modOpts').innerHTML = '';
+    $('modInputAnswers').innerHTML = '';
+
     let q;
     if (id) {
       q = Editor.questions.find(x => x.id === id);
-      $("modalTitle").innerText = "Редактирование вопроса";
+      $('modalTitle').innerText = 'Редактирование вопроса';
     } else {
-      const baseStyle = Editor.questions.length > 0 ? {...Editor.questions[0].style} : { bg: "#ffffff", text: "#333333", border: "#cccccc", font: "system-ui", size: 22, btnBg: "#ff7e67", btnText: "#ffffff", btnFont: "system-ui" };
-      q = { q: "", img: "", type: "choice", options: ["", ""], correctIdx: 0, inputText: "", style: baseStyle };
-      $("modalTitle").innerText = "Новый вопрос";
+      const tplIdx = parseInt($('newQTemplate')?.value || '-1', 10);
+      const templateQ = tplIdx >= 0 && Editor.questions[tplIdx] ? Editor.questions[tplIdx] : null;
+
+      q = {
+        q: '',
+        img: '',
+        type: templateQ?.type || 'choice',
+        options: ['', ''],
+        correctIndices: [0],
+        inputAnswers: [''],
+        style: templateQ?.style ? { ...templateQ.style } : { ...DEFAULT_STYLE }
+      };
+      $('modalTitle').innerText = 'Новый вопрос';
     }
 
-    $("modQText").value = q.q || "";
-    $("modQImg").value = q.img || "";
-    $("modQType").value = q.type || "choice";
-    $("modInputAns").value = q.inputText || "";
-    
-    (q.options || []).forEach((opt, idx) => addModalOpt(opt, idx === (q.correctIdx || 0)));
-    
+    $('modQText').value = q.q || '';
+    $('modQImg').value = q.img || '';
+    $('modQType').value = q.type || 'choice';
+
+    if (q.type === 'choice') {
+      const corrects = Array.isArray(q.correctIndices) ? q.correctIndices : [0];
+      (q.options || []).forEach((opt, idx) => addModalOpt(opt, corrects.includes(idx)));
+      if (!(q.options || []).length) {
+        addModalOpt('', true);
+        addModalOpt('', false);
+      }
+    } else {
+      const answers = Array.isArray(q.inputAnswers) ? q.inputAnswers : [''];
+      if (answers.length) answers.forEach(a => addModalInputAnswer(a));
+      else addModalInputAnswer('');
+    }
+
     const st = q.style || {};
-    $("modBgColor").value = st.bg || "#ffffff";
-    $("modTextColor").value = st.text || "#333333";
-    $("modBorderColor").value = st.border || "#cccccc";
-    $("modFont").value = st.font || "system-ui";
-    $("modFontSize").value = st.size || 22;
-    $("modBtnBg").value = st.btnBg || "#ff7e67";
-    $("modBtnText").value = st.btnText || "#ffffff";
-    $("modBtnFont").value = st.btnFont || "system-ui";
+    $('modBgColor').value = st.bg || DEFAULT_STYLE.bg;
+    $('modTextColor').value = st.text || DEFAULT_STYLE.text;
+    $('modBorderColor').value = st.border || DEFAULT_STYLE.border;
+    $('modFont').value = st.font || DEFAULT_STYLE.font;
+    $('modFontSize').value = st.size || DEFAULT_STYLE.size;
+    $('modBtnBg').value = st.btnBg || DEFAULT_STYLE.btnBg;
+    $('modBtnText').value = st.btnText || DEFAULT_STYLE.btnText;
+    $('modBtnFont').value = st.btnFont || DEFAULT_STYLE.btnFont;
 
     toggleQType();
-    $("qModal").classList.add("active");
+    $('qModal').classList.add('active');
+  }
+
+  function closeModal() {
+    $('qModal').classList.remove('active');
   }
 
   function toggleQType() {
-    const isChoice = $("modQType").value === "choice";
-    $("modChoiceArea").style.display = isChoice ? "block" : "none";
-    $("modInputArea").style.display = isChoice ? "none" : "block";
+    const isChoice = $('modQType').value === 'choice';
+    $('modChoiceArea').style.display = isChoice ? 'block' : 'none';
+    $('modInputArea').style.display = isChoice ? 'none' : 'block';
   }
 
-  function addModalOpt(val = "", isCorrect = false) {
-    const div = document.createElement("div"); div.className = "opt-row";
+  function addModalOpt(val = '', isCorrect = false) {
+    const div = document.createElement('div');
+    div.className = 'opt-row';
     div.innerHTML = `
-      <input type="radio" name="modOptCorrect" ${isCorrect ? 'checked' : ''}>
-      <input type="text" class="modOptVal" value="${val.replace(/"/g, '&quot;')}">
-      <button class="btn-outline btn-danger" onclick="this.parentElement.remove()">✕</button>
+      <input type="checkbox" class="modOptCorrect" ${isCorrect ? 'checked' : ''}>
+      <input type="text" class="modOptVal" value="${escapeAttr(val)}" placeholder="Текст варианта">
+      <button class="btn-outline btn-danger" type="button" onclick="this.parentElement.remove()">✕</button>
     `;
-    $("modOpts").appendChild(div);
+    $('modOpts').appendChild(div);
+  }
+
+  function addModalInputAnswer(val = '') {
+    const row = document.createElement('div');
+    row.className = 'opt-row';
+    row.innerHTML = `
+      <input type="text" class="modInputAnswerVal" value="${escapeAttr(val)}" placeholder="Правильный ответ">
+      <button class="btn-outline btn-danger" type="button" onclick="this.parentElement.remove()">✕</button>
+    `;
+    $('modInputAnswers').appendChild(row);
   }
 
   function saveModal() {
-    const qText = $("modQText").value.trim();
-    if(!qText) return alert("Введите вопрос!");
-    
-    const type = $("modQType").value;
-    let options = [], correctIdx = 0, inputText = "";
-    
-    if (type === "choice") {
-      const rows = document.querySelectorAll("#modOpts .opt-row");
-      if(rows.length < 2) return alert("Нужно минимум 2 варианта!");
-      let hasCorrect = false;
+    const qText = $('modQText').value.trim();
+    if (!qText) return alert('Введите вопрос!');
+
+    const type = $('modQType').value;
+    let options = [];
+    let correctIndices = [];
+    let inputAnswers = [];
+
+    if (type === 'choice') {
+      const rows = Array.from(document.querySelectorAll('#modOpts .opt-row'));
+      if (rows.length < 2) return alert('Нужно минимум 2 варианта!');
+
       rows.forEach((row, idx) => {
-        options.push(row.querySelector(".modOptVal").value.trim());
-        if(row.querySelector('input[type="radio"]').checked) { correctIdx = idx; hasCorrect = true; }
+        const val = row.querySelector('.modOptVal').value.trim();
+        if (val) {
+          const newIndex = options.length;
+          options.push(val);
+          if (row.querySelector('.modOptCorrect').checked) correctIndices.push(newIndex);
+        }
       });
-      if(!hasCorrect) return alert("Выберите правильный вариант!");
+
+      if (options.length < 2) return alert('Нужно минимум 2 непустых варианта!');
+      if (correctIndices.length < 1) return alert('Отметьте хотя бы один правильный вариант!');
     } else {
-      inputText = $("modInputAns").value.trim();
-      if(!inputText) return alert("Введите правильный ответ для проверки!");
+      const rows = Array.from(document.querySelectorAll('#modInputAnswers .opt-row'));
+      rows.forEach(row => {
+        const val = row.querySelector('.modInputAnswerVal').value.trim();
+        if (val) inputAnswers.push(val);
+      });
+      if (!inputAnswers.length) return alert('Введите хотя бы один правильный ответ!');
     }
 
     const newQ = {
-      id: editingId || uid(), q: qText, img: $("modQImg").value.trim(), type, options, correctIdx, inputText,
+      id: editingId || uid(),
+      q: qText,
+      img: $('modQImg').value.trim(),
+      type,
+      options,
+      correctIndices,
+      inputAnswers,
       style: {
-        bg: $("modBgColor").value, text: $("modTextColor").value, border: $("modBorderColor").value,
-        font: $("modFont").value, size: $("modFontSize").value, btnBg: $("modBtnBg").value, btnText: $("modBtnText").value, btnFont: $("modBtnFont").value
+        bg: $('modBgColor').value,
+        text: $('modTextColor').value,
+        border: $('modBorderColor').value,
+        font: $('modFont').value,
+        size: Number($('modFontSize').value) || 22,
+        btnBg: $('modBtnBg').value,
+        btnText: $('modBtnText').value,
+        btnFont: $('modBtnFont').value
       }
     };
 
     if (editingId) {
       const idx = Editor.questions.findIndex(x => x.id === editingId);
-      Editor.questions[idx] = newQ;
+      if (idx >= 0) Editor.questions[idx] = newQ;
     } else {
-      if(Editor.questions.length >= 5) return alert("Максимум 5 вопросов!");
+      if (Editor.questions.length >= 5) return alert('Максимум 5 вопросов!');
       Editor.questions.push(newQ);
     }
 
@@ -399,295 +930,686 @@
     saveAll();
   }
 
-  function applySettingsToAll() {
-    if(!confirm("Применить текущие цвета и шрифты ко всем вопросам?")) return;
+  function applyCurrentModalStyleToAll() {
+    if (!Editor.questions.length) return;
+    if (!confirm('Применить текущий дизайн из модалки ко всем вопросам?')) return;
+
     const style = {
-      bg: $("modBgColor").value, text: $("modTextColor").value, border: $("modBorderColor").value,
-      font: $("modFont").value, size: $("modFontSize").value, btnBg: $("modBtnBg").value, btnText: $("modBtnText").value, btnFont: $("modBtnFont").value
+      bg: $('modBgColor').value,
+      text: $('modTextColor').value,
+      border: $('modBorderColor').value,
+      font: $('modFont').value,
+      size: Number($('modFontSize').value) || 22,
+      btnBg: $('modBtnBg').value,
+      btnText: $('modBtnText').value,
+      btnFont: $('modBtnFont').value
     };
-    Editor.questions.forEach(q => { q.style = {...style}; });
+
+    Editor.questions.forEach(q => {
+      q.style = { ...style };
+    });
+
     saveAll();
-    alert("Дизайн скопирован на все вопросы!");
+    alert('Дизайн скопирован на все вопросы');
   }
 
-  function closeModal() { $("qModal").classList.remove("active"); }
-  function delQ(id) { Editor.questions = Editor.questions.filter(q => q.id !== id); renderQList(); saveAll(); }
+  function applyTemplateToAll() {
+    if (!Editor.questions.length) return;
 
-  // --- SAVE & PREVIEW ---
+    const tplIdx = parseInt($('newQTemplate')?.value || '-1', 10);
+    const tpl = tplIdx >= 0 && Editor.questions[tplIdx] ? Editor.questions[tplIdx] : null;
+
+    const baseType = tpl?.type || 'choice';
+    const baseStyle = tpl?.style ? { ...tpl.style } : { ...DEFAULT_STYLE };
+
+    if (!confirm('Применить тип вопроса и оформление ко всем вопросам?')) return;
+
+    Editor.questions.forEach(q => {
+      q.style = { ...baseStyle };
+
+      if (q.type !== baseType) {
+        q.type = baseType;
+
+        if (baseType === 'choice') {
+          const ans = Array.isArray(q.inputAnswers) && q.inputAnswers.length ? q.inputAnswers[0] : 'Верный ответ';
+          q.options = [ans, 'Вариант 2'];
+          q.correctIndices = [0];
+          q.inputAnswers = [];
+        } else {
+          let ans = '';
+          if (Array.isArray(q.options) && q.options.length && Array.isArray(q.correctIndices) && q.correctIndices.length) {
+            ans = q.options[q.correctIndices[0]] || '';
+          }
+          q.inputAnswers = [ans || 'Ответ'];
+          q.options = [];
+          q.correctIndices = [];
+        }
+      }
+    });
+
+    renderQList();
+    saveAll();
+    alert('Настройки применены ко всем вопросам');
+  }
+
+  function delQ(id) {
+    Editor.questions = Editor.questions.filter(q => q.id !== id);
+    renderQList();
+    saveAll();
+  }
+
   let debounceTimer;
-  function saveAll() {
-    Editor.title = $("inpTitle").value;
-    Editor.instText = $("inpInst").value;
-    Editor.winText = $("inpWin").value;
-    Editor.useLatex = $("chkLatex").checked;
-    
-    $("uiTitleText").innerText = Editor.title || "Пиньята";
 
+  function saveAll() {
+    Editor.title = $('inpTitle').value;
+    Editor.instText = $('inpInst').value;
+    Editor.winText = $('inpWin').value;
+    Editor.useLatex = $('chkLatex').checked;
+
+    $('uiTitleText').innerText = Editor.title || 'Пиньята';
     localStorage.setItem(SAVE_KEY, JSON.stringify(Editor));
-    
-    const k = "pinata_run_" + uid();
-    localStorage.setItem(k, JSON.stringify(Editor));
-    $("outLink").value = window.location.origin + window.location.pathname + "?cfgkey=" + k;
-    
+
+    const payload = normalizeEditor(JSON.parse(JSON.stringify(Editor)));
+    const packed = encodeGameData(payload);
+    const warn = $('sizeWarn');
+
+    if (packed.length < 2500) {
+      $('outLink').value = selfPageUrl() + '?game=' + packed;
+      warn.style.display = 'none';
+    } else {
+      const k = 'pinata_run_' + uid();
+      localStorage.setItem(k, JSON.stringify(payload));
+      sessionStorage.setItem(k, JSON.stringify(payload));
+      $('outLink').value = selfPageUrl() + '?cfgkey=' + encodeURIComponent(k);
+      warn.style.display = 'block';
+    }
+
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
-        // НАДЕЖНЫЙ МЕТОД ДЛЯ ЛОКАЛЬНЫХ ФАЙЛОВ (без ошибок CORS)
-        $("previewFrame").srcdoc = buildGameHTML(Editor, false);
-    }, 400);
+      $('previewFrame').srcdoc = buildGameHTML(payload, false);
+    }, 250);
   }
 
-  function copyIframe() { navigator.clipboard.writeText(`<iframe src="${$("outLink").value}" width="100%" height="600" frameborder="0" allowfullscreen></iframe>`).then(() => alert("Код Iframe скопирован!")); }
+  function copyIframe() {
+    const code = `<iframe src="${$('outLink').value}" width="100%" height="600" frameborder="0" allowfullscreen></iframe>`;
+    navigator.clipboard.writeText(code)
+      .then(() => alert('Код iframe скопирован!'))
+      .catch(() => alert('Не удалось скопировать код.'));
+  }
 
-  // --- GAME BUILDER ---
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function escapeAttr(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  }
+
   function buildGameHTML(cfg, isStandalone) {
+    const safeCfg = normalizeEditor(cfg);
+
     let latexScripts = '';
-    if(cfg.useLatex) {
-      latexScripts = `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-                      <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"><\/script>`;
+    if (safeCfg.useLatex) {
+      latexScripts = `
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"><\/script>
+      `;
     }
 
     return `<!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${cfg.title}</title>
-    ${latexScripts}
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Neucha&display=swap');
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        
-        #game-container { position: relative; width: 100vw; height: 100vh; background-image: url('bg (2).png'); background-size: cover; background-position: center; background-repeat: no-repeat; }
-        .game-logo { position: absolute; top: 20px; right: 20px; max-height: 80px; max-width: 150px; z-index: 100; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); object-fit: contain; }
-        
-        #startOverlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999; text-align: center; padding: 20px; }
-        #startOverlay h1 { color: #d6b14a; font-family: 'Caveat', cursive; font-size: 4rem; margin: 0 0 10px; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        #startOverlay p { color: #fff; font-size: 1.2rem; max-width: 500px; line-height: 1.5; margin-bottom: 30px; }
-        #startOverlay button { font-size: 1.2rem; padding: 15px 40px; border-radius: 30px; cursor: pointer; background: #d6b14a; color: #000; border: none; font-weight: bold; transition: 0.2s; box-shadow: 0 4px 15px rgba(214,177,74,0.4); }
-        #startOverlay button:hover { transform: scale(1.05); }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(safeCfg.title)}</title>
+  ${latexScripts}
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Neucha&display=swap');
 
-        /* КООРДИНАТЫ ПИНЬЯТЫ ЗАФИКСИРОВАНЫ */
-        #piniata-wrapper { position: absolute; width: 310px; left: 68.35%; top: 54.59%; transform: translate(-50%, -50%); z-index: 10; display: none; }
-        .piniata-image { width: 100%; height: auto; display: block; transform-origin: 50% 0%; cursor: pointer; filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.3)); }
-        
-        .swing { animation: swingAnim 4s ease-in-out infinite; }
-        @keyframes swingAnim { 0% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } 100% { transform: rotate(-6deg); } }
-        .hit-anim { animation: hitAnim 0.2s ease-out; }
-        @keyframes hitAnim { 0% { transform: scale(1) rotate(0deg); } 50% { transform: scale(0.9) rotate(15deg) translateY(-10px); } 100% { transform: scale(1) rotate(0deg); } }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #333;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-        #quiz-panel { position: absolute; left: 5%; top: 50%; transform: translateY(-50%); padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 360px; text-align: center; z-index: 50; display: none; transition: 0.3s; display: flex; flex-direction: column; gap: 15px; }
-        #q-img { max-width: 100%; border-radius: 10px; display: none; margin: 0 auto; max-height: 150px; object-fit: contain; }
-        #question-text-game { font-weight: bold; line-height: 1.3; }
-        
-        .option-btn { display: block; width: 100%; padding: 12px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .option-btn:hover { filter: brightness(0.9); transform: translateY(-2px); }
-        .option-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
-        
-        .input-wrapper { display: flex; flex-direction: column; gap: 10px; }
-        .input-field { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid rgba(0,0,0,0.1); font-size: 16px; outline: none; text-align: center; font-weight: bold; }
-        
-        #feedback-text-game { font-size: 18px; font-weight: bold; min-height: 24px; }
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background-image: url('bg (2).png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      overflow: hidden;
+    }
 
-        #win-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; font-weight: bold; color: #ffca3a; text-shadow: 4px 4px 0px #ff595e, 8px 8px 15px rgba(0,0,0,0.5); display: none; z-index: 100; text-transform: uppercase; text-align: center; }
-        .confetti { position: absolute; top: -20px; z-index: 90; animation: fall linear forwards; }
-        @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
-    </style>
+    .game-logo {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      max-height: 80px;
+      max-width: 150px;
+      z-index: 100;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      object-fit: contain;
+    }
+
+    #startOverlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      text-align: center;
+      padding: 20px;
+    }
+
+    #startOverlay h1 {
+      color: #d6b14a;
+      font-family: 'Caveat', cursive;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      margin: 0 0 10px;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    #startOverlay p {
+      color: #fff;
+      font-size: 1.2rem;
+      max-width: 560px;
+      line-height: 1.5;
+      margin-bottom: 30px;
+      white-space: pre-wrap;
+    }
+
+    #startOverlay button {
+      font-size: 1.2rem;
+      padding: 15px 40px;
+      border-radius: 30px;
+      cursor: pointer;
+      background: #d6b14a;
+      color: #000;
+      border: none;
+      font-weight: bold;
+      transition: 0.2s;
+      box-shadow: 0 4px 15px rgba(214,177,74,0.4);
+    }
+
+    #startOverlay button:hover { transform: scale(1.05); }
+
+    #piniata-wrapper {
+      position: absolute;
+      width: 310px;
+      left: 68.35%;
+      top: 54.59%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      display: none;
+    }
+
+    .piniata-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      transform-origin: 50% 0%;
+      cursor: pointer;
+      filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.3));
+    }
+
+    .swing { animation: swingAnim 4s ease-in-out infinite; }
+    @keyframes swingAnim {
+      0% { transform: rotate(-6deg); }
+      50% { transform: rotate(6deg); }
+      100% { transform: rotate(-6deg); }
+    }
+
+    .hit-anim { animation: hitAnim 0.2s ease-out; }
+    @keyframes hitAnim {
+      0% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(0.9) rotate(15deg) translateY(-10px); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    #quiz-panel {
+      position: absolute;
+      left: 5%;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      width: 380px;
+      text-align: center;
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+      gap: 15px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    #q-img {
+      max-width: 100%;
+      border-radius: 10px;
+      display: none;
+      margin: 0 auto;
+      max-height: 160px;
+      object-fit: contain;
+    }
+
+    #question-text-game {
+      font-weight: bold;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .option-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin-bottom: 10px;
+    }
+
+    .option-btn:hover {
+      filter: brightness(0.9);
+      transform: translateY(-2px);
+    }
+
+    .option-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .option-btn.selected {
+      outline: 3px solid rgba(45,210,125,.7);
+      transform: translateY(-1px) scale(0.99);
+    }
+
+    .input-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid rgba(0,0,0,0.1);
+      font-size: 16px;
+      outline: none;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    #feedback-text-game {
+      font-size: 18px;
+      font-weight: bold;
+      min-height: 24px;
+    }
+
+    #win-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      font-weight: bold;
+      color: #ffca3a;
+      text-shadow: 4px 4px 0px #ff595e, 8px 8px 15px rgba(0,0,0,0.5);
+      display: none;
+      z-index: 100;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 20px;
+      white-space: pre-wrap;
+    }
+
+    .confetti {
+      position: absolute;
+      top: -20px;
+      z-index: 90;
+      animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(720deg); }
+    }
+
+    @media (max-width: 900px) {
+      #quiz-panel {
+        left: 50%;
+        top: auto;
+        bottom: 20px;
+        transform: translateX(-50%);
+        width: min(92vw, 420px);
+      }
+      #piniata-wrapper {
+        left: 50%;
+        top: 30%;
+      }
+    }
+  </style>
 </head>
 <body>
-
-<div id="game-container">
+  <div id="game-container">
     <img src="logo.png" class="game-logo" onerror="this.style.display='none'">
-    
+
     <div id="startOverlay">
-        <h1>${cfg.title}</h1>
-        <p>${cfg.instText}</p>
-        <button id="btnStartGame">Начать игру</button>
+      <h1>${escapeHtml(safeCfg.title)}</h1>
+      <p>${escapeHtml(safeCfg.instText)}</p>
+      <button id="btnStartGame">Начать игру</button>
     </div>
 
     <div id="quiz-panel" style="display:none;">
-        <img id="q-img">
-        <div id="question-text-game"></div>
-        <div id="options-container"></div>
-        <div id="feedback-text-game"></div>
+      <img id="q-img">
+      <div id="question-text-game"></div>
+      <div id="options-container"></div>
+      <div id="feedback-text-game"></div>
     </div>
 
-    <div id="win-message">${cfg.winText}</div>
-    
+    <div id="win-message">${escapeHtml(safeCfg.winText)}</div>
+
     <div id="piniata-wrapper">
-        <img class="piniata-image swing" id="piniata-img" src="1.png" alt="Пиньята">
+      <img class="piniata-image swing" id="piniata-img" src="1.png" alt="Пиньята">
     </div>
-</div>
+  </div>
 
-<script>
-    const cfg = ${JSON.stringify(cfg)};
-    
-    let baseQs = cfg.questions && cfg.questions.length > 0 ? cfg.questions : [{ q: "Вопросов нет", type: "choice", options: ["Ок"], correctIdx: 0, style: { bg:"#fff", text:"#000", border:"#ccc", font:"system-ui", size:22, btnBg:"#ccc", btnText:"#000", btnFont:"system-ui" } }];
+  <script>
+    const cfg = ${JSON.stringify(safeCfg)};
+
+    const baseQs = Array.isArray(cfg.questions) && cfg.questions.length
+      ? cfg.questions
+      : [{
+          q: 'Вопросов нет',
+          type: 'choice',
+          options: ['Ок'],
+          correctIndices: [0],
+          inputAnswers: [],
+          style: ${JSON.stringify(DEFAULT_STYLE)}
+        }];
+
     const gameQs = [];
     for (let i = 0; i < 5; i++) gameQs.push(baseQs[i % baseQs.length]);
-    
+
     const images = ['1.png', '2.png', '112.png', '3.png', '4.png', '5.png'];
     let currentStage = 0;
     let canHit = false;
     let audioCtx = null;
+    let multiSelected = new Set();
 
-    const btnStart = document.getElementById("btnStartGame");
-    const overlay = document.getElementById("startOverlay");
-    const piniataImg = document.getElementById("piniata-img");
-    const piniataWrapper = document.getElementById("piniata-wrapper");
-    const quizPanel = document.getElementById("quiz-panel");
-    const qImg = document.getElementById("q-img");
-    const qText = document.getElementById("question-text-game");
-    const optContainer = document.getElementById("options-container");
-    const feedbackText = document.getElementById("feedback-text-game");
-    const winMessage = document.getElementById("win-message");
+    const btnStart = document.getElementById('btnStartGame');
+    const overlay = document.getElementById('startOverlay');
+    const piniataImg = document.getElementById('piniata-img');
+    const piniataWrapper = document.getElementById('piniata-wrapper');
+    const quizPanel = document.getElementById('quiz-panel');
+    const qImg = document.getElementById('q-img');
+    const qText = document.getElementById('question-text-game');
+    const optContainer = document.getElementById('options-container');
+    const feedbackText = document.getElementById('feedback-text-game');
+    const winMessage = document.getElementById('win-message');
 
     btnStart.onclick = () => {
-        overlay.style.display = 'none';
-        piniataWrapper.style.display = 'block';
-        quizPanel.style.display = 'flex';
-        loadQuestion();
+      overlay.style.display = 'none';
+      piniataWrapper.style.display = 'block';
+      quizPanel.style.display = 'flex';
+      loadQuestion();
     };
 
     function playHitSound() {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-        osc.type = 'square'; osc.frequency.setValueAtTime(130, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.5, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(130, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.1);
     }
 
     function renderLatex(el, text) {
-        if(cfg.useLatex && window.katex) { try { katex.render(text, el, {throwOnError: false}); } catch(e) { el.innerText = text; } } 
-        else { el.innerText = text; }
+      if (cfg.useLatex && window.katex) {
+        try {
+          katex.render(text, el, { throwOnError: false });
+        } catch (e) {
+          el.innerText = text;
+        }
+      } else {
+        el.innerText = text;
+      }
+    }
+
+    function cleanText(str) {
+      return (str || '').toString().toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    function cleanCompact(str) {
+      return (str || '').toString().toLowerCase().replace(/\s+/g, '');
     }
 
     function loadQuestion() {
-        if (currentStage >= 5) return;
-        
-        const currentQ = gameQs[currentStage];
-        const st = currentQ.style;
-        
-        quizPanel.style.backgroundColor = st.bg || '#ffffff';
-        quizPanel.style.border = '2px solid ' + (st.border || '#cccccc');
-        qText.style.color = st.text || '#333333';
-        qText.style.fontFamily = st.font || 'system-ui';
-        qText.style.fontSize = (st.size || 22) + 'px';
-        
-        if (currentQ.img) { qImg.src = currentQ.img; qImg.style.display = 'block'; } 
-        else { qImg.style.display = 'none'; }
-        
-        renderLatex(qText, currentQ.q);
-        optContainer.innerHTML = ''; 
-        feedbackText.innerText = ''; 
-        canHit = false;
+      if (currentStage >= 5) return;
 
-        if (currentQ.type === "choice") {
-            currentQ.options.forEach((opt, index) => {
-                const btn = document.createElement('button'); 
-                btn.className = 'option-btn'; 
-                renderLatex(btn, opt);
-                btn.style.backgroundColor = st.btnBg || '#ff7e67';
-                btn.style.color = st.btnText || '#ffffff';
-                btn.style.fontFamily = st.btnFont || 'system-ui';
-                
-                btn.onclick = () => checkChoice(index, currentQ.correctIdx, btn);
-                optContainer.appendChild(btn);
-            });
-        } else {
-            const wrap = document.createElement('div'); wrap.className = 'input-wrapper';
-            const inp = document.createElement('input'); inp.type = 'text'; inp.className = 'input-field'; inp.placeholder = 'Ваш ответ...';
-            inp.style.fontFamily = st.btnFont || 'system-ui';
-            
-            const btn = document.createElement('button'); btn.className = 'option-btn'; btn.innerText = 'ОТВЕТИТЬ';
-            btn.style.backgroundColor = st.btnBg || '#ff7e67'; btn.style.color = st.btnText || '#ffffff'; btn.style.fontFamily = st.btnFont || 'system-ui';
-            
-            btn.onclick = () => checkInput(inp.value, currentQ.inputText, btn, inp);
-            inp.onkeydown = (e) => { if(e.key === 'Enter') btn.click(); };
-            
-            wrap.appendChild(inp); wrap.appendChild(btn);
-            optContainer.appendChild(wrap);
-            setTimeout(() => inp.focus(), 100);
+      const currentQ = gameQs[currentStage];
+      const st = currentQ.style || {};
+      multiSelected = new Set();
+
+      quizPanel.style.backgroundColor = st.bg || '#ffffff';
+      quizPanel.style.border = '2px solid ' + (st.border || '#cccccc');
+      qText.style.color = st.text || '#333333';
+      qText.style.fontFamily = st.font || 'system-ui';
+      qText.style.fontSize = (st.size || 22) + 'px';
+
+      if (currentQ.img) {
+        qImg.src = currentQ.img;
+        qImg.style.display = 'block';
+      } else {
+        qImg.style.display = 'none';
+      }
+
+      renderLatex(qText, currentQ.q || '');
+      optContainer.innerHTML = '';
+      feedbackText.innerText = '';
+      canHit = false;
+
+      if (currentQ.type === 'choice') {
+        const corrects = Array.isArray(currentQ.correctIndices) && currentQ.correctIndices.length
+          ? currentQ.correctIndices
+          : [0];
+
+        const isMulti = corrects.length > 1;
+
+        currentQ.options.forEach((opt, index) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          renderLatex(btn, opt);
+          btn.style.backgroundColor = st.btnBg || '#ff7e67';
+          btn.style.color = st.btnText || '#ffffff';
+          btn.style.fontFamily = st.btnFont || 'system-ui';
+
+          if (isMulti) {
+            btn.onclick = () => {
+              if (canHit) return;
+              if (multiSelected.has(index)) {
+                multiSelected.delete(index);
+                btn.classList.remove('selected');
+              } else {
+                multiSelected.add(index);
+                btn.classList.add('selected');
+              }
+            };
+          } else {
+            btn.onclick = () => checkChoice([index], corrects, btn);
+          }
+
+          optContainer.appendChild(btn);
+        });
+
+        if (isMulti) {
+          const submit = document.createElement('button');
+          submit.className = 'option-btn';
+          submit.innerText = 'ПРОВЕРИТЬ';
+          submit.style.backgroundColor = st.btnBg || '#ff7e67';
+          submit.style.color = st.btnText || '#ffffff';
+          submit.style.fontFamily = st.btnFont || 'system-ui';
+          submit.onclick = () => checkChoice(Array.from(multiSelected).sort((a,b) => a-b), corrects.sort((a,b) => a-b), submit);
+          optContainer.appendChild(submit);
         }
+      } else {
+        const wrap = document.createElement('div');
+        wrap.className = 'input-wrapper';
+
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = 'input-field';
+        inp.placeholder = 'Ваш ответ...';
+        inp.style.fontFamily = st.btnFont || 'system-ui';
+
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerText = 'ОТВЕТИТЬ';
+        btn.style.backgroundColor = st.btnBg || '#ff7e67';
+        btn.style.color = st.btnText || '#ffffff';
+        btn.style.fontFamily = st.btnFont || 'system-ui';
+
+        btn.onclick = () => checkInput(inp.value, currentQ.inputAnswers || [], btn, inp);
+        inp.onkeydown = (e) => { if (e.key === 'Enter') btn.click(); };
+
+        wrap.appendChild(inp);
+        wrap.appendChild(btn);
+        optContainer.appendChild(wrap);
+        setTimeout(() => inp.focus(), 100);
+      }
     }
 
-    function checkChoice(selectedIndex, correctIndex, btnElement) {
-        if (canHit) return;
-        if (selectedIndex === correctIndex) {
-            handleCorrect(btnElement);
-            document.querySelectorAll('.option-btn').forEach(b => b.disabled = true); 
-        } else { handleWrong(btnElement); }
+    function arraysEqual(a, b) {
+      if (a.length !== b.length) return false;
+      for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+      return true;
     }
 
-    function checkInput(userVal, correctVal, btnElement, inpElement) {
-        if (canHit) return;
-        const clean = (str) => (str||'').toString().toLowerCase().replace(/\\s+/g, '');
-        if (clean(userVal) === clean(correctVal)) {
-            handleCorrect(btnElement);
-            inpElement.disabled = true; btnElement.disabled = true;
-            inpElement.style.borderColor = '#28a745';
-        } else { handleWrong(btnElement); }
+    function checkChoice(selectedIndices, correctIndices, btnElement) {
+      if (canHit) return;
+
+      const selected = [...selectedIndices].sort((a, b) => a - b);
+      const correct = [...correctIndices].sort((a, b) => a - b);
+
+      if (arraysEqual(selected, correct)) {
+        handleCorrect(btnElement);
+        document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+      } else {
+        handleWrong(btnElement);
+      }
+    }
+
+    function checkInput(userVal, correctVals, btnElement, inpElement) {
+      if (canHit) return;
+      const user = cleanCompact(userVal);
+      const ok = (correctVals || []).some(v => cleanCompact(v) === user);
+
+      if (ok) {
+        handleCorrect(btnElement);
+        inpElement.disabled = true;
+        btnElement.disabled = true;
+        inpElement.style.borderColor = '#28a745';
+      } else {
+        handleWrong(btnElement);
+      }
     }
 
     function handleCorrect(btn) {
-        feedbackText.innerText = "Правильно! Ударь пиньяту!"; 
-        feedbackText.style.color = '#28a745'; 
-        canHit = true; 
-        btn.style.backgroundColor = '#28a745'; btn.style.color = '#fff';
+      feedbackText.innerText = 'Правильно! Ударь пиньяту!';
+      feedbackText.style.color = '#28a745';
+      canHit = true;
+      if (btn) {
+        btn.style.backgroundColor = '#28a745';
+        btn.style.color = '#fff';
+      }
     }
 
     function handleWrong(btn) {
-        feedbackText.innerText = "Промахнулся! Попробуй еще раз."; 
-        feedbackText.style.color = '#d9381e';
-        btn.style.transform = 'translateX(-5px)'; 
-        setTimeout(() => btn.style.transform = 'translateX(5px)', 50); 
+      feedbackText.innerText = 'Промахнулся! Попробуй еще раз.';
+      feedbackText.style.color = '#d9381e';
+      if (btn) {
+        btn.style.transform = 'translateX(-5px)';
+        setTimeout(() => btn.style.transform = 'translateX(5px)', 50);
         setTimeout(() => btn.style.transform = 'translateX(0)', 100);
+      }
     }
 
     piniataImg.addEventListener('click', () => {
-        if (!canHit) { 
-            if(feedbackText.innerText === "") { 
-                feedbackText.innerText = "Сначала ответь на вопрос!"; 
-                feedbackText.style.color = '#d9381e'; 
-            } 
-            return; 
+      if (!canHit) {
+        if (feedbackText.innerText === '') {
+          feedbackText.innerText = 'Сначала ответь на вопрос!';
+          feedbackText.style.color = '#d9381e';
         }
-        
-        playHitSound();
-        
-        piniataImg.classList.remove('swing'); 
-        piniataImg.classList.add('hit-anim');
-        
-        currentStage++;
-        
-        setTimeout(() => { 
-            piniataImg.classList.remove('hit-anim'); 
-            if (currentStage < 5) piniataImg.classList.add('swing'); 
-        }, 200);
-        
-        piniataImg.src = images[currentStage];
-        
-        if (currentStage === 5) { 
-            quizPanel.style.display = 'none'; 
-            winMessage.style.display = 'block'; 
-            launchConfetti(); 
-        } else { 
-            setTimeout(loadQuestion, 500); 
-        }
+        return;
+      }
+
+      playHitSound();
+      piniataImg.classList.remove('swing');
+      piniataImg.classList.add('hit-anim');
+      currentStage++;
+
+      setTimeout(() => {
+        piniataImg.classList.remove('hit-anim');
+        if (currentStage < 5) piniataImg.classList.add('swing');
+      }, 200);
+
+      piniataImg.src = images[currentStage];
+
+      if (currentStage === 5) {
+        quizPanel.style.display = 'none';
+        winMessage.style.display = 'block';
+        launchConfetti();
+      } else {
+        setTimeout(loadQuestion, 500);
+      }
     });
 
     function launchConfetti() {
-        const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93', '#ff924c'];
-        const cont = document.getElementById('game-container');
-        for (let i = 0; i < 120; i++) {
-            const piece = document.createElement('div'); piece.className = 'confetti';
-            const size = 8 + Math.random() * 10; piece.style.width = size + 'px'; piece.style.height = (size * 1.5) + 'px';
-            piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            piece.style.left = Math.random() * 100 + 'vw'; piece.style.animationDuration = (Math.random() * 3 + 2) + 's'; piece.style.animationDelay = (Math.random() * 1.5) + 's';
-            cont.appendChild(piece);
-        }
+      const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93', '#ff924c'];
+      const cont = document.getElementById('game-container');
+      for (let i = 0; i < 120; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti';
+        const size = 8 + Math.random() * 10;
+        piece.style.width = size + 'px';
+        piece.style.height = (size * 1.5) + 'px';
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.left = Math.random() * 100 + 'vw';
+        piece.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        piece.style.animationDelay = (Math.random() * 1.5) + 's';
+        cont.appendChild(piece);
+      }
     }
-<\/script>
+  <\/script>
 </body>
 </html>`;
   }
