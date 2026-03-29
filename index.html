@@ -3,55 +3,49 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Редактор игры "Пиньята"</title>
+  <title>Пиньята — Редактор</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Neucha&display=swap');
-    
     html, body { height: 100%; margin: 0; overflow: hidden; position: relative; }
-    :root{ --text:#eaf0ff; --muted:#a9b6e6; --border: rgba(255,255,255,.10); --shadow2: 0 12px 34px rgba(0,0,0,.40); --radius: 18px; --radius2: 22px; --neon:#ffca3a; --danger:#ff595e; --ok:#8ac926; }
+    :root{ --text:#eaf0ff; --muted:#a9b6e6; --border: rgba(255,255,255,.10); --shadow2: 0 12px 34px rgba(0,0,0,.40); --radius: 18px; --radius2: 22px; --neon:#d6b14a; --danger:#ff4d4d; --ok:#2dd27d; }
     *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    
-    /* Стили редактора */
-    body { color:var(--text); background: radial-gradient(1100px 700px at 12% 18%, rgba(35,82,200,.15), #0f121b 80%); }
+    body{ color:var(--text); background: radial-gradient(1100px 700px at 12% 18%, rgba(35,82,200,.15), #0f121b 80%); }
     .hidden { display: none !important; }
     button { cursor:pointer; font-weight:600; border:none; border-radius:8px; padding:10px 16px; transition:.2s; }
     button:active { transform:scale(.95); }
     .btn-primary { background:var(--neon); color:#000; }
-    .btn-primary:hover { filter:brightness(1.1); box-shadow:0 0 15px rgba(255,202,58,.4); }
+    .btn-primary:hover { filter:brightness(1.1); box-shadow:0 0 15px rgba(214,177,74,.4); }
     .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); }
     .btn-outline:hover { background:rgba(255,255,255,.05); }
     .btn-danger { background:var(--danger); color:#fff; }
-    
     input, textarea { width:100%; background:rgba(0,0,0,.3); border:1px solid var(--border); color:#fff; padding:10px 14px; border-radius:8px; outline:none; transition:.2s; }
     input:focus, textarea:focus { border-color:var(--neon); background:rgba(0,0,0,.5); }
     
     #editorRoot { display:flex; height:100vh; }
     
-    /* Сайдбар настроек */
+    /* САЙДБАР КАК В ШАБЛОНЕ */
     .sidebar { width:340px; background:rgba(20,24,35,.8); backdrop-filter:blur(15px); border-right:1px solid var(--border); display:flex; flex-direction:column; z-index:10; }
     .hdr { padding:20px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; }
-    .hdr-logo { width:38px; height:38px; border-radius:8px; object-fit:cover; background:#000; display:none; }
+    .hdr-icon { font-size:28px; width:38px; height:38px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.1); border-radius:8px; }
     .hdr-title { font-size:17px; font-weight:700; line-height:1.2; }
     .hdr-subtitle { font-size:12px; color:var(--neon); }
     .settings-wrap { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:20px; }
     .setting-group label { display:block; font-size:13px; color:var(--muted); margin-bottom:6px; font-weight:500; }
-    .setting-group .hint { font-size:11px; color:#667499; margin-top:4px; }
     
-    /* Основная зона (Вопросы) */
+    /* ОСНОВНАЯ ЗОНА КАК В ШАБЛОНЕ */
     .main-area { flex:1; display:flex; flex-direction:column; background:url('data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.05)"/></svg>'); }
     .main-header { padding:20px 40px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); background:rgba(0,0,0,.2); backdrop-filter:blur(10px); }
     .q-list { flex:1; overflow-y:auto; padding:40px; display:flex; flex-direction:column; gap:12px; }
-    
     .q-card { background:rgba(30,35,50,.7); border:1px solid var(--border); border-radius:12px; padding:16px 20px; display:flex; align-items:center; gap:15px; transition:.2s; cursor:pointer; }
     .q-card:hover { border-color:rgba(255,255,255,.2); background:rgba(40,46,65,.8); transform:translateY(-2px); }
     .q-card-num { width:32px; height:32px; border-radius:50%; background:rgba(0,0,0,.3); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:var(--muted); }
     .q-card-text { flex:1; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .q-card-actions button { padding:6px 10px; font-size:13px; }
     
-    /* Модалка вопроса */
+    /* МОДАЛКА КАК В ШАБЛОНЕ */
     .modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.6); backdrop-filter:blur(5px); z-index:100; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:.3s; }
     .modal-overlay.active { opacity:1; pointer-events:all; }
     .modal { background:#161925; width:500px; border-radius:20px; border:1px solid var(--border); box-shadow:var(--shadow2); transform:translateY(20px); transition:.3s; display:flex; flex-direction:column; max-height:90vh; }
@@ -59,84 +53,40 @@
     .modal-hdr { padding:20px 24px; border-bottom:1px solid var(--border); font-weight:700; font-size:18px; }
     .modal-body { padding:24px; overflow-y:auto; }
     .modal-ftr { padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; background:rgba(0,0,0,.2); border-radius:0 0 20px 20px; }
-    
     .opt-row { display:flex; gap:10px; align-items:center; margin-top:10px; }
     .opt-row input[type="radio"] { width:20px; height:20px; accent-color:var(--ok); cursor:pointer; flex-shrink:0; }
     .opt-row button { padding:10px; color:var(--danger); }
     
-    /* Шаринг */
     .share-bar { padding:20px 40px; background:rgba(20,24,35,.9); border-top:1px solid var(--border); display:flex; gap:15px; align-items:center; }
     .share-bar input { flex:1; font-family:monospace; color:var(--neon); }
 
     /* =========================================
-       СТИЛИ САМОЙ ИГРЫ ПИНЬЯТА
+       СТИЛИ ИГРЫ (ИЗОЛИРОВАННЫЕ ДЛЯ ПИНЬЯТЫ)
        ========================================= */
-    #gameRoot { display:none; width:100vw; height:100vh; }
+    #gameRoot { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background-size:cover; background-position:center; background-repeat:no-repeat; }
     
-    #pinata-game-container {
-        position: relative; width: 100%; height: 100%;
-        background-size: cover; background-position: center; background-repeat: no-repeat;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+    #startOverlay { position:absolute; inset:0; background:rgba(0,0,0,.85); backdrop-filter:blur(8px); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:99999; text-align:center; padding:20px; }
+    #startOverlay h1 { color:var(--neon); font-family:'Caveat', cursive; font-size:4rem; margin:0 0 10px; text-shadow:0 4px 20px rgba(0,0,0,.5); }
+    #startOverlay p { color:#fff; font-size:1.2rem; max-width:500px; line-height:1.5; margin-bottom:30px; }
+    #startOverlay button { font-size:1.2rem; padding:15px 40px; border-radius:30px; }
 
-    .game-logo-img { position:absolute; top:20px; right:20px; max-height:80px; z-index:100; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-
-    /* Обертка пиньяты (Ваши координаты!) */
-    #piniata-wrapper {
-        position: absolute;
-        width: 310px; left: 68.35%; top: 54.59%;
-        transform: translate(-50%, -50%);
-        z-index: 10;
-    }
-
-    .piniata-image {
-        width: 100%; height: auto; display: block;
-        transform-origin: 50% 0%; cursor: pointer;
-        filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.3));
-    }
-
+    #piniata-wrapper { position: absolute; width: 310px; left: 68.35%; top: 54.59%; transform: translate(-50%, -50%); z-index: 10; }
+    .piniata-image { width: 100%; height: auto; display: block; transform-origin: 50% 0%; cursor: pointer; filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.3)); }
     .swing { animation: swingAnim 4s ease-in-out infinite; }
-    @keyframes swingAnim {
-        0% { transform: rotate(-6deg); }
-        50% { transform: rotate(6deg); }
-        100% { transform: rotate(-6deg); }
-    }
-
+    @keyframes swingAnim { 0% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } 100% { transform: rotate(-6deg); } }
     .hit-anim { animation: hitAnim 0.2s ease-out; }
-    @keyframes hitAnim {
-        0% { transform: scale(1) rotate(0deg); }
-        50% { transform: scale(0.9) rotate(15deg) translateY(-10px); }
-        100% { transform: scale(1) rotate(0deg); }
-    }
+    @keyframes hitAnim { 0% { transform: scale(1) rotate(0deg); } 50% { transform: scale(0.9) rotate(15deg) translateY(-10px); } 100% { transform: scale(1) rotate(0deg); } }
 
-    /* Панель викторины */
-    #quiz-panel {
-        position: absolute; left: 5%; top: 50%; transform: translateY(-50%);
-        background: rgba(255, 255, 255, 0.95); padding: 25px; border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 340px; text-align: center; z-index: 50;
-    }
-
+    #quiz-panel { position: absolute; left: 5%; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.95); padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 340px; text-align: center; z-index: 50; }
     #question-text-game { font-size: 22px; font-weight: bold; margin-bottom: 20px; color: #333; }
-    
-    .option-btn {
-        display: block; width: 100%; margin: 10px 0; padding: 12px; font-size: 18px; font-weight: bold;
-        border: none; border-radius: 10px; background: #ff7e67; color: white; cursor: pointer;
-        transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
+    .option-btn { display: block; width: 100%; margin: 10px 0; padding: 12px; font-size: 18px; font-weight: bold; border: none; border-radius: 10px; background: #ff7e67; color: white; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
     .option-btn:hover { background: #ff5a3d; transform: translateY(-2px); }
     .option-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
-
     #feedback-text-game { margin-top: 15px; font-size: 18px; font-weight: bold; min-height: 24px; }
     .text-wrong { color: #d9381e; }
     .text-correct { color: #28a745; }
 
-    #win-message {
-        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        font-size: 70px; font-weight: bold; color: #ffca3a;
-        text-shadow: 4px 4px 0px #ff595e, 8px 8px 15px rgba(0,0,0,0.5);
-        display: none; z-index: 100; text-transform: uppercase; text-align: center;
-    }
-
+    #win-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; font-weight: bold; color: #ffca3a; text-shadow: 4px 4px 0px #ff595e, 8px 8px 15px rgba(0,0,0,0.5); display: none; z-index: 100; text-transform: uppercase; text-align: center; }
     .confetti { position: absolute; top: -20px; z-index: 90; animation: fall linear forwards; }
     @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
   </style>
@@ -146,10 +96,11 @@
 <div id="editorRoot">
   <div class="sidebar">
     <div class="hdr">
-      <img id="hdrLogo" class="hdr-logo" src="" />
+      <img id="hdrLogo" class="hdr-icon" style="display:none; object-fit:contain; border-radius:4px; padding:0; background:none;"/>
+      <div id="hdrEmoji" class="hdr-icon">🪅</div>
       <div>
         <div class="hdr-subtitle">Светлана Быкова</div>
-        <div class="hdr-title">Редактор "Пиньята"</div>
+        <div class="hdr-title" id="hdrTitleText">Пиньята</div>
       </div>
     </div>
     
@@ -159,17 +110,19 @@
         <input type="text" id="inpTitle" value="Праздничная Пиньята" oninput="saveAndBuild()" />
       </div>
       <div class="setting-group">
+        <label>URL Логотипа</label>
+        <input type="text" id="inpLogo" placeholder="https://..." oninput="updateLogo(); saveAndBuild()" />
+      </div>
+      <div class="setting-group">
         <label>URL фона (JPG/PNG)</label>
         <input type="text" id="inpBgUrl" placeholder="bg (2).png" value="bg (2).png" oninput="saveAndBuild()" />
-        <div class="hint">Оставьте bg (2).png, если фон лежит в той же папке</div>
       </div>
       <div class="setting-group">
-        <label>URL Логотипа</label>
-        <input type="text" id="inpLogoUrl" placeholder="https://.../logo.png" oninput="updateLogoPreview()" />
-        <div class="hint">Появится в левом верхнем углу редактора и в самой игре</div>
+        <label>Инструкция перед стартом</label>
+        <textarea id="inpInstruction" rows="3" oninput="saveAndBuild()">Ответь на 5 вопросов правильно, чтобы разбить пиньяту и получить сюрприз!</textarea>
       </div>
       <div class="setting-group">
-        <label>Текст при победе</label>
+        <label>Текст при успехе</label>
         <input type="text" id="inpFeedback" value="Молодец!" oninput="saveAndBuild()" />
       </div>
       <div class="setting-group" style="display:flex; align-items:center; gap:10px;">
@@ -182,14 +135,12 @@
   <div class="main-area">
     <div class="main-header">
       <div>
-        <h2 style="margin:0;font-size:22px;">Вопросы викторины <span id="qCountDisplay" style="color:var(--neon); margin-left:10px;"></span></h2>
-        <div style="color:var(--muted);font-size:13px;margin-top:4px;">Добавьте до 5 вопросов. Если их меньше, они будут повторяться по кругу.</div>
+        <h2 style="margin:0;font-size:22px;">Вопросы <span id="qCountDisplay" style="color:var(--neon); margin-left:10px;"></span></h2>
+        <div style="color:var(--muted);font-size:13px;margin-top:4px;">Добавьте до 5 вопросов.</div>
       </div>
       <button id="btnAddQ" class="btn-primary" onclick="openModal()">+ Добавить вопрос</button>
     </div>
-    
     <div class="q-list" id="qList"></div>
-    
     <div class="share-bar">
       <button class="btn-primary" onclick="previewGame()">▶ Тест игры</button>
       <input type="text" id="outLink" readonly onclick="this.select()" />
@@ -199,7 +150,7 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="modal">
+<div class="modal-overlay" id="qModal">
   <div class="modal">
     <div class="modal-hdr" id="modalTitle">Редактировать вопрос</div>
     <div class="modal-body">
@@ -221,307 +172,207 @@
 <div id="gameRoot"></div>
 
 <script>
-  const AUTOSAVE_KEY = "pinata_editor_autosave";
-  const pId = () => Math.random().toString(36).substring(2,9);
+  const AUTOSAVE_KEY = "pinata_editor_autosave_v2";
+  const uid = () => Math.random().toString(36).substring(2,9);
+  const $ = id => document.getElementById(id);
   
-  // Дефолтные вопросы для старта (ровно 5)
   let Editor = {
-    title: "Праздничная Пиньята",
-    bgDataUrl: "bg (2).png",
-    logoDataUrl: "",
-    useLatex: false,
+    title: "Праздничная Пиньята", bgDataUrl: "bg (2).png", logoUrl: "", useLatex: false,
+    instruction: { text: "Ответь на 5 вопросов правильно, чтобы разбить пиньяту и получить сюрприз!" },
     feedback: { text: "Молодец!" },
     questions: [
-        { id: pId(), q: "Сколько будет 2 + 2?", options: ["3", "4", "5"], correct: 1 },
-        { id: pId(), q: "Сколько будет 5 + 5?", options: ["9", "10", "11"], correct: 1 },
-        { id: pId(), q: "Сколько будет 3 * 3?", options: ["6", "9", "12"], correct: 1 },
-        { id: pId(), q: "Реши пример: 10 - 4", options: ["5", "6", "7"], correct: 1 },
-        { id: pId(), q: "Сколько месяцев в году?", options: ["10", "12", "24"], correct: 1 }
+        { id: uid(), q: "Сколько будет 2 + 2?", options: ["3", "4", "5"], correct: 1 }
     ]
   };
 
-  const $ = id => document.getElementById(id);
-
-  // --- ИНИЦИАЛИЗАЦИЯ И МАРШРУТИЗАЦИЯ ---
   const urlParams = new URLSearchParams(window.location.search);
-  const cfgParam = urlParams.get('cfg');
-  const playParam = urlParams.get('play');
+  const cfgKeyParam = urlParams.get('cfgkey');
 
-  if (cfgParam) {
-    try {
-      const raw = JSON.parse(LZString.decompressFromEncodedURIComponent(cfgParam));
-      if(playParam) { bootGameOnly(raw); } 
-      else { Editor = Object.assign(Editor, raw); bootEditor(); }
-    } catch(e) { bootEditor(); }
+  if(cfgKeyParam){ 
+    try{ 
+        const rawStr = localStorage.getItem(cfgKeyParam) || sessionStorage.getItem(cfgKeyParam); 
+        if(!rawStr) throw new Error("cfgkey not found"); 
+        bootGameOnly(JSON.parse(rawStr)); 
+    } catch(e){ 
+        $("gameRoot").innerHTML = '<div style="padding:16px;color:#ffd6d6;font-weight:900">Ошибка загрузки игры</div>'; 
+        $("gameRoot").style.display = 'block';
+    } 
   } else {
-    try {
-      const saved = localStorage.getItem(AUTOSAVE_KEY);
-      if (saved) Editor = Object.assign(Editor, JSON.parse(saved));
+    try { 
+        const saved = localStorage.getItem(AUTOSAVE_KEY); 
+        if (saved) Editor = Object.assign(Editor, JSON.parse(saved)); 
     } catch(e){}
     bootEditor();
   }
 
-  // --- РЕДАКТОР ---
   function bootEditor() {
     $("inpTitle").value = Editor.title || "";
     $("inpBgUrl").value = Editor.bgDataUrl || "bg (2).png";
-    $("inpLogoUrl").value = Editor.logoDataUrl || "";
-    $("inpFeedback").value = Editor.feedback?.text || "Молодец!";
+    $("inpLogo").value = Editor.logoUrl || "";
+    $("inpInstruction").value = Editor.instruction?.text || "";
+    $("inpFeedback").value = Editor.feedback?.text || "";
     $("chkUseLatex").checked = !!Editor.useLatex;
-    updateLogoPreview();
+    updateLogo();
     renderQList();
     saveAndBuild();
   }
 
-  function updateLogoPreview() {
-    const url = $("inpLogoUrl").value.trim();
-    Editor.logoDataUrl = url;
-    if(url) { $("hdrLogo").src = url; $("hdrLogo").style.display = "block"; }
-    else { $("hdrLogo").style.display = "none"; }
-    saveAndBuild();
+  function updateLogo() {
+    const url = $("inpLogo").value.trim();
+    if(url) { $("hdrLogo").src = url; $("hdrLogo").style.display="block"; $("hdrEmoji").style.display="none"; }
+    else { $("hdrLogo").style.display="none"; $("hdrEmoji").style.display="flex"; }
+    $("hdrTitleText").innerText = $("inpTitle").value || "Пиньята";
   }
 
   function renderQList() {
-    const c = $("qList");
-    c.innerHTML = "";
+    const c = $("qList"); c.innerHTML = "";
     Editor.questions.forEach((q, i) => {
-      const el = document.createElement("div");
-      el.className = "q-card";
-      el.innerHTML = `
-        <div class="q-card-num">${i+1}</div>
-        <div class="q-card-text">${q.q}</div>
-        <div class="q-card-actions">
-          <button class="btn-outline" onclick="editQ('${q.id}')">✏️</button>
-          <button class="btn-outline btn-danger" onclick="delQ('${q.id}')">🗑</button>
-        </div>
-      `;
+      const el = document.createElement("div"); el.className = "q-card";
+      el.innerHTML = `<div class="q-card-num">${i+1}</div><div class="q-card-text">${q.q}</div><div class="q-card-actions"><button class="btn-outline" onclick="editQ('${q.id}')">✏️</button> <button class="btn-outline btn-danger" onclick="delQ('${q.id}')">🗑</button></div>`;
       c.appendChild(el);
     });
 
-    // Ограничение до 5 вопросов
     const addBtn = $("btnAddQ");
     const countDisplay = $("qCountDisplay");
     countDisplay.innerText = `${Editor.questions.length} / 5`;
-    
-    if (Editor.questions.length >= 5) {
-        addBtn.style.display = 'none';
-        countDisplay.style.color = '#8ac926'; // Зеленый, когда заполнено
-    } else {
-        addBtn.style.display = 'inline-block';
-        countDisplay.style.color = 'var(--neon)';
-    }
+    if (Editor.questions.length >= 5) { addBtn.style.display = 'none'; countDisplay.style.color = 'var(--ok)'; } 
+    else { addBtn.style.display = 'inline-block'; countDisplay.style.color = 'var(--neon)'; }
   }
 
   let editingId = null;
   function openModal(id = null) {
-    editingId = id;
-    const c = $("optsContainer");
-    c.innerHTML = "";
-    
+    editingId = id; const c = $("optsContainer"); c.innerHTML = "";
     if (id) {
       const q = Editor.questions.find(x => x.id === id);
       $("modalTitle").innerText = "Редактировать вопрос";
       $("inpQText").value = q.q;
       q.options.forEach((opt, i) => addOptionInput(opt, i === q.correct));
     } else {
-      $("modalTitle").innerText = "Новый вопрос";
-      $("inpQText").value = "";
-      addOptionInput("", true);
-      addOptionInput("", false);
+      $("modalTitle").innerText = "Новый вопрос"; $("inpQText").value = "";
+      addOptionInput("", true); addOptionInput("", false);
     }
-    $("modal").classList.add("active");
+    $("qModal").classList.add("active");
   }
 
-  function editQ(id) {
-      openModal(id);
-  }
-
-  function closeModal() { $("modal").classList.remove("active"); }
+  function editQ(id) { openModal(id); }
+  function closeModal() { $("qModal").classList.remove("active"); }
 
   function addOptionInput(val = "", isCorrect = false) {
-    const c = $("optsContainer");
-    const id = pId();
-    const div = document.createElement("div");
-    div.className = "opt-row";
-    div.innerHTML = `
-      <input type="radio" name="optCorrect" value="${id}" ${isCorrect ? 'checked' : ''}>
-      <input type="text" class="opt-val" data-id="${id}" value="${val.replace(/"/g, '&quot;')}" placeholder="Вариант ответа">
-      <button class="btn-outline" onclick="this.parentElement.remove()">✕</button>
-    `;
+    const c = $("optsContainer"); const id = uid(); const div = document.createElement("div"); div.className = "opt-row";
+    div.innerHTML = `<input type="radio" name="optCorrect" value="${id}" ${isCorrect ? 'checked' : ''}><input type="text" class="opt-val" value="${val.replace(/"/g, '&quot;')}" placeholder="Вариант ответа"><button class="btn-outline" onclick="this.parentElement.remove()">✕</button>`;
     c.appendChild(div);
   }
 
   function saveQuestion() {
-    const text = $("inpQText").value.trim();
-    if(!text) return alert("Введите вопрос");
-    
-    const optInputs = document.querySelectorAll(".opt-val");
-    if(optInputs.length < 2) return alert("Нужно минимум 2 варианта");
-    
-    let correctIdx = 0;
-    const options = [];
-    let hasCorrect = false;
-
-    optInputs.forEach((inp, idx) => {
-      options.push(inp.value.trim());
-      const radio = inp.parentElement.querySelector('input[type="radio"]');
-      if (radio.checked) { correctIdx = idx; hasCorrect = true; }
-    });
-
+    const text = $("inpQText").value.trim(); if(!text) return alert("Введите вопрос");
+    const optInputs = document.querySelectorAll(".opt-val"); if(optInputs.length < 2) return alert("Нужно минимум 2 варианта");
+    let correctIdx = 0, options = [], hasCorrect = false;
+    optInputs.forEach((inp, idx) => { options.push(inp.value.trim()); if (inp.parentElement.querySelector('input[type="radio"]').checked) { correctIdx = idx; hasCorrect = true; } });
     if(!hasCorrect) return alert("Выберите правильный вариант");
-
-    const newQ = { id: editingId || pId(), q: text, options, correct: correctIdx };
-
-    if(editingId) {
-      const idx = Editor.questions.findIndex(x => x.id === editingId);
-      Editor.questions[idx] = newQ;
-    } else {
-      if(Editor.questions.length >= 5) return alert("Достигнут лимит в 5 вопросов!");
-      Editor.questions.push(newQ);
-    }
-    
-    closeModal();
-    renderQList();
-    saveAndBuild();
+    const newQ = { id: editingId || uid(), q: text, options, correct: correctIdx };
+    if(editingId) { Editor.questions[Editor.questions.findIndex(x => x.id === editingId)] = newQ; } 
+    else { if(Editor.questions.length >= 5) return alert("Лимит 5 вопросов!"); Editor.questions.push(newQ); }
+    closeModal(); renderQList(); saveAndBuild();
   }
 
-  function delQ(id) {
-    if(confirm("Удалить вопрос?")) {
-      Editor.questions = Editor.questions.filter(x => x.id !== id);
-      renderQList();
-      saveAndBuild();
-    }
-  }
+  function delQ(id) { if(confirm("Удалить вопрос?")) { Editor.questions = Editor.questions.filter(x => x.id !== id); renderQList(); saveAndBuild(); } }
 
   function saveAndBuild() {
-    Editor.title = $("inpTitle").value;
-    Editor.bgDataUrl = $("inpBgUrl").value || "bg (2).png";
-    Editor.useLatex = $("chkUseLatex").checked;
-    Editor.feedback = { text: $("inpFeedback").value };
-    
+    Editor.title = $("inpTitle").value; Editor.bgDataUrl = $("inpBgUrl").value; Editor.logoUrl = $("inpLogo").value;
+    Editor.instruction.text = $("inpInstruction").value; Editor.feedback.text = $("inpFeedback").value; Editor.useLatex = $("chkUseLatex").checked;
+    updateLogo();
     localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(Editor));
-    
-    const comp = LZString.compressToEncodedURIComponent(JSON.stringify(Editor));
-    const url = window.location.origin + window.location.pathname + "?play=1&cfg=" + comp;
+    const k = "pinata_cfg_" + uid(); localStorage.setItem(k, JSON.stringify(Editor));
+    const url = window.location.origin + window.location.pathname + "?cfgkey=" + k;
     $("outLink").value = url;
   }
 
-  function copyLink() {
-    $("outLink").select();
-    document.execCommand("copy");
-    alert("Ссылка скопирована!");
-  }
-
-  function copyIframe() {
-    const code = `<iframe src="${$("outLink").value}" width="100%" height="600" frameborder="0" allowfullscreen></iframe>`;
-    navigator.clipboard.writeText(code).then(() => alert("Код Iframe скопирован для Genially!"));
-  }
-
-  function previewGame() {
-    window.open($("outLink").value, '_blank');
-  }
-
+  function copyLink() { $("outLink").select(); document.execCommand("copy"); alert("Ссылка скопирована!"); }
+  function copyIframe() { navigator.clipboard.writeText(`<iframe src="${$("outLink").value}" width="100%" height="600" frameborder="0" allowfullscreen></iframe>`).then(() => alert("Код Iframe скопирован!")); }
+  function previewGame() { window.open($("outLink").value, '_blank'); }
 
   // =========================================
-  // ЛОГИКА ИГРЫ "ПИНЬЯТА"
+  // ЛОГИКА ИГРЫ (ИЗОЛИРОВАННАЯ И СТРОГАЯ)
   // =========================================
   function bootGameOnly(cfg) {
     $("editorRoot").style.display = "none";
     const root = $("gameRoot");
     root.style.display = "block";
+    root.style.backgroundImage = `url('${cfg.bgDataUrl}')`;
 
-    // Подключаем LaTeX если нужно
     if(cfg.useLatex) {
-        const script = document.createElement('script');
-        script.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
-        document.head.appendChild(script);
-        const link = document.createElement('link');
-        link.rel = "stylesheet";
-        link.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";
-        document.head.appendChild(link);
+        const script = document.createElement('script'); script.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"; document.head.appendChild(script);
+        const link = document.createElement('link'); link.rel = "stylesheet"; link.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"; document.head.appendChild(link);
     }
 
-    // Рендер HTML игры
     root.innerHTML = `
-      <div id="pinata-game-container" style="background-image: url('${cfg.bgDataUrl}');">
-        ${cfg.logoDataUrl ? `<img src="${cfg.logoDataUrl}" class="game-logo-img">` : ''}
-        
-        <div id="quiz-panel">
-            <div id="question-text-game"></div>
-            <div id="options-container"></div>
-            <div id="feedback-text-game"></div>
-        </div>
+      ${cfg.logoUrl ? `<img src="${cfg.logoUrl}" style="position:absolute; top:20px; right:20px; max-height:80px; z-index:9999; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.3);">` : ''}
+      
+      <div id="startOverlay">
+        <h1>${cfg.title}</h1>
+        <p>${cfg.instruction.text}</p>
+        <button class="btn-primary" id="btnStartGame">Начать</button>
+      </div>
 
-        <div id="win-message">${cfg.feedback?.text || 'Молодец!'}</div>
-        
-        <div id="piniata-wrapper" class="swing">
-            <img class="piniata-image" id="piniata-img" src="1.png" alt="Пиньята">
-        </div>
+      <div id="quiz-panel" style="display:none;">
+          <div id="question-text-game"></div>
+          <div id="options-container"></div>
+          <div id="feedback-text-game"></div>
+      </div>
+
+      <div id="win-message">${cfg.feedback.text}</div>
+      
+      <div id="piniata-wrapper" style="display:none;">
+          <img class="piniata-image swing" id="piniata-img" src="1.png" alt="Пиньята">
       </div>
     `;
 
-    // Подготовка вопросов (дублируем, если меньше 5)
     let baseQuestions = cfg.questions || [];
-    if (baseQuestions.length === 0) {
-        baseQuestions = [{ q: "Добавьте вопросы в редакторе!", options: ["Ок", "Понятно"], correct: 0 }];
-    }
-    
-    // Формируем строгий массив из 5 вопросов
+    if (baseQuestions.length === 0) baseQuestions = [{ q: "Добавьте вопросы в редакторе!", options: ["Ок", "Понятно"], correct: 0 }];
     const gameQuestions = [];
-    for (let i = 0; i < 5; i++) {
-        gameQuestions.push(baseQuestions[i % baseQuestions.length]);
-    }
+    for (let i = 0; i < 5; i++) gameQuestions.push(baseQuestions[i % baseQuestions.length]);
     
-    // Итоговый порядок картинок (с 1 по 6)
     const images = ['1.png', '2.png', '112.png', '3.png', '4.png', '5.png'];
-    
-    let currentStage = 0; // Индекс ударов/стадий (от 0 до 5)
-    let canHit = false;
-    let audioCtx = null;
+    let currentStage = 0; let canHit = false; let audioCtx = null;
 
-    const piniataImg = $("piniata-img");
-    const piniataWrapper = $("piniata-wrapper");
-    const quizPanel = $("quiz-panel");
-    const qText = $("question-text-game");
-    const optContainer = $("options-container");
-    const feedbackText = $("feedback-text-game");
-    const winMessage = $("win-message");
+    const btnStart = root.querySelector("#btnStartGame");
+    const overlay = root.querySelector("#startOverlay");
+    const piniataImg = root.querySelector("#piniata-img");
+    const piniataWrapper = root.querySelector("#piniata-wrapper");
+    const quizPanel = root.querySelector("#quiz-panel");
+    const qText = root.querySelector("#question-text-game");
+    const optContainer = root.querySelector("#options-container");
+    const feedbackText = root.querySelector("#feedback-text-game");
+    const winMessage = root.querySelector("#win-message");
+
+    btnStart.onclick = () => {
+        overlay.style.display = 'none';
+        piniataWrapper.style.display = 'block';
+        quizPanel.style.display = 'block';
+        loadQuestion();
+    };
 
     function playHitSound() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(120, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.15);
-        gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+        osc.type = 'square'; osc.frequency.setValueAtTime(120, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.6, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.15);
     }
 
     function renderLatex(el, text) {
-        if(cfg.useLatex && window.katex) {
-            try { katex.render(text, el, {throwOnError: false}); } 
-            catch(e) { el.innerText = text; }
-        } else { el.innerText = text; }
+        if(cfg.useLatex && window.katex) { try { katex.render(text, el, {throwOnError: false}); } catch(e) { el.innerText = text; } } 
+        else { el.innerText = text; }
     }
 
     function loadQuestion() {
-        if (currentStage >= 5) return; // Игра окончена
-        
-        const currentQ = gameQuestions[currentStage]; // Берем вопрос для текущего удара
+        if (currentStage >= 5) return;
+        const currentQ = gameQuestions[currentStage];
         renderLatex(qText, currentQ.q);
-        optContainer.innerHTML = '';
-        feedbackText.innerText = '';
-        feedbackText.className = '';
-        canHit = false;
-
+        optContainer.innerHTML = ''; feedbackText.innerText = ''; feedbackText.className = ''; canHit = false;
         currentQ.options.forEach((opt, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            renderLatex(btn, opt);
+            const btn = document.createElement('button'); btn.className = 'option-btn'; renderLatex(btn, opt);
             btn.onclick = () => checkAnswer(index, currentQ.correct, btn);
             optContainer.appendChild(btn);
         });
@@ -529,80 +380,35 @@
 
     function checkAnswer(selectedIndex, correctIndex, btnElement) {
         if (canHit) return;
-
         if (selectedIndex === correctIndex) {
-            feedbackText.innerText = "Правильно! Ударь пиньяту!";
-            feedbackText.className = 'text-correct';
-            canHit = true; 
-            
-            const allBtns = root.querySelectorAll('.option-btn');
-            allBtns.forEach(b => b.disabled = true);
-            btnElement.style.background = '#28a745'; 
+            feedbackText.innerText = "Правильно! Ударь пиньяту!"; feedbackText.className = 'text-correct'; canHit = true; 
+            root.querySelectorAll('.option-btn').forEach(b => b.disabled = true); btnElement.style.background = '#28a745'; 
         } else {
-            feedbackText.innerText = "Промахнулся! Попробуй еще раз.";
-            feedbackText.className = 'text-wrong';
-            btnElement.style.transform = 'translateX(-5px)';
-            setTimeout(() => btnElement.style.transform = 'translateX(5px)', 50);
-            setTimeout(() => btnElement.style.transform = 'translateX(0)', 100);
+            feedbackText.innerText = "Промахнулся! Попробуй еще раз."; feedbackText.className = 'text-wrong';
+            btnElement.style.transform = 'translateX(-5px)'; setTimeout(() => btnElement.style.transform = 'translateX(5px)', 50); setTimeout(() => btnElement.style.transform = 'translateX(0)', 100);
         }
     }
 
     piniataImg.addEventListener('click', () => {
-        if (!canHit) {
-            if(feedbackText.innerText === "") {
-                feedbackText.innerText = "Сначала ответь на вопрос!";
-                feedbackText.className = 'text-wrong';
-            }
-            return;
-        }
-
+        if (!canHit) { if(feedbackText.innerText === "") { feedbackText.innerText = "Сначала ответь на вопрос!"; feedbackText.className = 'text-wrong'; } return; }
         playHitSound();
-
-        // Анимация удара
-        piniataWrapper.classList.remove('swing');
-        piniataWrapper.classList.add('hit-anim');
-        
-        currentStage++; // Переходим на следующую стадию
-        
-        setTimeout(() => {
-            piniataWrapper.classList.remove('hit-anim');
-            if (currentStage < 5) piniataWrapper.classList.add('swing');
-        }, 200);
-
-        // Строго меняем картинки по порядку 1 -> 2 -> 3 -> 4 -> 5
+        piniataWrapper.classList.remove('swing'); piniataWrapper.classList.add('hit-anim');
+        currentStage++;
+        setTimeout(() => { piniataWrapper.classList.remove('hit-anim'); if (currentStage < 5) piniataWrapper.classList.add('swing'); }, 200);
         piniataImg.src = images[currentStage];
-
         if (currentStage === 5) { 
-            // Это был 5-й удар (последний), Финал
-            quizPanel.style.display = 'none'; 
-            winMessage.style.display = 'block'; 
-            launchConfetti(); 
-        } else {
-            // Грузим следующий вопрос
-            setTimeout(loadQuestion, 500); 
-        }
+            quizPanel.style.display = 'none'; winMessage.style.display = 'block'; 
+            const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93', '#ff924c'];
+            for (let i = 0; i < 120; i++) {
+                const piece = document.createElement('div'); piece.className = 'confetti';
+                const size = 8 + Math.random() * 10; piece.style.width = size + 'px'; piece.style.height = (size * 1.5) + 'px';
+                piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.left = Math.random() * 100 + 'vw'; piece.style.animationDuration = (Math.random() * 3 + 2) + 's'; piece.style.animationDelay = (Math.random() * 1.5) + 's';
+                root.appendChild(piece);
+            }
+        } else { setTimeout(loadQuestion, 500); }
     });
-
-    function launchConfetti() {
-        const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93', '#ff924c'];
-        for (let i = 0; i < 120; i++) {
-            const piece = document.createElement('div');
-            piece.className = 'confetti';
-            const size = 8 + Math.random() * 10;
-            piece.style.width = size + 'px';
-            piece.style.height = (size * 1.5) + 'px';
-            piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            piece.style.left = Math.random() * 100 + 'vw';
-            piece.style.animationDuration = (Math.random() * 3 + 2) + 's';
-            piece.style.animationDelay = (Math.random() * 1.5) + 's';
-            root.appendChild(piece);
-        }
-    }
-
-    // Старт
-    loadQuestion();
   }
 </script>
-
 </body>
 </html>
