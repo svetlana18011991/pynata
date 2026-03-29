@@ -128,6 +128,21 @@
             <button class="btn" id="btnClearQs" type="button">🧹 Очистить</button>
           </div>
           <div class="muted" style="margin-bottom:8px">Количество вопросов должно быть не меньше количества ударов. Обычно это число стадий минус 1.</div>
+
+          <div style="background: rgba(255, 174, 0, 0.1); padding: 10px; border-radius: 12px; border: 1px solid rgba(255,174,0,.4); margin-bottom: 12px;">
+            <div style="font-size: 12px; color: var(--neon); font-weight: bold; margin-bottom: 8px;">🎨 Шаблоны настроек (Шрифт, Таймер, Тип):</div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap: wrap;">
+              <select id="newQTemplate" style="flex:1; min-width: 160px; border: 1px solid rgba(255,174,0,.4); border-radius: 12px; padding: 6px; font-size: 13px; background: rgba(0,0,0,0.5); color: #fff; outline: none;">
+                <option value="-1">Стандартные (по умолчанию)</option>
+              </select>
+              <button class="btn small" style="background:var(--neon); color:#000; border:none; font-weight:bold; padding: 8px 12px;" id="btnApplyAll" type="button">🔄 Применить ко всем</button>
+            </div>
+            <div style="font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 8px; line-height: 1.3;">
+              * Выбранный шаблон будет применяться ко всем <b>новым</b> вопросам.<br>
+              * Кнопка применяет настройки (шрифт, размер, <b>тип вопроса</b>, таймер) ко всем <b>уже созданным</b> вопросам.
+            </div>
+          </div>
+
           <div class="q-list" id="qList"></div>
         </div>
       </div>
@@ -305,17 +320,30 @@
 
   function renderList(){
     const list = $("qList"); list.innerHTML = ""; setCountPill();
-    if(Editor.questions.length === 0){ list.innerHTML = '<div class="muted">Пока нет вопросов. Нажми «Добавить» и заполни викторину.</div>'; return; }
-    list.innerHTML = Editor.questions.map((q,i)=>{ const s=qSummary(q); return `
-      <div class="q-item">
-        <div class="meta"><div class="t"><b>#${i+1}</b> ${escapeHtml(s.title)}</div><div class="s">${escapeHtml(s.sub)}</div></div>
-        <div style="display:flex;gap:4px">
-          <button class="btn small" onclick="previewQ(${i})" type="button">👁</button>
-          <button class="btn small" onclick="copyQ(${i})" type="button">📋</button>
-          <button class="btn small" onclick="editQ(${i})" type="button">✏️</button>
-          <button class="btn small danger" onclick="delQ('${q.id}')" type="button">🗑</button>
-        </div>
-      </div>`; }).join('');
+    if(Editor.questions.length === 0){ list.innerHTML = '<div class="muted">Пока нет вопросов. Нажми «Добавить» и заполни викторину.</div>'; }
+    else {
+      list.innerHTML = Editor.questions.map((q,i)=>{ const s=qSummary(q); return `
+        <div class="q-item">
+          <div class="meta"><div class="t"><b>#${i+1}</b> ${escapeHtml(s.title)}</div><div class="s">${escapeHtml(s.sub)}</div></div>
+          <div style="display:flex;gap:4px">
+            <button class="btn small" onclick="previewQ(${i})" type="button">👁</button>
+            <button class="btn small" onclick="copyQ(${i})" type="button">📋</button>
+            <button class="btn small" onclick="editQ(${i})" type="button">✏️</button>
+            <button class="btn small danger" onclick="delQ('${q.id}')" type="button">🗑</button>
+          </div>
+        </div>`; }).join('');
+    }
+
+    const sel = $("newQTemplate");
+    if(sel){
+        const val = sel.value;
+        sel.innerHTML = '<option value="-1">Стандартные (по умолчанию)</option>';
+        Editor.questions.forEach((q, i) => {
+            sel.innerHTML += '<option value="' + i + '">Как в вопросе #' + (i+1) + '</option>';
+        });
+        if(val && Editor.questions[val]) sel.value = val;
+        else sel.value = "-1";
+    }
   }
 
   function showModal(){ $("modalBackdrop").style.display = 'block'; $("modalBackdrop").setAttribute('aria-hidden','false'); }
@@ -377,7 +405,21 @@
 
   function openModal(existing=null){
     Editor.editingId = existing?.id || null;
-    Editor.draft = normalizeQuestion(existing || { type: 'choice', options:['',''], correctIndices:[0] });
+    let draft = existing ? deepClone(existing) : null;
+    
+    if (!draft) {
+       const tplIdx = parseInt($("newQTemplate") ? $("newQTemplate").value : "-1");
+       if (tplIdx >= 0 && Editor.questions[tplIdx]) {
+          const tq = Editor.questions[tplIdx];
+          draft = { type: tq.type, font: tq.font, fontSize: tq.fontSize, seconds: tq.seconds };
+          if (tq.type === 'choice') { draft.options = ["",""]; draft.correctIndices = [0]; }
+          else { draft.accepts = [""]; }
+       } else {
+          draft = { type: 'choice', options:['',''], correctIndices:[0] };
+       }
+    }
+    
+    Editor.draft = normalizeQuestion(draft);
     $("modalTitle").textContent = existing ? 'Редактировать вопрос' : 'Добавить вопрос';
     
     $("selType").value = Editor.draft.type || "choice";
@@ -457,6 +499,46 @@
     $("btnCloseModal").addEventListener('click',()=>{ Editor.draft=null; Editor.editingId=null; hideModal(); });
     $("modalBackdrop").addEventListener('click',e=>{ if(e.target === $("modalBackdrop")){ Editor.draft=null; Editor.editingId=null; hideModal(); } });
     
+    $("btnApplyAll").addEventListener("click", () => {
+      if(Editor.questions.length === 0) return;
+      const tplIdx = parseInt($("newQTemplate").value);
+      
+      if(!confirm("Применить настройки (шрифт, размер, таймер, ТИП вопроса) ко всем созданным вопросам?\\n(При смене типа вопроса ответы будут аккуратно сконвертированы)")) return;
+      
+      let baseQ = { font: "", fontSize: 20, seconds: null, type: "choice" };
+      if (tplIdx >= 0 && Editor.questions[tplIdx]) {
+          const tq = Editor.questions[tplIdx];
+          baseQ = { font: tq.font, fontSize: tq.fontSize, seconds: tq.seconds, type: tq.type };
+      }
+      
+      Editor.questions.forEach(q => {
+          q.font = baseQ.font;
+          q.fontSize = baseQ.fontSize;
+          q.seconds = baseQ.seconds;
+
+          if (q.type !== baseQ.type) {
+              q.type = baseQ.type;
+              if (q.type === 'choice') {
+                  let ans = (q.accepts && q.accepts.length > 0) ? q.accepts[0] : "";
+                  q.options = [ans, "Вариант 2"];
+                  q.correctIndices = [0];
+                  delete q.accepts;
+              } else {
+                  let ans = "";
+                  if (q.options && q.correctIndices && q.correctIndices.length > 0) {
+                      ans = q.options[q.correctIndices[0]] || "";
+                  }
+                  q.accepts = [ans];
+                  delete q.options;
+                  delete q.correctIndices;
+              }
+          }
+      });
+      renderList();
+      updatePreview(false);
+      toast("Настройки применены!");
+    });
+
     $("selType").addEventListener("change", ()=>{
       const q = Editor.draft; if(!q) return;
       q.type = $("selType").value; syncModalType();
@@ -545,7 +627,6 @@
     const winMessage = mount.querySelector('#win-message');
     const piniataImg = mount.querySelector('#piniata-img');
 
-    // Безопасно обрабатываем новые типы вопросов для игры
     const questions = (cfg.questions || []).map(q => ({ 
         type: q.type || 'choice',
         q: q.prompt, 
@@ -567,13 +648,66 @@
     winMessage.textContent = cfg.winText || 'Молодец!';
     piniataImg.src = '1.png';
 
-    function playHitSound(){
+    function playCrackSound(){
       if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if(audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
-      osc.type='square'; osc.frequency.setValueAtTime(120, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.15);
-      gain.gain.setValueAtTime(0.6, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-      osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+      const t = audioCtx.currentTime;
+      
+      const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.15, audioCtx.sampleRate);
+      const data = buf.getChannelData(0);
+      for(let i=0; i<data.length; i++) data[i] = Math.random() * 2 - 1;
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buf;
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.value = 1500;
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.8, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+      noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+      noise.start(t);
+      
+      const osc = audioCtx.createOscillator();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(400, t);
+      osc.frequency.exponentialRampToValueAtTime(50, t + 0.08);
+      const oscGain = audioCtx.createGain();
+      oscGain.gain.setValueAtTime(0.8, t);
+      oscGain.gain.exponentialRampToValueAtTime(0.01, t + 0.08);
+      osc.connect(oscGain); oscGain.connect(audioCtx.destination);
+      osc.start(t); osc.stop(t+0.1);
+    }
+
+    function playCorrect(){
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if(audioCtx.state === 'suspended') audioCtx.resume();
+      const t = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(420, t);
+      osc.frequency.exponentialRampToValueAtTime(780, t + 0.12);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(0.20, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(t); osc.stop(t + 0.2);
+    }
+
+    function playWrong(){
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if(audioCtx.state === 'suspended') audioCtx.resume();
+      const t = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(150, t);
+      osc.frequency.exponentialRampToValueAtTime(80, t + 0.2);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(0.20, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(t); osc.stop(t + 0.2);
     }
 
     function launchConfetti(){
@@ -618,9 +752,11 @@
              const userVal = ansInput.value.trim().toLowerCase();
              const isCorrect = currentQ.accepts.some(a => a.trim().toLowerCase() === userVal);
              if (isCorrect) {
+                playCorrect();
                 feedbackText.innerText = 'Правильно! Ударь пиньяту!'; feedbackText.className='text-correct'; canHit=true;
                 ansSubmit.disabled = true; ansInput.disabled = true;
              } else {
+                playWrong();
                 feedbackText.innerText = 'Промахнулся! Попробуй еще раз.'; feedbackText.className='text-wrong';
              }
           };
@@ -635,9 +771,11 @@
               btn.onclick=()=> {
                   if(canHit) return;
                   if(currentQ.correctIndices.includes(index)){
+                    playCorrect();
                     feedbackText.innerText = 'Правильно! Ударь пиньяту!'; feedbackText.className='text-correct'; canHit=true;
                     optionsContainer.querySelectorAll('.option-btn').forEach(b=>b.disabled=true); btn.style.background='#28a745';
                   } else {
+                    playWrong();
                     feedbackText.innerText = 'Промахнулся! Попробуй еще раз.'; feedbackText.className='text-wrong'; 
                     btn.style.transform='translateX(-5px)'; setTimeout(()=>btn.style.transform='translateX(5px)',50); setTimeout(()=>btn.style.transform='translateX(0)',100); 
                   }
@@ -650,7 +788,7 @@
     piniataImg.addEventListener('click',()=>{
       if(startScreen.style.display !== 'none') return;
       if(!canHit){ if(feedbackText.innerText === ''){ feedbackText.innerText='Сначала ответь на вопрос!'; feedbackText.className='text-wrong'; } return; }
-      playHitSound(); piniataImg.classList.remove('swing'); piniataImg.classList.add('hit-anim');
+      playCrackSound(); piniataImg.classList.remove('swing'); piniataImg.classList.add('hit-anim');
       setTimeout(()=>{ piniataImg.classList.remove('hit-anim'); if(currentStage < images.length - 1) piniataImg.classList.add('swing'); },200);
       currentStage++; piniataImg.src = images[currentStage] || images[images.length-1];
       if(currentStage === images.length - 1 || currentStage >= questions.length){ quizPanel.style.display='none'; winMessage.style.display='block'; launchConfetti(); }
