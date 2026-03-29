@@ -31,7 +31,8 @@
     .btn-danger:hover { background: rgba(255,77,77,0.1); }
 
     input, textarea, select { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 10px 14px; border-radius: 8px; outline: none; font-family: inherit; }
-    input:focus, textarea:focus { border-color: var(--neon); background: rgba(0,0,0,0.5); }
+    input:focus, textarea:focus, select:focus { border-color: var(--neon); background: rgba(0,0,0,0.5); }
+    select { appearance: none; cursor: pointer; }
 
     /* LAYOUT */
     #app { display: flex; height: 100vh; width: 100vw; }
@@ -51,30 +52,36 @@
     
     .field { margin-bottom: 15px; }
     .field label { display: block; font-size: 13px; color: #a9b6e6; margin-bottom: 6px; }
-    .field-row { display: flex; gap: 10px; }
-    .field-row > div { flex: 1; }
 
-    /* ACCORDION (QUESTIONS) */
-    .q-block { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
-    .q-head { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: rgba(255,255,255,0.02); font-weight: 600; font-size: 14px; }
-    .q-head:hover { background: rgba(255,255,255,0.05); }
-    .q-body { padding: 16px; border-top: 1px solid var(--border); display: none; background: rgba(0,0,0,0.1); }
-    .q-block.open .q-body { display: block; }
+    /* QUESTION LIST */
+    .q-item { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
+    .q-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); }
+    .q-item-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; }
+    .q-item-actions button { padding: 6px; font-size: 12px; }
+
+    /* MODAL (TOWER STYLE) */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: #161925; width: 700px; max-height: 90vh; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow2); display: flex; flex-direction: column; }
+    .modal-hdr { padding: 20px 24px; border-bottom: 1px solid var(--border); font-weight: 700; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-body { padding: 24px; overflow-y: auto; display: flex; gap: 20px; }
+    .modal-col { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+    .modal-ftr { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; background: rgba(0,0,0,0.2); border-radius: 0 0 20px 20px; }
     
-    .opt-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .opt-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
     .opt-row input[type="radio"] { width: 18px; height: 18px; accent-color: var(--ok); cursor: pointer; flex-shrink: 0; }
     
-    .style-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-top: 15px; border: 1px dashed rgba(255,255,255,0.1); }
-    .style-box h4 { margin: 0 0 10px 0; font-size: 12px; color: #a9b6e6; }
-    
-    input[type="color"] { padding: 0; height: 38px; cursor: pointer; }
+    .color-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .color-row label { font-size: 13px; color: #a9b6e6; }
+    .color-row input[type="color"] { width: 40px; height: 30px; padding: 0; cursor: pointer; border: none; border-radius: 4px; }
+    .color-row input[type="number"] { width: 70px; padding: 6px; }
+    .color-row select { width: 120px; padding: 6px; }
 
     /* RIGHT PANEL (PREVIEW) */
     .preview { flex: 1; position: relative; background: #000; }
     iframe { width: 100%; height: 100%; border: none; display: block; }
     .preview-badge { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; color: var(--neon); pointer-events: none; z-index: 100; border: 1px solid rgba(255,255,255,0.1); }
 
-    /* GENERATE BLOCK */
     .export-box { display: flex; gap: 10px; align-items: center; }
     .export-box input { flex: 1; font-family: monospace; color: var(--ok); }
   </style>
@@ -84,7 +91,7 @@
 <div id="app">
   <div class="panel">
     <div class="panel-hdr">
-      <img id="uiLogo" src="logo.png" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%23d6b14a\' viewBox=\'0 0 24 24\'><path d=\'M12 2L2 22h20L12 2z\'/></svg>'">
+      <img src="logo.png" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%23d6b14a\' viewBox=\'0 0 24 24\'><path d=\'M12 2L2 22h20L12 2z\'/></svg>'">
       <div>
         <span>Светлана Быкова</span>
         <h1 id="uiTitleText">Пиньята</h1>
@@ -92,20 +99,11 @@
     </div>
     
     <div class="panel-content">
-      
       <div class="section">
         <div class="section-title">Основное</div>
         <div class="field">
           <label>Название игры</label>
           <input type="text" id="inpTitle" value="Праздничная Пиньята" oninput="saveAll()">
-        </div>
-        <div class="field">
-          <label>URL Логотипа</label>
-          <input type="text" id="inpLogo" value="logo.png" placeholder="logo.png" oninput="saveAll()">
-        </div>
-        <div class="field">
-          <label>URL Фона (JPG/PNG)</label>
-          <input type="text" id="inpBg" value="bg (2).png" placeholder="bg (2).png" oninput="saveAll()">
         </div>
         <div class="field">
           <label>Инструкция (Стартовый экран)</label>
@@ -124,11 +122,10 @@
       <div class="section">
         <div class="section-title" style="display:flex; justify-content:space-between;">
           <span>Вопросы <span id="qCount" style="color:#fff;">(0/5)</span></span>
-          <button class="btn-primary" style="padding:4px 8px; font-size:12px;" id="btnAddQ" onclick="addQ()">+ Добавить</button>
+          <button class="btn-primary" style="padding:4px 8px; font-size:12px;" id="btnAddQ" onclick="openModal(null)">+ Добавить</button>
         </div>
         <div id="qList"></div>
       </div>
-
     </div>
     
     <div class="panel-footer">
@@ -146,24 +143,119 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="qModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span id="modalTitle">Редактирование вопроса</span>
+      <button class="btn-outline" style="border:none; padding:5px;" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-col" style="border-right:1px solid var(--border); padding-right:20px;">
+        <div class="field">
+          <label>Текст вопроса</label>
+          <textarea id="modQText" rows="3"></textarea>
+        </div>
+        <div class="field">
+          <label>URL картинки (необязательно)</label>
+          <input type="text" id="modQImg" placeholder="https://...">
+        </div>
+        <div class="field">
+          <label>Тип ответа</label>
+          <select id="modQType" onchange="toggleQType()">
+            <option value="choice">Выбор вариантов</option>
+            <option value="input">Ввод текста</option>
+          </select>
+        </div>
+        
+        <div id="modChoiceArea">
+          <label style="font-size:13px; color:#a9b6e6; display:block; margin-bottom:10px;">Варианты (отметьте верный)</label>
+          <div id="modOpts"></div>
+          <button class="btn-outline" style="width:100%; border-style:dashed;" onclick="addModalOpt()">+ Добавить вариант</button>
+        </div>
+        
+        <div id="modInputArea" style="display:none;">
+          <label style="font-size:13px; color:#a9b6e6; display:block; margin-bottom:10px;">Правильный ответ (для проверки)</label>
+          <input type="text" id="modInputAns" placeholder="Например: 15">
+          <div style="font-size:11px; color:var(--muted); margin-top:5px;">*Регистр букв и пробелы игнорируются при проверке.</div>
+        </div>
+      </div>
+      
+      <div class="modal-col">
+        <div class="section-title" style="margin-bottom:10px;">Дизайн блока</div>
+        <div class="color-row">
+          <label>Фон плашки</label>
+          <input type="color" id="modBgColor" value="#ffffff">
+        </div>
+        <div class="color-row">
+          <label>Цвет текста</label>
+          <input type="color" id="modTextColor" value="#333333">
+        </div>
+        <div class="color-row">
+          <label>Обводка</label>
+          <input type="color" id="modBorderColor" value="#cccccc">
+        </div>
+        <div class="color-row">
+          <label>Шрифт текста</label>
+          <select id="modFont">
+            <option value="system-ui">Стандартный</option>
+            <option value="'Caveat', cursive">Caveat</option>
+            <option value="'Neucha', cursive">Neucha</option>
+            <option value="Arial">Arial</option>
+            <option value="Courier New">Courier New</option>
+          </select>
+        </div>
+        <div class="color-row">
+          <label>Размер текста</label>
+          <input type="number" id="modFontSize" value="22">
+        </div>
+
+        <div class="section-title" style="margin:20px 0 10px;">Дизайн кнопок / ввода</div>
+        <div class="color-row">
+          <label>Фон</label>
+          <input type="color" id="modBtnBg" value="#ff7e67">
+        </div>
+        <div class="color-row">
+          <label>Цвет текста</label>
+          <input type="color" id="modBtnText" value="#ffffff">
+        </div>
+        <div class="color-row">
+          <label>Шрифт</label>
+          <select id="modBtnFont">
+            <option value="system-ui">Стандартный</option>
+            <option value="'Caveat', cursive">Caveat</option>
+            <option value="'Neucha', cursive">Neucha</option>
+            <option value="Arial">Arial</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn-outline btn-danger" id="btnApplyAll" onclick="applySettingsToAll()">Применить дизайн ко всем</button>
+      <div>
+        <button class="btn-outline" onclick="closeModal()">Отмена</button>
+        <button class="btn-primary" onclick="saveModal()">Сохранить вопрос</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   const uid = () => Math.random().toString(36).substr(2, 6);
   const $ = id => document.getElementById(id);
   
   // DATA MODEL
   let Editor = {
-    title: "Праздничная Пиньята", bgUrl: "bg (2).png", logoUrl: "logo.png", useLatex: false,
+    title: "Праздничная Пиньята", useLatex: false,
     instText: "Ответь на 5 вопросов правильно, чтобы разбить пиньяту и получить сюрприз!",
     winText: "Молодец!",
     questions: [
       {
-        id: uid(), q: "Сколько будет 2 + 2?", options: ["3", "4", "5"], correct: 1,
-        style: { qBg: "rgba(255, 255, 255, 0.95)", qColor: "#333333", qSize: 22, optBg: "#ff7e67", optColor: "#ffffff", optSize: 18 }
+        id: uid(), q: "Сколько будет 2 + 2?", img: "", type: "choice", options: ["3", "4", "5"], correctIdx: 1, inputText: "",
+        style: { bg: "#ffffff", text: "#333333", border: "#cccccc", font: "system-ui", size: 22, btnBg: "#ff7e67", btnText: "#ffffff", btnFont: "system-ui" }
       }
     ]
   };
 
-  // CHECK IF PLAY MODE
   const urlParams = new URLSearchParams(window.location.search);
   const cfgKeyParam = urlParams.get('cfgkey');
 
@@ -181,121 +273,153 @@
     initEditor();
   }
 
-  // --- EDITOR LOGIC ---
   function initEditor() {
-    try { const saved = localStorage.getItem("pinata_pro_save"); if(saved) Editor = Object.assign(Editor, JSON.parse(saved)); } catch(e){}
-    
+    try { const saved = localStorage.getItem("pinata_pro_save_v3"); if(saved) Editor = Object.assign(Editor, JSON.parse(saved)); } catch(e){}
     $("inpTitle").value = Editor.title;
-    $("inpLogo").value = Editor.logoUrl;
-    $("inpBg").value = Editor.bgUrl;
     $("inpInst").value = Editor.instText;
     $("inpWin").value = Editor.winText;
     $("chkLatex").checked = Editor.useLatex;
-
-    renderQuestions();
+    renderQList();
     saveAll();
   }
 
-  function renderQuestions() {
+  function renderQList() {
     const list = $("qList"); list.innerHTML = "";
     Editor.questions.forEach((q, i) => {
-      const block = document.createElement("div"); block.className = "q-block";
-      
-      let optsHtml = "";
-      q.options.forEach((opt, oIdx) => {
-        optsHtml += `
-          <div class="opt-row">
-            <input type="radio" name="correct_${q.id}" ${q.correct === oIdx ? 'checked' : ''} onchange="updateCorrect('${q.id}', ${oIdx})">
-            <input type="text" value="${opt.replace(/"/g, '&quot;')}" placeholder="Вариант ответа" oninput="updateOpt('${q.id}', ${oIdx}, this.value)">
-            <button class="btn-outline btn-danger" style="padding:8px;" onclick="delOpt('${q.id}', ${oIdx})">✕</button>
-          </div>
-        `;
-      });
-
-      block.innerHTML = `
-        <div class="q-head" onclick="this.parentElement.classList.toggle('open')">
-          <span>Вопрос ${i+1}: ${q.q.substring(0, 20) || '...'}</span>
-          <span style="color:var(--danger);" onclick="event.stopPropagation(); delQ('${q.id}')">Удалить</span>
-        </div>
-        <div class="q-body">
-          <label style="font-size:12px;color:#a9b6e6;">Текст вопроса</label>
-          <textarea rows="2" style="margin-bottom:10px;" oninput="updateQ('${q.id}', this.value)">${q.q}</textarea>
-          
-          <label style="font-size:12px;color:#a9b6e6;display:block;margin-bottom:5px;">Варианты (отметьте верный)</label>
-          ${optsHtml}
-          <button class="btn-outline" style="width:100%; border-style:dashed; margin-top:5px; padding:6px;" onclick="addOpt('${q.id}')">+ Вариант</button>
-          
-          <div class="style-box">
-            <h4>🎨 Дизайн этого вопроса</h4>
-            <div class="field-row">
-              <div><label>Фон плашки</label><input type="color" value="${rgbaToHex(q.style.qBg)}" oninput="updateStyle('${q.id}', 'qBg', this.value)"></div>
-              <div><label>Цвет текста</label><input type="color" value="${q.style.qColor}" oninput="updateStyle('${q.id}', 'qColor', this.value)"></div>
-              <div><label>Размер шрифта</label><input type="number" value="${q.style.qSize}" oninput="updateStyle('${q.id}', 'qSize', this.value)"></div>
-            </div>
-            <div class="field-row" style="margin-top:10px;">
-              <div><label>Фон кнопок</label><input type="color" value="${q.style.optBg}" oninput="updateStyle('${q.id}', 'optBg', this.value)"></div>
-              <div><label>Цвет кнопок</label><input type="color" value="${q.style.optColor}" oninput="updateStyle('${q.id}', 'optColor', this.value)"></div>
-              <div><label>Шрифт кнопок</label><input type="number" value="${q.style.optSize}" oninput="updateStyle('${q.id}', 'optSize', this.value)"></div>
-            </div>
-            <button class="btn-primary" style="width:100%; margin-top:15px; font-size:13px;" onclick="applyStyleToAll('${q.id}')">✨ Применить этот дизайн ко всем вопросам</button>
-          </div>
+      const item = document.createElement("div"); item.className = "q-item";
+      item.innerHTML = `
+        <div class="q-item-title" onclick="openModal('${q.id}')">${i+1}. ${q.q || 'Пустой вопрос'}</div>
+        <div class="q-item-actions">
+          <button class="btn-outline" onclick="openModal('${q.id}')">✏️</button>
+          <button class="btn-outline btn-danger" onclick="delQ('${q.id}')">🗑</button>
         </div>
       `;
-      list.appendChild(block);
+      list.appendChild(item);
     });
-
     $("qCount").innerText = `(${Editor.questions.length}/5)`;
     $("btnAddQ").style.display = Editor.questions.length >= 5 ? "none" : "block";
   }
 
-  // --- QUESTION ACTIONS ---
-  function addQ() {
-    if(Editor.questions.length >= 5) return;
-    const baseStyle = Editor.questions.length > 0 ? {...Editor.questions[Editor.questions.length-1].style} : { qBg: "#ffffff", qColor: "#333333", qSize: 22, optBg: "#ff7e67", optColor: "#ffffff", optSize: 18 };
-    Editor.questions.push({ id: uid(), q: "Новый вопрос", options: ["Вариант 1", "Вариант 2"], correct: 0, style: baseStyle });
-    renderQuestions(); saveAll();
-  }
-  function delQ(id) { Editor.questions = Editor.questions.filter(q => q.id !== id); renderQuestions(); saveAll(); }
-  function updateQ(id, val) { const q = Editor.questions.find(x => x.id === id); if(q) { q.q = val; saveAll(false); } }
-  function updateCorrect(id, idx) { const q = Editor.questions.find(x => x.id === id); if(q) { q.correct = idx; saveAll(); } }
-  function updateOpt(id, idx, val) { const q = Editor.questions.find(x => x.id === id); if(q) { q.options[idx] = val; saveAll(false); } }
-  function addOpt(id) { const q = Editor.questions.find(x => x.id === id); if(q) { q.options.push("Новый вариант"); renderQuestions(); saveAll(); } }
-  function delOpt(id, idx) { const q = Editor.questions.find(x => x.id === id); if(q && q.options.length > 2) { q.options.splice(idx, 1); if(q.correct >= q.options.length) q.correct = 0; renderQuestions(); saveAll(); } else { alert("Минимум 2 варианта!"); } }
-  function updateStyle(id, prop, val) { const q = Editor.questions.find(x => x.id === id); if(q) { q.style[prop] = val; saveAll(false); } }
-  
-  function applyStyleToAll(id) {
-    const src = Editor.questions.find(x => x.id === id);
-    if(!src) return;
-    Editor.questions.forEach(q => { q.style = { ...src.style }; });
-    renderQuestions(); saveAll();
-    alert("Дизайн успешно скопирован на все вопросы!");
+  // --- MODAL LOGIC ---
+  let editingId = null;
+
+  function openModal(id) {
+    editingId = id;
+    $("modOpts").innerHTML = "";
+    
+    let q;
+    if (id) {
+      q = Editor.questions.find(x => x.id === id);
+      $("modalTitle").innerText = "Редактирование вопроса";
+    } else {
+      const baseStyle = Editor.questions.length > 0 ? {...Editor.questions[0].style} : { bg: "#ffffff", text: "#333333", border: "#cccccc", font: "system-ui", size: 22, btnBg: "#ff7e67", btnText: "#ffffff", btnFont: "system-ui" };
+      q = { q: "", img: "", type: "choice", options: ["", ""], correctIdx: 0, inputText: "", style: baseStyle };
+      $("modalTitle").innerText = "Новый вопрос";
+    }
+
+    $("modQText").value = q.q;
+    $("modQImg").value = q.img;
+    $("modQType").value = q.type;
+    $("modInputAns").value = q.inputText;
+    
+    q.options.forEach((opt, idx) => addModalOpt(opt, idx === q.correctIdx));
+    
+    $("modBgColor").value = q.style.bg;
+    $("modTextColor").value = q.style.text;
+    $("modBorderColor").value = q.style.border;
+    $("modFont").value = q.style.font;
+    $("modFontSize").value = q.style.size;
+    $("modBtnBg").value = q.style.btnBg;
+    $("modBtnText").value = q.style.btnText;
+    $("modBtnFont").value = q.style.btnFont;
+
+    toggleQType();
+    $("qModal").classList.add("active");
   }
 
-  // Helper for color input
-  function rgbaToHex(rgba) {
-    if(rgba.startsWith('#')) return rgba;
-    let parts = rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-    if(!parts) return "#ffffff";
-    delete parts[0];
-    let hex = '#';
-    for (let i = 1; i <= 3; ++i) { let part = parseInt(parts[i]).toString(16); if (part.length === 1) part = '0' + part; hex += part; }
-    return hex;
+  function toggleQType() {
+    const isChoice = $("modQType").value === "choice";
+    $("modChoiceArea").style.display = isChoice ? "block" : "none";
+    $("modInputArea").style.display = isChoice ? "none" : "block";
   }
 
-  // --- SAVE & BUILD ---
+  function addModalOpt(val = "", isCorrect = false) {
+    const div = document.createElement("div"); div.className = "opt-row";
+    div.innerHTML = `
+      <input type="radio" name="modOptCorrect" ${isCorrect ? 'checked' : ''}>
+      <input type="text" class="modOptVal" value="${val.replace(/"/g, '&quot;')}">
+      <button class="btn-outline btn-danger" onclick="this.parentElement.remove()">✕</button>
+    `;
+    $("modOpts").appendChild(div);
+  }
+
+  function saveModal() {
+    const qText = $("modQText").value.trim();
+    if(!qText) return alert("Введите вопрос!");
+    
+    const type = $("modQType").value;
+    let options = [], correctIdx = 0, inputText = "";
+    
+    if (type === "choice") {
+      const rows = document.querySelectorAll("#modOpts .opt-row");
+      if(rows.length < 2) return alert("Нужно минимум 2 варианта!");
+      let hasCorrect = false;
+      rows.forEach((row, idx) => {
+        options.push(row.querySelector(".modOptVal").value.trim());
+        if(row.querySelector('input[type="radio"]').checked) { correctIdx = idx; hasCorrect = true; }
+      });
+      if(!hasCorrect) return alert("Выберите правильный вариант!");
+    } else {
+      inputText = $("modInputAns").value.trim();
+      if(!inputText) return alert("Введите правильный ответ для проверки!");
+    }
+
+    const newQ = {
+      id: editingId || uid(), q: qText, img: $("modQImg").value.trim(), type, options, correctIdx, inputText,
+      style: {
+        bg: $("modBgColor").value, text: $("modTextColor").value, border: $("modBorderColor").value,
+        font: $("modFont").value, size: $("modFontSize").value, btnBg: $("modBtnBg").value, btnText: $("modBtnText").value, btnFont: $("modBtnFont").value
+      }
+    };
+
+    if (editingId) {
+      const idx = Editor.questions.findIndex(x => x.id === editingId);
+      Editor.questions[idx] = newQ;
+    } else {
+      if(Editor.questions.length >= 5) return alert("Максимум 5 вопросов!");
+      Editor.questions.push(newQ);
+    }
+
+    closeModal();
+    renderQList();
+    saveAll();
+  }
+
+  function applySettingsToAll() {
+    if(!confirm("Применить текущие цвета и шрифты ко всем вопросам?")) return;
+    const style = {
+      bg: $("modBgColor").value, text: $("modTextColor").value, border: $("modBorderColor").value,
+      font: $("modFont").value, size: $("modFontSize").value, btnBg: $("modBtnBg").value, btnText: $("modBtnText").value, btnFont: $("modBtnFont").value
+    };
+    Editor.questions.forEach(q => q.style = {...style});
+    saveAll();
+    alert("Дизайн скопирован на все вопросы!");
+  }
+
+  function closeModal() { $("qModal").classList.remove("active"); }
+  function delQ(id) { Editor.questions = Editor.questions.filter(q => q.id !== id); renderQList(); saveAll(); }
+
+  // --- SAVE & PREVIEW ---
   let debounceTimer;
-  function saveAll(reRenderUI = true) {
+  function saveAll() {
     Editor.title = $("inpTitle").value;
-    Editor.bgUrl = $("inpBg").value;
-    Editor.logoUrl = $("inpLogo").value;
     Editor.instText = $("inpInst").value;
     Editor.winText = $("inpWin").value;
     Editor.useLatex = $("chkLatex").checked;
     
     $("uiTitleText").innerText = Editor.title || "Пиньята";
-    if(Editor.logoUrl) $("uiLogo").src = Editor.logoUrl;
 
-    localStorage.setItem("pinata_pro_save", JSON.stringify(Editor));
+    localStorage.setItem("pinata_pro_save_v3", JSON.stringify(Editor));
     
     const k = "pinata_run_" + uid();
     localStorage.setItem(k, JSON.stringify(Editor));
@@ -303,13 +427,15 @@
     
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
-      $("previewFrame").srcdoc = buildGameHTML(Editor, false);
+        // НАДЕЖНЫЙ МЕТОД ОБНОВЛЕНИЯ IFRAME (Вместо srcdoc)
+        const frameDoc = $("previewFrame").contentWindow.document;
+        frameDoc.open();
+        frameDoc.write(buildGameHTML(Editor, false));
+        frameDoc.close();
     }, 400);
   }
 
-  function copyIframe() {
-    navigator.clipboard.writeText(`<iframe src="${$("outLink").value}" width="100%" height="600" frameborder="0" allowfullscreen></iframe>`).then(() => alert("Код Iframe скопирован!"));
-  }
+  function copyIframe() { navigator.clipboard.writeText(`<iframe src="${$("outLink").value}" width="100%" height="600" frameborder="0" allowfullscreen></iframe>`).then(() => alert("Код Iframe скопирован!")); }
 
   // --- GAME BUILDER ---
   function buildGameHTML(cfg, isStandalone) {
@@ -319,6 +445,10 @@
                       <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"><\/script>`;
     }
 
+    // ХАРДКОД ФОНА И ЛОГОТИПА
+    const BG_URL = 'bg (2).png';
+    const LOGO_URL = 'logo.png';
+
     return `<!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -327,11 +457,10 @@
     <title>${cfg.title}</title>
     ${latexScripts}
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Neucha&display=swap');
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
-        #game-container { position: relative; width: 100vw; height: 100vh; background-size: cover; background-position: center; background-repeat: no-repeat; }
-        
+        #game-container { position: relative; width: 100vw; height: 100vh; background-image: url('${BG_URL}'); background-size: cover; background-position: center; background-repeat: no-repeat; }
         .game-logo { position: absolute; top: 20px; right: 20px; max-height: 80px; max-width: 150px; z-index: 100; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); object-fit: contain; }
         
         #startOverlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999; text-align: center; padding: 20px; }
@@ -340,6 +469,7 @@
         #startOverlay button { font-size: 1.2rem; padding: 15px 40px; border-radius: 30px; cursor: pointer; background: #d6b14a; color: #000; border: none; font-weight: bold; transition: 0.2s; box-shadow: 0 4px 15px rgba(214,177,74,0.4); }
         #startOverlay button:hover { transform: scale(1.05); }
 
+        /* КООРДИНАТЫ ПИНЬЯТЫ ЗАФИКСИРОВАНЫ */
         #piniata-wrapper { position: absolute; width: 310px; left: 68.35%; top: 54.59%; transform: translate(-50%, -50%); z-index: 10; display: none; }
         .piniata-image { width: 100%; height: auto; display: block; transform-origin: 50% 0%; cursor: pointer; filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.3)); }
         
@@ -348,14 +478,18 @@
         .hit-anim { animation: hitAnim 0.2s ease-out; }
         @keyframes hitAnim { 0% { transform: scale(1) rotate(0deg); } 50% { transform: scale(0.9) rotate(15deg) translateY(-10px); } 100% { transform: scale(1) rotate(0deg); } }
 
-        #quiz-panel { position: absolute; left: 5%; top: 50%; transform: translateY(-50%); padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); width: 340px; text-align: center; z-index: 50; display: none; transition: 0.3s background-color; }
-        #question-text-game { font-weight: bold; margin-bottom: 20px; transition: 0.3s color; }
+        #quiz-panel { position: absolute; left: 5%; top: 50%; transform: translateY(-50%); padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 360px; text-align: center; z-index: 50; display: none; transition: 0.3s; display: flex; flex-direction: column; gap: 15px; }
+        #q-img { max-width: 100%; border-radius: 10px; display: none; margin: 0 auto; max-height: 150px; object-fit: contain; }
+        #question-text-game { font-weight: bold; line-height: 1.3; }
         
-        .option-btn { display: block; width: 100%; margin: 10px 0; padding: 12px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .option-btn { display: block; width: 100%; padding: 12px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .option-btn:hover { filter: brightness(0.9); transform: translateY(-2px); }
         .option-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
         
-        #feedback-text-game { margin-top: 15px; font-size: 18px; font-weight: bold; min-height: 24px; }
+        .input-wrapper { display: flex; flex-direction: column; gap: 10px; }
+        .input-field { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid rgba(0,0,0,0.1); font-size: 16px; outline: none; text-align: center; font-weight: bold; }
+        
+        #feedback-text-game { font-size: 18px; font-weight: bold; min-height: 24px; }
 
         #win-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; font-weight: bold; color: #ffca3a; text-shadow: 4px 4px 0px #ff595e, 8px 8px 15px rgba(0,0,0,0.5); display: none; z-index: 100; text-transform: uppercase; text-align: center; }
         .confetti { position: absolute; top: -20px; z-index: 90; animation: fall linear forwards; }
@@ -364,8 +498,8 @@
 </head>
 <body>
 
-<div id="game-container" style="background-image: url('${cfg.bgUrl}');">
-    ${cfg.logoUrl ? `<img src="${cfg.logoUrl}" class="game-logo" onerror="this.style.display='none'">` : ''}
+<div id="game-container">
+    <img src="${LOGO_URL}" class="game-logo" onerror="this.style.display='none'">
     
     <div id="startOverlay">
         <h1>${cfg.title}</h1>
@@ -373,7 +507,8 @@
         <button id="btnStartGame">Начать игру</button>
     </div>
 
-    <div id="quiz-panel">
+    <div id="quiz-panel" style="display:none;">
+        <img id="q-img">
         <div id="question-text-game"></div>
         <div id="options-container"></div>
         <div id="feedback-text-game"></div>
@@ -389,8 +524,7 @@
 <script>
     const cfg = ${JSON.stringify(cfg)};
     
-    // Подготовка 5 вопросов (зацикливание, если меньше 5)
-    let baseQs = cfg.questions && cfg.questions.length > 0 ? cfg.questions : [{ q: "Нет вопросов", options: ["Ок", "Тест"], correct: 0, style: { qBg:"#fff", qColor:"#000", qSize:22, optBg:"#ccc", optColor:"#000", optSize:18 } }];
+    let baseQs = cfg.questions && cfg.questions.length > 0 ? cfg.questions : [{ q: "Вопросов нет", type: "choice", options: ["Ок"], correctIdx: 0, style: { bg:"#fff", text:"#000", border:"#ccc", font:"system-ui", size:22, btnBg:"#ccc", btnText:"#000", btnFont:"system-ui" } }];
     const gameQs = [];
     for (let i = 0; i < 5; i++) gameQs.push(baseQs[i % baseQs.length]);
     
@@ -404,6 +538,7 @@
     const piniataImg = document.getElementById("piniata-img");
     const piniataWrapper = document.getElementById("piniata-wrapper");
     const quizPanel = document.getElementById("quiz-panel");
+    const qImg = document.getElementById("q-img");
     const qText = document.getElementById("question-text-game");
     const optContainer = document.getElementById("options-container");
     const feedbackText = document.getElementById("feedback-text-game");
@@ -412,7 +547,7 @@
     btnStart.onclick = () => {
         overlay.style.display = 'none';
         piniataWrapper.style.display = 'block';
-        quizPanel.style.display = 'block';
+        quizPanel.style.display = 'flex';
         loadQuestion();
     };
 
@@ -436,93 +571,105 @@
         const currentQ = gameQs[currentStage];
         const st = currentQ.style;
         
-        // Применяем настройки дизайна конкретного вопроса
-        quizPanel.style.backgroundColor = st.qBg || '#ffffff';
-        qText.style.color = st.qColor || '#333333';
-        qText.style.fontSize = (st.qSize || 22) + 'px';
+        quizPanel.style.backgroundColor = st.bg || '#ffffff';
+        quizPanel.style.border = '2px solid ' + (st.border || '#cccccc');
+        qText.style.color = st.text || '#333333';
+        qText.style.fontFamily = st.font || 'system-ui';
+        qText.style.fontSize = (st.size || 22) + 'px';
+        
+        if (currentQ.img) { qImg.src = currentQ.img; qImg.style.display = 'block'; } 
+        else { qImg.style.display = 'none'; }
         
         renderLatex(qText, currentQ.q);
         optContainer.innerHTML = ''; 
         feedbackText.innerText = ''; 
         canHit = false;
 
-        currentQ.options.forEach((opt, index) => {
-            const btn = document.createElement('button'); 
-            btn.className = 'option-btn'; 
-            renderLatex(btn, opt);
+        if (currentQ.type === "choice") {
+            currentQ.options.forEach((opt, index) => {
+                const btn = document.createElement('button'); 
+                btn.className = 'option-btn'; 
+                renderLatex(btn, opt);
+                btn.style.backgroundColor = st.btnBg || '#ff7e67';
+                btn.style.color = st.btnText || '#ffffff';
+                btn.style.fontFamily = st.btnFont || 'system-ui';
+                
+                btn.onclick = () => checkChoice(index, currentQ.correctIdx, btn);
+                optContainer.appendChild(btn);
+            });
+        } else {
+            const wrap = document.createElement('div'); wrap.className = 'input-wrapper';
+            const inp = document.createElement('input'); inp.type = 'text'; inp.className = 'input-field'; inp.placeholder = 'Ваш ответ...';
+            inp.style.fontFamily = st.btnFont || 'system-ui';
             
-            // Стили кнопки
-            btn.style.backgroundColor = st.optBg || '#ff7e67';
-            btn.style.color = st.optColor || '#ffffff';
-            btn.style.fontSize = (st.optSize || 18) + 'px';
+            const btn = document.createElement('button'); btn.className = 'option-btn'; btn.innerText = 'ОТВЕТИТЬ';
+            btn.style.backgroundColor = st.btnBg || '#ff7e67'; btn.style.color = st.btnText || '#ffffff'; btn.style.fontFamily = st.btnFont || 'system-ui';
             
-            btn.onclick = () => checkAnswer(index, currentQ.correct, btn);
-            optContainer.appendChild(btn);
-        });
+            btn.onclick = () => checkInput(inp.value, currentQ.inputText, btn, inp);
+            inp.onkeydown = (e) => { if(e.key === 'Enter') btn.click(); };
+            
+            wrap.appendChild(inp); wrap.appendChild(btn);
+            optContainer.appendChild(wrap);
+            setTimeout(() => inp.focus(), 100);
+        }
     }
 
-    function checkAnswer(selectedIndex, correctIndex, btnElement) {
+    function checkChoice(selectedIndex, correctIndex, btnElement) {
         if (canHit) return;
         if (selectedIndex === correctIndex) {
-            feedbackText.innerText = "Правильно! Ударь пиньяту!"; 
-            feedbackText.style.color = '#28a745'; 
-            canHit = true; 
+            handleCorrect(btnElement);
             document.querySelectorAll('.option-btn').forEach(b => b.disabled = true); 
-            btnElement.style.backgroundColor = '#28a745'; 
-            btnElement.style.color = '#fff';
-        } else {
-            feedbackText.innerText = "Промахнулся! Попробуй еще раз."; 
-            feedbackText.style.color = '#d9381e';
-            btnElement.style.transform = 'translateX(-5px)'; 
-            setTimeout(() => btnElement.style.transform = 'translateX(5px)', 50); 
-            setTimeout(() => btnElement.style.transform = 'translateX(0)', 100);
-        }
+        } else { handleWrong(btnElement); }
+    }
+
+    function checkInput(userVal, correctVal, btnElement, inpElement) {
+        if (canHit) return;
+        const clean = (str) => (str||'').toString().toLowerCase().replace(/\\s+/g, '');
+        if (clean(userVal) === clean(correctVal)) {
+            handleCorrect(btnElement);
+            inpElement.disabled = true; btnElement.disabled = true;
+            inpElement.style.borderColor = '#28a745';
+        } else { handleWrong(btnElement); }
+    }
+
+    function handleCorrect(btn) {
+        feedbackText.innerText = "Правильно! Ударь пиньяту!"; 
+        feedbackText.style.color = '#28a745'; 
+        canHit = true; 
+        btn.style.backgroundColor = '#28a745'; btn.style.color = '#fff';
+    }
+
+    function handleWrong(btn) {
+        feedbackText.innerText = "Промахнулся! Попробуй еще раз."; 
+        feedbackText.style.color = '#d9381e';
+        btn.style.transform = 'translateX(-5px)'; 
+        setTimeout(() => btn.style.transform = 'translateX(5px)', 50); 
+        setTimeout(() => btn.style.transform = 'translateX(0)', 100);
     }
 
     piniataImg.addEventListener('click', () => {
-        if (!canHit) { 
-            if(feedbackText.innerText === "") { 
-                feedbackText.innerText = "Сначала ответь на вопрос!"; 
-                feedbackText.style.color = '#d9381e'; 
-            } 
-            return; 
-        }
+        if (!canHit) { if(feedbackText.innerText === "") { feedbackText.innerText = "Сначала ответь на вопрос!"; feedbackText.style.color = '#d9381e'; } return; }
         
         playHitSound();
-        
-        // Анимация только на саму картинку
-        piniataImg.classList.remove('swing'); 
-        piniataImg.classList.add('hit-anim');
-        
+        piniataImg.classList.remove('swing'); piniataImg.classList.add('hit-anim');
         currentStage++;
         
-        setTimeout(() => { 
-            piniataImg.classList.remove('hit-anim'); 
-            if (currentStage < 5) piniataImg.classList.add('swing'); 
-        }, 200);
-        
+        setTimeout(() => { piniataImg.classList.remove('hit-anim'); if (currentStage < 5) piniataImg.classList.add('swing'); }, 200);
         piniataImg.src = images[currentStage];
         
         if (currentStage === 5) { 
-            quizPanel.style.display = 'none'; 
-            winMessage.style.display = 'block'; 
-            launchConfetti(); 
-        } else { 
-            setTimeout(loadQuestion, 500); 
-        }
+            quizPanel.style.display = 'none'; winMessage.style.display = 'block'; 
+            const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93', '#ff924c'];
+            const cont = document.getElementById('game-container');
+            for (let i = 0; i < 120; i++) {
+                const piece = document.createElement('div'); piece.className = 'confetti';
+                const size = 8 + Math.random() * 10; piece.style.width = size + 'px'; piece.style.height = (size * 1.5) + 'px';
+                piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.left = Math.random() * 100 + 'vw'; piece.style.animationDuration = (Math.random() * 3 + 2) + 's'; piece.style.animationDelay = (Math.random() * 1.5) + 's';
+                cont.appendChild(piece);
+            }
+        } else { setTimeout(loadQuestion, 500); }
     });
-
-    function launchConfetti() {
-        const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93', '#ff924c'];
-        const cont = document.getElementById('game-container');
-        for (let i = 0; i < 120; i++) {
-            const piece = document.createElement('div'); piece.className = 'confetti';
-            const size = 8 + Math.random() * 10; piece.style.width = size + 'px'; piece.style.height = (size * 1.5) + 'px';
-            piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            piece.style.left = Math.random() * 100 + 'vw'; piece.style.animationDuration = (Math.random() * 3 + 2) + 's'; piece.style.animationDelay = (Math.random() * 1.5) + 's';
-            cont.appendChild(piece);
-        }
-    }
 <\/script>
 </body>
 </html>`;
