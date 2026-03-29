@@ -3,349 +3,411 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Пиньята — Редактор</title>
+  <title>Пиньята — PRO Редактор</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Neucha&display=swap');
-    html, body { height: 100%; margin: 0; overflow: hidden; position: relative; }
-    :root{ --text:#eaf0ff; --muted:#a9b6e6; --border: rgba(255,255,255,.10); --shadow2: 0 12px 34px rgba(0,0,0,.40); --radius: 18px; --radius2: 22px; --neon:#d6b14a; --danger:#ff4d4d; --ok:#2dd27d; }
-    *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    body{ color:var(--text); background: radial-gradient(1100px 700px at 12% 18%, rgba(35,82,200,.15), #0f121b 80%); }
-    .hidden { display: none !important; }
-    button { cursor:pointer; font-weight:600; border:none; border-radius:8px; padding:10px 16px; transition:.2s; }
-    button:active { transform:scale(.95); }
-    .btn-primary { background:var(--neon); color:#000; }
-    .btn-primary:hover { filter:brightness(1.1); box-shadow:0 0 15px rgba(214,177,74,.4); }
-    .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); }
-    .btn-outline:hover { background:rgba(255,255,255,.05); }
-    .btn-danger { background:var(--danger); color:#fff; }
-    input, textarea { width:100%; background:rgba(0,0,0,.3); border:1px solid var(--border); color:#fff; padding:10px 14px; border-radius:8px; outline:none; transition:.2s; }
-    input:focus, textarea:focus { border-color:var(--neon); background:rgba(0,0,0,.5); }
     
-    #editorRoot { display:flex; height:100vh; }
+    html, body { height: 100%; margin: 0; overflow: hidden; background: #0f121b; color: #eaf0ff; font-family: system-ui, -apple-system, Segoe UI, sans-serif; }
+    * { box-sizing: border-box; }
     
-    /* САЙДБАР */
-    .sidebar { width:340px; background:rgba(20,24,35,.8); backdrop-filter:blur(15px); border-right:1px solid var(--border); display:flex; flex-direction:column; z-index:10; }
-    .hdr { padding:20px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; }
-    .hdr-icon { font-size:28px; width:38px; height:38px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.1); border-radius:8px; }
-    .hdr-title { font-size:17px; font-weight:700; line-height:1.2; }
-    .hdr-subtitle { font-size:12px; color:var(--neon); }
-    .settings-wrap { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:20px; }
-    .setting-group label { display:block; font-size:13px; color:var(--muted); margin-bottom:6px; font-weight:500; }
-    
-    /* ОСНОВНАЯ ЗОНА */
-    .main-area { flex:1; display:flex; flex-direction:column; background:url('data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.05)"/></svg>'); }
-    .main-header { padding:20px 40px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); background:rgba(0,0,0,.2); backdrop-filter:blur(10px); }
-    .q-list { flex:1; overflow-y:auto; padding:40px; display:flex; flex-direction:column; gap:12px; }
-    .q-card { background:rgba(30,35,50,.7); border:1px solid var(--border); border-radius:12px; padding:16px 20px; display:flex; align-items:center; gap:15px; transition:.2s; cursor:pointer; }
-    .q-card:hover { border-color:rgba(255,255,255,.2); background:rgba(40,46,65,.8); transform:translateY(-2px); }
-    .q-card-num { width:32px; height:32px; border-radius:50%; background:rgba(0,0,0,.3); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:var(--muted); }
-    .q-card-text { flex:1; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .q-card-actions button { padding:6px 10px; font-size:13px; }
-    
-    /* МОДАЛКА */
-    .modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.6); backdrop-filter:blur(5px); z-index:100; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:.3s; }
-    .modal-overlay.active { opacity:1; pointer-events:all; }
-    .modal { background:#161925; width:500px; border-radius:20px; border:1px solid var(--border); box-shadow:var(--shadow2); transform:translateY(20px); transition:.3s; display:flex; flex-direction:column; max-height:90vh; }
-    .modal-overlay.active .modal { transform:translateY(0); }
-    .modal-hdr { padding:20px 24px; border-bottom:1px solid var(--border); font-weight:700; font-size:18px; }
-    .modal-body { padding:24px; overflow-y:auto; }
-    .modal-ftr { padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; background:rgba(0,0,0,.2); border-radius:0 0 20px 20px; }
-    .opt-row { display:flex; gap:10px; align-items:center; margin-top:10px; }
-    .opt-row input[type="radio"] { width:20px; height:20px; accent-color:var(--ok); cursor:pointer; flex-shrink:0; }
-    .opt-row button { padding:10px; color:var(--danger); }
-    
-    .share-bar { padding:20px 40px; background:rgba(20,24,35,.9); border-top:1px solid var(--border); display:flex; gap:15px; align-items:center; }
-    .share-bar input { flex:1; font-family:monospace; color:var(--neon); }
+    :root {
+      --neon: #d6b14a;
+      --bg-panel: rgba(20, 24, 35, 0.95);
+      --border: rgba(255, 255, 255, 0.1);
+      --danger: #ff4d4d;
+      --ok: #2dd27d;
+    }
 
-    /* =========================================
-       СТИЛИ ИГРЫ (ИЗОЛИРОВАННЫЕ ДЛЯ ПИНЬЯТЫ)
-       ========================================= */
-    #gameRoot { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background-size:cover; background-position:center; background-repeat:no-repeat; }
+    button { cursor: pointer; border: none; font-weight: 600; border-radius: 8px; transition: 0.2s; }
+    button:active { transform: scale(0.95); }
+    .btn-primary { background: var(--neon); color: #000; padding: 10px 16px; }
+    .btn-primary:hover { filter: brightness(1.1); box-shadow: 0 0 15px rgba(214,177,74,0.4); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: #fff; padding: 8px 12px; }
+    .btn-outline:hover { background: rgba(255,255,255,0.05); }
+    .btn-danger { color: var(--danger); border-color: rgba(255,77,77,0.3); }
+    .btn-danger:hover { background: rgba(255,77,77,0.1); }
+
+    input, textarea, select { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 10px 14px; border-radius: 8px; outline: none; font-family: inherit; }
+    input:focus, textarea:focus { border-color: var(--neon); background: rgba(0,0,0,0.5); }
+
+    /* LAYOUT */
+    #app { display: flex; height: 100vh; width: 100vw; }
     
-    #startOverlay { position:absolute; inset:0; background:rgba(0,0,0,.85); backdrop-filter:blur(8px); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:99999; text-align:center; padding:20px; }
-    #startOverlay h1 { color:var(--neon); font-family:'Caveat', cursive; font-size:4rem; margin:0 0 10px; text-shadow:0 4px 20px rgba(0,0,0,.5); }
-    #startOverlay p { color:#fff; font-size:1.2rem; max-width:500px; line-height:1.5; margin-bottom:30px; }
-    #startOverlay button { font-size:1.2rem; padding:15px 40px; border-radius:30px; }
-
-    /* Обертка теперь статична, все анимации идут на саму картинку */
-    #piniata-wrapper { position: absolute; width: 310px; left: 68.35%; top: 54.59%; transform: translate(-50%, -50%); z-index: 10; }
-    .piniata-image { width: 100%; height: auto; display: block; transform-origin: 50% 0%; cursor: pointer; filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.3)); }
+    /* LEFT PANEL */
+    .panel { width: 450px; background: var(--bg-panel); display: flex; flex-direction: column; border-right: 1px solid var(--border); z-index: 10; box-shadow: 5px 0 25px rgba(0,0,0,0.5); }
+    .panel-hdr { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
+    .panel-hdr img { width: 40px; height: 40px; border-radius: 8px; object-fit: contain; background: rgba(255,255,255,0.05); }
+    .panel-hdr h1 { margin: 0; font-size: 18px; }
+    .panel-hdr span { font-size: 12px; color: var(--neon); }
     
-    .swing { animation: swingAnim 4s ease-in-out infinite; }
-    @keyframes swingAnim { 0% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } 100% { transform: rotate(-6deg); } }
-    .hit-anim { animation: hitAnim 0.2s ease-out; }
-    @keyframes hitAnim { 0% { transform: scale(1) rotate(0deg); } 50% { transform: scale(0.9) rotate(15deg) translateY(-10px); } 100% { transform: scale(1) rotate(0deg); } }
+    .panel-content { flex: 1; overflow-y: auto; padding: 20px; }
+    .panel-footer { padding: 20px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+    
+    .section { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+    .section-title { font-size: 14px; font-weight: 700; color: var(--neon); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+    
+    .field { margin-bottom: 15px; }
+    .field label { display: block; font-size: 13px; color: #a9b6e6; margin-bottom: 6px; }
+    .field-row { display: flex; gap: 10px; }
+    .field-row > div { flex: 1; }
 
-    #quiz-panel { position: absolute; left: 5%; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.95); padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 340px; text-align: center; z-index: 50; }
-    #question-text-game { font-size: 22px; font-weight: bold; margin-bottom: 20px; color: #333; }
-    .option-btn { display: block; width: 100%; margin: 10px 0; padding: 12px; font-size: 18px; font-weight: bold; border: none; border-radius: 10px; background: #ff7e67; color: white; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .option-btn:hover { background: #ff5a3d; transform: translateY(-2px); }
-    .option-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
-    #feedback-text-game { margin-top: 15px; font-size: 18px; font-weight: bold; min-height: 24px; }
-    .text-wrong { color: #d9381e; }
-    .text-correct { color: #28a745; }
+    /* ACCORDION (QUESTIONS) */
+    .q-block { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+    .q-head { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: rgba(255,255,255,0.02); font-weight: 600; font-size: 14px; }
+    .q-head:hover { background: rgba(255,255,255,0.05); }
+    .q-body { padding: 16px; border-top: 1px solid var(--border); display: none; background: rgba(0,0,0,0.1); }
+    .q-block.open .q-body { display: block; }
+    
+    .opt-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .opt-row input[type="radio"] { width: 18px; height: 18px; accent-color: var(--ok); cursor: pointer; flex-shrink: 0; }
+    
+    .style-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-top: 15px; border: 1px dashed rgba(255,255,255,0.1); }
+    .style-box h4 { margin: 0 0 10px 0; font-size: 12px; color: #a9b6e6; }
+    
+    input[type="color"] { padding: 0; height: 38px; cursor: pointer; }
 
-    #win-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; font-weight: bold; color: #ffca3a; text-shadow: 4px 4px 0px #ff595e, 8px 8px 15px rgba(0,0,0,0.5); display: none; z-index: 100; text-transform: uppercase; text-align: center; }
-    .confetti { position: absolute; top: -20px; z-index: 90; animation: fall linear forwards; }
-    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+    /* RIGHT PANEL (PREVIEW) */
+    .preview { flex: 1; position: relative; background: #000; }
+    iframe { width: 100%; height: 100%; border: none; display: block; }
+    .preview-badge { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; color: var(--neon); pointer-events: none; z-index: 100; border: 1px solid rgba(255,255,255,0.1); }
+
+    /* GENERATE BLOCK */
+    .export-box { display: flex; gap: 10px; align-items: center; }
+    .export-box input { flex: 1; font-family: monospace; color: var(--ok); }
   </style>
 </head>
 <body>
 
-<div id="editorRoot">
-  <div class="sidebar">
-    <div class="hdr">
-      <img id="hdrLogo" class="hdr-icon" style="display:none; object-fit:contain; border-radius:4px; padding:0; background:none;"/>
-      <div id="hdrEmoji" class="hdr-icon">🪅</div>
+<div id="app">
+  <div class="panel">
+    <div class="panel-hdr">
+      <img id="uiLogo" src="logo.png" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%23d6b14a\' viewBox=\'0 0 24 24\'><path d=\'M12 2L2 22h20L12 2z\'/></svg>'">
       <div>
-        <div class="hdr-subtitle">Светлана Быкова</div>
-        <div class="hdr-title" id="hdrTitleText">Пиньята</div>
+        <span>Светлана Быкова</span>
+        <h1 id="uiTitleText">Пиньята</h1>
       </div>
     </div>
     
-    <div class="settings-wrap">
-      <div class="setting-group">
-        <label>Название игры</label>
-        <input type="text" id="inpTitle" value="Праздничная Пиньята" oninput="saveAndBuild()" />
+    <div class="panel-content">
+      
+      <div class="section">
+        <div class="section-title">Основное</div>
+        <div class="field">
+          <label>Название игры</label>
+          <input type="text" id="inpTitle" value="Праздничная Пиньята" oninput="saveAll()">
+        </div>
+        <div class="field">
+          <label>URL Логотипа</label>
+          <input type="text" id="inpLogo" value="logo.png" placeholder="logo.png" oninput="saveAll()">
+        </div>
+        <div class="field">
+          <label>URL Фона (JPG/PNG)</label>
+          <input type="text" id="inpBg" value="bg (2).png" placeholder="bg (2).png" oninput="saveAll()">
+        </div>
+        <div class="field">
+          <label>Инструкция (Стартовый экран)</label>
+          <textarea id="inpInst" rows="2" oninput="saveAll()">Ответь на 5 вопросов правильно, чтобы разбить пиньяту и получить сюрприз!</textarea>
+        </div>
+        <div class="field">
+          <label>Текст при победе</label>
+          <input type="text" id="inpWin" value="Молодец!" oninput="saveAll()">
+        </div>
+        <div class="field" style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="chkLatex" style="width:auto; height:18px; cursor:pointer;" onchange="saveAll()">
+          <label for="chkLatex" style="margin:0; cursor:pointer;">Включить формулы (LaTeX)</label>
+        </div>
       </div>
-      <div class="setting-group">
-        <label>URL Логотипа</label>
-        <input type="text" id="inpLogo" placeholder="https://..." oninput="updateLogo(); saveAndBuild()" />
+
+      <div class="section">
+        <div class="section-title" style="display:flex; justify-content:space-between;">
+          <span>Вопросы <span id="qCount" style="color:#fff;">(0/5)</span></span>
+          <button class="btn-primary" style="padding:4px 8px; font-size:12px;" id="btnAddQ" onclick="addQ()">+ Добавить</button>
+        </div>
+        <div id="qList"></div>
       </div>
-      <div class="setting-group">
-        <label>URL фона (JPG/PNG)</label>
-        <input type="text" id="inpBgUrl" placeholder="bg (2).png" value="bg (2).png" oninput="saveAndBuild()" />
-      </div>
-      <div class="setting-group">
-        <label>Инструкция перед стартом</label>
-        <textarea id="inpInstruction" rows="3" oninput="saveAndBuild()">Ответь на 5 вопросов правильно, чтобы разбить пиньяту и получить сюрприз!</textarea>
-      </div>
-      <div class="setting-group">
-        <label>Текст при успехе</label>
-        <input type="text" id="inpFeedback" value="Молодец!" oninput="saveAndBuild()" />
-      </div>
-      <div class="setting-group" style="display:flex; align-items:center; gap:10px;">
-        <input type="checkbox" id="chkUseLatex" style="width:18px;height:18px;margin:0;" onchange="saveAndBuild()">
-        <label style="margin:0;cursor:pointer;" for="chkUseLatex">Поддержка формул (LaTeX)</label>
+
+    </div>
+    
+    <div class="panel-footer">
+      <div class="export-box">
+        <button class="btn-primary" onclick="window.open($('outLink').value, '_blank')">▶ Играть</button>
+        <input type="text" id="outLink" readonly onclick="this.select()">
+        <button class="btn-outline" onclick="copyIframe()" title="Скопировать код для Genially">&lt;/&gt;</button>
       </div>
     </div>
   </div>
 
-  <div class="main-area">
-    <div class="main-header">
-      <div>
-        <h2 style="margin:0;font-size:22px;">Вопросы <span id="qCountDisplay" style="color:var(--neon); margin-left:10px;"></span></h2>
-        <div style="color:var(--muted);font-size:13px;margin-top:4px;">Добавьте до 5 вопросов.</div>
-      </div>
-      <button id="btnAddQ" class="btn-primary" onclick="openModal()">+ Добавить вопрос</button>
-    </div>
-    <div class="q-list" id="qList"></div>
-    <div class="share-bar">
-      <button class="btn-primary" onclick="previewGame()">▶ Тест игры</button>
-      <input type="text" id="outLink" readonly onclick="this.select()" />
-      <button class="btn-outline" onclick="copyLink()">Копировать</button>
-      <button class="btn-outline" onclick="copyIframe()">Код Iframe (Genially)</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="qModal">
-  <div class="modal">
-    <div class="modal-hdr" id="modalTitle">Редактировать вопрос</div>
-    <div class="modal-body">
-      <div class="setting-group" style="margin-bottom:20px;">
-        <label>Текст вопроса</label>
-        <textarea id="inpQText" rows="3"></textarea>
-      </div>
-      <label style="display:block; font-size:13px; color:var(--muted); margin-bottom:10px; font-weight:500;">Варианты ответов (отметьте правильный)</label>
-      <div id="optsContainer"></div>
-      <button class="btn-outline" style="margin-top:15px; width:100%; border-style:dashed;" onclick="addOptionInput()">+ Добавить вариант</button>
-    </div>
-    <div class="modal-ftr">
-      <button class="btn-outline" onclick="closeModal()">Отмена</button>
-      <button class="btn-primary" onclick="saveQuestion()">Сохранить</button>
-    </div>
+  <div class="preview">
+    <div class="preview-badge">Live Preview</div>
+    <iframe id="previewFrame"></iframe>
   </div>
 </div>
-
-<div id="gameRoot"></div>
 
 <script>
-  const AUTOSAVE_KEY = "pinata_editor_autosave_v2";
-  const uid = () => Math.random().toString(36).substring(2,9);
+  const uid = () => Math.random().toString(36).substr(2, 6);
   const $ = id => document.getElementById(id);
   
+  // DATA MODEL
   let Editor = {
-    title: "Праздничная Пиньята", bgDataUrl: "bg (2).png", logoUrl: "", useLatex: false,
-    instruction: { text: "Ответь на 5 вопросов правильно, чтобы разбить пиньяту и получить сюрприз!" },
-    feedback: { text: "Молодец!" },
+    title: "Праздничная Пиньята", bgUrl: "bg (2).png", logoUrl: "logo.png", useLatex: false,
+    instText: "Ответь на 5 вопросов правильно, чтобы разбить пиньяту и получить сюрприз!",
+    winText: "Молодец!",
     questions: [
-        { id: uid(), q: "Сколько будет 2 + 2?", options: ["3", "4", "5"], correct: 1 }
+      {
+        id: uid(), q: "Сколько будет 2 + 2?", options: ["3", "4", "5"], correct: 1,
+        style: { qBg: "rgba(255, 255, 255, 0.95)", qColor: "#333333", qSize: 22, optBg: "#ff7e67", optColor: "#ffffff", optSize: 18 }
+      }
     ]
   };
 
+  // CHECK IF PLAY MODE
   const urlParams = new URLSearchParams(window.location.search);
   const cfgKeyParam = urlParams.get('cfgkey');
 
-  if(cfgKeyParam){ 
-    try{ 
-        const rawStr = localStorage.getItem(cfgKeyParam) || sessionStorage.getItem(cfgKeyParam); 
-        if(!rawStr) throw new Error("cfgkey not found"); 
-        bootGameOnly(JSON.parse(rawStr)); 
-    } catch(e){ 
-        $("gameRoot").innerHTML = '<div style="padding:16px;color:#ffd6d6;font-weight:900">Ошибка загрузки игры</div>'; 
-        $("gameRoot").style.display = 'block';
-    } 
+  if(cfgKeyParam) {
+    document.body.innerHTML = "";
+    try {
+      const rawStr = localStorage.getItem(cfgKeyParam) || sessionStorage.getItem(cfgKeyParam);
+      if(!rawStr) throw new Error();
+      document.write(buildGameHTML(JSON.parse(rawStr), true));
+      document.close();
+    } catch(e) {
+      document.body.innerHTML = '<h2 style="color:red;text-align:center;margin-top:50px;">Ошибка загрузки игры</h2>';
+    }
   } else {
-    try { 
-        const saved = localStorage.getItem(AUTOSAVE_KEY); 
-        if (saved) Editor = Object.assign(Editor, JSON.parse(saved)); 
-    } catch(e){}
-    bootEditor();
+    initEditor();
   }
 
-  function bootEditor() {
-    $("inpTitle").value = Editor.title || "";
-    $("inpBgUrl").value = Editor.bgDataUrl || "bg (2).png";
-    $("inpLogo").value = Editor.logoUrl || "";
-    $("inpInstruction").value = Editor.instruction?.text || "";
-    $("inpFeedback").value = Editor.feedback?.text || "";
-    $("chkUseLatex").checked = !!Editor.useLatex;
-    updateLogo();
-    renderQList();
-    saveAndBuild();
+  // --- EDITOR LOGIC ---
+  function initEditor() {
+    try { const saved = localStorage.getItem("pinata_pro_save"); if(saved) Editor = Object.assign(Editor, JSON.parse(saved)); } catch(e){}
+    
+    $("inpTitle").value = Editor.title;
+    $("inpLogo").value = Editor.logoUrl;
+    $("inpBg").value = Editor.bgUrl;
+    $("inpInst").value = Editor.instText;
+    $("inpWin").value = Editor.winText;
+    $("chkLatex").checked = Editor.useLatex;
+
+    renderQuestions();
+    saveAll();
   }
 
-  function updateLogo() {
-    const url = $("inpLogo").value.trim();
-    if(url) { $("hdrLogo").src = url; $("hdrLogo").style.display="block"; $("hdrEmoji").style.display="none"; }
-    else { $("hdrLogo").style.display="none"; $("hdrEmoji").style.display="flex"; }
-    $("hdrTitleText").innerText = $("inpTitle").value || "Пиньята";
-  }
-
-  function renderQList() {
-    const c = $("qList"); c.innerHTML = "";
+  function renderQuestions() {
+    const list = $("qList"); list.innerHTML = "";
     Editor.questions.forEach((q, i) => {
-      const el = document.createElement("div"); el.className = "q-card";
-      el.innerHTML = `<div class="q-card-num">${i+1}</div><div class="q-card-text">${q.q}</div><div class="q-card-actions"><button class="btn-outline" onclick="editQ('${q.id}')">✏️</button> <button class="btn-outline btn-danger" onclick="delQ('${q.id}')">🗑</button></div>`;
-      c.appendChild(el);
+      const block = document.createElement("div"); block.className = "q-block";
+      
+      let optsHtml = "";
+      q.options.forEach((opt, oIdx) => {
+        optsHtml += `
+          <div class="opt-row">
+            <input type="radio" name="correct_${q.id}" ${q.correct === oIdx ? 'checked' : ''} onchange="updateCorrect('${q.id}', ${oIdx})">
+            <input type="text" value="${opt.replace(/"/g, '&quot;')}" placeholder="Вариант ответа" oninput="updateOpt('${q.id}', ${oIdx}, this.value)">
+            <button class="btn-outline btn-danger" style="padding:8px;" onclick="delOpt('${q.id}', ${oIdx})">✕</button>
+          </div>
+        `;
+      });
+
+      block.innerHTML = `
+        <div class="q-head" onclick="this.parentElement.classList.toggle('open')">
+          <span>Вопрос ${i+1}: ${q.q.substring(0, 20) || '...'}</span>
+          <span style="color:var(--danger);" onclick="event.stopPropagation(); delQ('${q.id}')">Удалить</span>
+        </div>
+        <div class="q-body">
+          <label style="font-size:12px;color:#a9b6e6;">Текст вопроса</label>
+          <textarea rows="2" style="margin-bottom:10px;" oninput="updateQ('${q.id}', this.value)">${q.q}</textarea>
+          
+          <label style="font-size:12px;color:#a9b6e6;display:block;margin-bottom:5px;">Варианты (отметьте верный)</label>
+          ${optsHtml}
+          <button class="btn-outline" style="width:100%; border-style:dashed; margin-top:5px; padding:6px;" onclick="addOpt('${q.id}')">+ Вариант</button>
+          
+          <div class="style-box">
+            <h4>🎨 Дизайн этого вопроса</h4>
+            <div class="field-row">
+              <div><label>Фон плашки</label><input type="color" value="${rgbaToHex(q.style.qBg)}" oninput="updateStyle('${q.id}', 'qBg', this.value)"></div>
+              <div><label>Цвет текста</label><input type="color" value="${q.style.qColor}" oninput="updateStyle('${q.id}', 'qColor', this.value)"></div>
+              <div><label>Размер шрифта</label><input type="number" value="${q.style.qSize}" oninput="updateStyle('${q.id}', 'qSize', this.value)"></div>
+            </div>
+            <div class="field-row" style="margin-top:10px;">
+              <div><label>Фон кнопок</label><input type="color" value="${q.style.optBg}" oninput="updateStyle('${q.id}', 'optBg', this.value)"></div>
+              <div><label>Цвет кнопок</label><input type="color" value="${q.style.optColor}" oninput="updateStyle('${q.id}', 'optColor', this.value)"></div>
+              <div><label>Шрифт кнопок</label><input type="number" value="${q.style.optSize}" oninput="updateStyle('${q.id}', 'optSize', this.value)"></div>
+            </div>
+            <button class="btn-primary" style="width:100%; margin-top:15px; font-size:13px;" onclick="applyStyleToAll('${q.id}')">✨ Применить этот дизайн ко всем вопросам</button>
+          </div>
+        </div>
+      `;
+      list.appendChild(block);
     });
 
-    const addBtn = $("btnAddQ");
-    const countDisplay = $("qCountDisplay");
-    countDisplay.innerText = `${Editor.questions.length} / 5`;
-    if (Editor.questions.length >= 5) { addBtn.style.display = 'none'; countDisplay.style.color = 'var(--ok)'; } 
-    else { addBtn.style.display = 'inline-block'; countDisplay.style.color = 'var(--neon)'; }
+    $("qCount").innerText = `(${Editor.questions.length}/5)`;
+    $("btnAddQ").style.display = Editor.questions.length >= 5 ? "none" : "block";
   }
 
-  let editingId = null;
-  function openModal(id = null) {
-    editingId = id; const c = $("optsContainer"); c.innerHTML = "";
-    if (id) {
-      const q = Editor.questions.find(x => x.id === id);
-      $("modalTitle").innerText = "Редактировать вопрос";
-      $("inpQText").value = q.q;
-      q.options.forEach((opt, i) => addOptionInput(opt, i === q.correct));
-    } else {
-      $("modalTitle").innerText = "Новый вопрос"; $("inpQText").value = "";
-      addOptionInput("", true); addOptionInput("", false);
-    }
-    $("qModal").classList.add("active");
+  // --- QUESTION ACTIONS ---
+  function addQ() {
+    if(Editor.questions.length >= 5) return;
+    const baseStyle = Editor.questions.length > 0 ? {...Editor.questions[Editor.questions.length-1].style} : { qBg: "#ffffff", qColor: "#333333", qSize: 22, optBg: "#ff7e67", optColor: "#ffffff", optSize: 18 };
+    Editor.questions.push({ id: uid(), q: "Новый вопрос", options: ["Вариант 1", "Вариант 2"], correct: 0, style: baseStyle });
+    renderQuestions(); saveAll();
+  }
+  function delQ(id) { Editor.questions = Editor.questions.filter(q => q.id !== id); renderQuestions(); saveAll(); }
+  function updateQ(id, val) { const q = Editor.questions.find(x => x.id === id); if(q) { q.q = val; saveAll(false); } }
+  function updateCorrect(id, idx) { const q = Editor.questions.find(x => x.id === id); if(q) { q.correct = idx; saveAll(); } }
+  function updateOpt(id, idx, val) { const q = Editor.questions.find(x => x.id === id); if(q) { q.options[idx] = val; saveAll(false); } }
+  function addOpt(id) { const q = Editor.questions.find(x => x.id === id); if(q) { q.options.push("Новый вариант"); renderQuestions(); saveAll(); } }
+  function delOpt(id, idx) { const q = Editor.questions.find(x => x.id === id); if(q && q.options.length > 2) { q.options.splice(idx, 1); if(q.correct >= q.options.length) q.correct = 0; renderQuestions(); saveAll(); } else { alert("Минимум 2 варианта!"); } }
+  function updateStyle(id, prop, val) { const q = Editor.questions.find(x => x.id === id); if(q) { q.style[prop] = val; saveAll(false); } }
+  
+  function applyStyleToAll(id) {
+    const src = Editor.questions.find(x => x.id === id);
+    if(!src) return;
+    Editor.questions.forEach(q => { q.style = { ...src.style }; });
+    renderQuestions(); saveAll();
+    alert("Дизайн успешно скопирован на все вопросы!");
   }
 
-  function editQ(id) { openModal(id); }
-  function closeModal() { $("qModal").classList.remove("active"); }
-
-  function addOptionInput(val = "", isCorrect = false) {
-    const c = $("optsContainer"); const id = uid(); const div = document.createElement("div"); div.className = "opt-row";
-    div.innerHTML = `<input type="radio" name="optCorrect" value="${id}" ${isCorrect ? 'checked' : ''}><input type="text" class="opt-val" value="${val.replace(/"/g, '&quot;')}" placeholder="Вариант ответа"><button class="btn-outline" onclick="this.parentElement.remove()">✕</button>`;
-    c.appendChild(div);
+  // Helper for color input
+  function rgbaToHex(rgba) {
+    if(rgba.startsWith('#')) return rgba;
+    let parts = rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if(!parts) return "#ffffff";
+    delete parts[0];
+    let hex = '#';
+    for (let i = 1; i <= 3; ++i) { let part = parseInt(parts[i]).toString(16); if (part.length === 1) part = '0' + part; hex += part; }
+    return hex;
   }
 
-  function saveQuestion() {
-    const text = $("inpQText").value.trim(); if(!text) return alert("Введите вопрос");
-    const optInputs = document.querySelectorAll(".opt-val"); if(optInputs.length < 2) return alert("Нужно минимум 2 варианта");
-    let correctIdx = 0, options = [], hasCorrect = false;
-    optInputs.forEach((inp, idx) => { options.push(inp.value.trim()); if (inp.parentElement.querySelector('input[type="radio"]').checked) { correctIdx = idx; hasCorrect = true; } });
-    if(!hasCorrect) return alert("Выберите правильный вариант");
-    const newQ = { id: editingId || uid(), q: text, options, correct: correctIdx };
-    if(editingId) { Editor.questions[Editor.questions.findIndex(x => x.id === editingId)] = newQ; } 
-    else { if(Editor.questions.length >= 5) return alert("Лимит 5 вопросов!"); Editor.questions.push(newQ); }
-    closeModal(); renderQList(); saveAndBuild();
+  // --- SAVE & BUILD ---
+  let debounceTimer;
+  function saveAll(reRenderUI = true) {
+    Editor.title = $("inpTitle").value;
+    Editor.bgUrl = $("inpBg").value;
+    Editor.logoUrl = $("inpLogo").value;
+    Editor.instText = $("inpInst").value;
+    Editor.winText = $("inpWin").value;
+    Editor.useLatex = $("chkLatex").checked;
+    
+    $("uiTitleText").innerText = Editor.title || "Пиньята";
+    if(Editor.logoUrl) $("uiLogo").src = Editor.logoUrl;
+
+    localStorage.setItem("pinata_pro_save", JSON.stringify(Editor));
+    
+    const k = "pinata_run_" + uid();
+    localStorage.setItem(k, JSON.stringify(Editor));
+    $("outLink").value = window.location.origin + window.location.pathname + "?cfgkey=" + k;
+    
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      $("previewFrame").srcdoc = buildGameHTML(Editor, false);
+    }, 400);
   }
 
-  function delQ(id) { if(confirm("Удалить вопрос?")) { Editor.questions = Editor.questions.filter(x => x.id !== id); renderQList(); saveAndBuild(); } }
-
-  function saveAndBuild() {
-    Editor.title = $("inpTitle").value; Editor.bgDataUrl = $("inpBgUrl").value; Editor.logoUrl = $("inpLogo").value;
-    Editor.instruction.text = $("inpInstruction").value; Editor.feedback.text = $("inpFeedback").value; Editor.useLatex = $("chkUseLatex").checked;
-    updateLogo();
-    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(Editor));
-    const k = "pinata_cfg_" + uid(); localStorage.setItem(k, JSON.stringify(Editor));
-    const url = window.location.origin + window.location.pathname + "?cfgkey=" + k;
-    $("outLink").value = url;
+  function copyIframe() {
+    navigator.clipboard.writeText(`<iframe src="${$("outLink").value}" width="100%" height="600" frameborder="0" allowfullscreen></iframe>`).then(() => alert("Код Iframe скопирован!"));
   }
 
-  function copyLink() { $("outLink").select(); document.execCommand("copy"); alert("Ссылка скопирована!"); }
-  function copyIframe() { navigator.clipboard.writeText(`<iframe src="${$("outLink").value}" width="100%" height="600" frameborder="0" allowfullscreen></iframe>`).then(() => alert("Код Iframe скопирован!")); }
-  function previewGame() { window.open($("outLink").value, '_blank'); }
-
-  // =========================================
-  // ЛОГИКА ИГРЫ (ИЗОЛИРОВАННАЯ И СТРОГАЯ)
-  // =========================================
-  function bootGameOnly(cfg) {
-    $("editorRoot").style.display = "none";
-    const root = $("gameRoot");
-    root.style.display = "block";
-    root.style.backgroundImage = `url('${cfg.bgDataUrl}')`;
-
+  // --- GAME BUILDER ---
+  function buildGameHTML(cfg, isStandalone) {
+    let latexScripts = '';
     if(cfg.useLatex) {
-        const script = document.createElement('script'); script.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"; document.head.appendChild(script);
-        const link = document.createElement('link'); link.rel = "stylesheet"; link.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"; document.head.appendChild(link);
+      latexScripts = `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+                      <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"><\/script>`;
     }
 
-    root.innerHTML = `
-      ${cfg.logoUrl ? `<img src="${cfg.logoUrl}" style="position:absolute; top:20px; right:20px; max-height:80px; z-index:9999; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.3);">` : ''}
-      
-      <div id="startOverlay">
+    return `<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${cfg.title}</title>
+    ${latexScripts}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&display=swap');
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        #game-container { position: relative; width: 100vw; height: 100vh; background-size: cover; background-position: center; background-repeat: no-repeat; }
+        
+        .game-logo { position: absolute; top: 20px; right: 20px; max-height: 80px; max-width: 150px; z-index: 100; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); object-fit: contain; }
+        
+        #startOverlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999; text-align: center; padding: 20px; }
+        #startOverlay h1 { color: #d6b14a; font-family: 'Caveat', cursive; font-size: 4rem; margin: 0 0 10px; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        #startOverlay p { color: #fff; font-size: 1.2rem; max-width: 500px; line-height: 1.5; margin-bottom: 30px; }
+        #startOverlay button { font-size: 1.2rem; padding: 15px 40px; border-radius: 30px; cursor: pointer; background: #d6b14a; color: #000; border: none; font-weight: bold; transition: 0.2s; box-shadow: 0 4px 15px rgba(214,177,74,0.4); }
+        #startOverlay button:hover { transform: scale(1.05); }
+
+        #piniata-wrapper { position: absolute; width: 310px; left: 68.35%; top: 54.59%; transform: translate(-50%, -50%); z-index: 10; display: none; }
+        .piniata-image { width: 100%; height: auto; display: block; transform-origin: 50% 0%; cursor: pointer; filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.3)); }
+        
+        .swing { animation: swingAnim 4s ease-in-out infinite; }
+        @keyframes swingAnim { 0% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } 100% { transform: rotate(-6deg); } }
+        .hit-anim { animation: hitAnim 0.2s ease-out; }
+        @keyframes hitAnim { 0% { transform: scale(1) rotate(0deg); } 50% { transform: scale(0.9) rotate(15deg) translateY(-10px); } 100% { transform: scale(1) rotate(0deg); } }
+
+        #quiz-panel { position: absolute; left: 5%; top: 50%; transform: translateY(-50%); padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); width: 340px; text-align: center; z-index: 50; display: none; transition: 0.3s background-color; }
+        #question-text-game { font-weight: bold; margin-bottom: 20px; transition: 0.3s color; }
+        
+        .option-btn { display: block; width: 100%; margin: 10px 0; padding: 12px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .option-btn:hover { filter: brightness(0.9); transform: translateY(-2px); }
+        .option-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        #feedback-text-game { margin-top: 15px; font-size: 18px; font-weight: bold; min-height: 24px; }
+
+        #win-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; font-weight: bold; color: #ffca3a; text-shadow: 4px 4px 0px #ff595e, 8px 8px 15px rgba(0,0,0,0.5); display: none; z-index: 100; text-transform: uppercase; text-align: center; }
+        .confetti { position: absolute; top: -20px; z-index: 90; animation: fall linear forwards; }
+        @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+    </style>
+</head>
+<body>
+
+<div id="game-container" style="background-image: url('${cfg.bgUrl}');">
+    ${cfg.logoUrl ? `<img src="${cfg.logoUrl}" class="game-logo" onerror="this.style.display='none'">` : ''}
+    
+    <div id="startOverlay">
         <h1>${cfg.title}</h1>
-        <p>${cfg.instruction.text}</p>
-        <button class="btn-primary" id="btnStartGame">Начать</button>
-      </div>
+        <p>${cfg.instText}</p>
+        <button id="btnStartGame">Начать игру</button>
+    </div>
 
-      <div id="quiz-panel" style="display:none;">
-          <div id="question-text-game"></div>
-          <div id="options-container"></div>
-          <div id="feedback-text-game"></div>
-      </div>
+    <div id="quiz-panel">
+        <div id="question-text-game"></div>
+        <div id="options-container"></div>
+        <div id="feedback-text-game"></div>
+    </div>
 
-      <div id="win-message">${cfg.feedback.text}</div>
-      
-      <div id="piniata-wrapper" style="display:none;">
-          <img class="piniata-image swing" id="piniata-img" src="1.png" alt="Пиньята">
-      </div>
-    `;
+    <div id="win-message">${cfg.winText}</div>
+    
+    <div id="piniata-wrapper">
+        <img class="piniata-image swing" id="piniata-img" src="1.png" alt="Пиньята">
+    </div>
+</div>
 
-    let baseQuestions = cfg.questions || [];
-    if (baseQuestions.length === 0) baseQuestions = [{ q: "Добавьте вопросы в редакторе!", options: ["Ок", "Понятно"], correct: 0 }];
-    const gameQuestions = [];
-    for (let i = 0; i < 5; i++) gameQuestions.push(baseQuestions[i % baseQuestions.length]);
+<script>
+    const cfg = ${JSON.stringify(cfg)};
+    
+    // Подготовка 5 вопросов (зацикливание, если меньше 5)
+    let baseQs = cfg.questions && cfg.questions.length > 0 ? cfg.questions : [{ q: "Нет вопросов", options: ["Ок", "Тест"], correct: 0, style: { qBg:"#fff", qColor:"#000", qSize:22, optBg:"#ccc", optColor:"#000", optSize:18 } }];
+    const gameQs = [];
+    for (let i = 0; i < 5; i++) gameQs.push(baseQs[i % baseQs.length]);
     
     const images = ['1.png', '2.png', '112.png', '3.png', '4.png', '5.png'];
-    let currentStage = 0; let canHit = false; let audioCtx = null;
+    let currentStage = 0;
+    let canHit = false;
+    let audioCtx = null;
 
-    const btnStart = root.querySelector("#btnStartGame");
-    const overlay = root.querySelector("#startOverlay");
-    const piniataImg = root.querySelector("#piniata-img");
-    const piniataWrapper = root.querySelector("#piniata-wrapper");
-    const quizPanel = root.querySelector("#quiz-panel");
-    const qText = root.querySelector("#question-text-game");
-    const optContainer = root.querySelector("#options-container");
-    const feedbackText = root.querySelector("#feedback-text-game");
-    const winMessage = root.querySelector("#win-message");
+    const btnStart = document.getElementById("btnStartGame");
+    const overlay = document.getElementById("startOverlay");
+    const piniataImg = document.getElementById("piniata-img");
+    const piniataWrapper = document.getElementById("piniata-wrapper");
+    const quizPanel = document.getElementById("quiz-panel");
+    const qText = document.getElementById("question-text-game");
+    const optContainer = document.getElementById("options-container");
+    const feedbackText = document.getElementById("feedback-text-game");
+    const winMessage = document.getElementById("win-message");
 
     btnStart.onclick = () => {
         overlay.style.display = 'none';
@@ -358,9 +420,9 @@
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-        osc.type = 'square'; osc.frequency.setValueAtTime(120, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.15);
-        gain.gain.setValueAtTime(0.6, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+        osc.type = 'square'; osc.frequency.setValueAtTime(130, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.5, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
     }
 
     function renderLatex(el, text) {
@@ -370,11 +432,30 @@
 
     function loadQuestion() {
         if (currentStage >= 5) return;
-        const currentQ = gameQuestions[currentStage];
+        
+        const currentQ = gameQs[currentStage];
+        const st = currentQ.style;
+        
+        // Применяем настройки дизайна конкретного вопроса
+        quizPanel.style.backgroundColor = st.qBg || '#ffffff';
+        qText.style.color = st.qColor || '#333333';
+        qText.style.fontSize = (st.qSize || 22) + 'px';
+        
         renderLatex(qText, currentQ.q);
-        optContainer.innerHTML = ''; feedbackText.innerText = ''; feedbackText.className = ''; canHit = false;
+        optContainer.innerHTML = ''; 
+        feedbackText.innerText = ''; 
+        canHit = false;
+
         currentQ.options.forEach((opt, index) => {
-            const btn = document.createElement('button'); btn.className = 'option-btn'; renderLatex(btn, opt);
+            const btn = document.createElement('button'); 
+            btn.className = 'option-btn'; 
+            renderLatex(btn, opt);
+            
+            // Стили кнопки
+            btn.style.backgroundColor = st.optBg || '#ff7e67';
+            btn.style.color = st.optColor || '#ffffff';
+            btn.style.fontSize = (st.optSize || 18) + 'px';
+            
             btn.onclick = () => checkAnswer(index, currentQ.correct, btn);
             optContainer.appendChild(btn);
         });
@@ -383,19 +464,33 @@
     function checkAnswer(selectedIndex, correctIndex, btnElement) {
         if (canHit) return;
         if (selectedIndex === correctIndex) {
-            feedbackText.innerText = "Правильно! Ударь пиньяту!"; feedbackText.className = 'text-correct'; canHit = true; 
-            root.querySelectorAll('.option-btn').forEach(b => b.disabled = true); btnElement.style.background = '#28a745'; 
+            feedbackText.innerText = "Правильно! Ударь пиньяту!"; 
+            feedbackText.style.color = '#28a745'; 
+            canHit = true; 
+            document.querySelectorAll('.option-btn').forEach(b => b.disabled = true); 
+            btnElement.style.backgroundColor = '#28a745'; 
+            btnElement.style.color = '#fff';
         } else {
-            feedbackText.innerText = "Промахнулся! Попробуй еще раз."; feedbackText.className = 'text-wrong';
-            btnElement.style.transform = 'translateX(-5px)'; setTimeout(() => btnElement.style.transform = 'translateX(5px)', 50); setTimeout(() => btnElement.style.transform = 'translateX(0)', 100);
+            feedbackText.innerText = "Промахнулся! Попробуй еще раз."; 
+            feedbackText.style.color = '#d9381e';
+            btnElement.style.transform = 'translateX(-5px)'; 
+            setTimeout(() => btnElement.style.transform = 'translateX(5px)', 50); 
+            setTimeout(() => btnElement.style.transform = 'translateX(0)', 100);
         }
     }
 
     piniataImg.addEventListener('click', () => {
-        if (!canHit) { if(feedbackText.innerText === "") { feedbackText.innerText = "Сначала ответь на вопрос!"; feedbackText.className = 'text-wrong'; } return; }
+        if (!canHit) { 
+            if(feedbackText.innerText === "") { 
+                feedbackText.innerText = "Сначала ответь на вопрос!"; 
+                feedbackText.style.color = '#d9381e'; 
+            } 
+            return; 
+        }
+        
         playHitSound();
         
-        // ВНИМАНИЕ: Применяем анимации ТОЛЬКО к самой картинке (piniataImg), а не к обертке!
+        // Анимация только на саму картинку
         piniataImg.classList.remove('swing'); 
         piniataImg.classList.add('hit-anim');
         
@@ -409,17 +504,28 @@
         piniataImg.src = images[currentStage];
         
         if (currentStage === 5) { 
-            quizPanel.style.display = 'none'; winMessage.style.display = 'block'; 
-            const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93', '#ff924c'];
-            for (let i = 0; i < 120; i++) {
-                const piece = document.createElement('div'); piece.className = 'confetti';
-                const size = 8 + Math.random() * 10; piece.style.width = size + 'px'; piece.style.height = (size * 1.5) + 'px';
-                piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                piece.style.left = Math.random() * 100 + 'vw'; piece.style.animationDuration = (Math.random() * 3 + 2) + 's'; piece.style.animationDelay = (Math.random() * 1.5) + 's';
-                root.appendChild(piece);
-            }
-        } else { setTimeout(loadQuestion, 500); }
+            quizPanel.style.display = 'none'; 
+            winMessage.style.display = 'block'; 
+            launchConfetti(); 
+        } else { 
+            setTimeout(loadQuestion, 500); 
+        }
     });
+
+    function launchConfetti() {
+        const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93', '#ff924c'];
+        const cont = document.getElementById('game-container');
+        for (let i = 0; i < 120; i++) {
+            const piece = document.createElement('div'); piece.className = 'confetti';
+            const size = 8 + Math.random() * 10; piece.style.width = size + 'px'; piece.style.height = (size * 1.5) + 'px';
+            piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            piece.style.left = Math.random() * 100 + 'vw'; piece.style.animationDuration = (Math.random() * 3 + 2) + 's'; piece.style.animationDelay = (Math.random() * 1.5) + 's';
+            cont.appendChild(piece);
+        }
+    }
+<\/script>
+</body>
+</html>`;
   }
 </script>
 </body>
