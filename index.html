@@ -677,8 +677,9 @@
     mount.innerHTML = `
       ${mathJaxHtml}
       <style>
-        html,body{height:100%;margin:0;overflow:hidden;font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;background:#333}
-        #game-container{position:relative;width:100vw;height:100vh;background-size:cover;background-position:center;background-repeat:no-repeat;overflow:hidden}
+        html,body{height:100%;margin:0;overflow:hidden;font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;background:transparent;}
+        #game-wrapper { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        #game-container{position:relative;width:100%;height:100%;max-width:calc(100vh * 16 / 9);max-height:calc(100vw * 9 / 16);aspect-ratio:16/9;background-size:100% 100%;background-position:center;background-repeat:no-repeat;overflow:hidden;}
         #start-screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center, rgba(0,0,0,.25), rgba(0,0,0,.65));z-index:120}
         #start-card{width:min(720px, calc(100% - 24px));background:rgba(20,22,30,.82);border:1px solid ${startColor};border-radius:24px;box-shadow:${boxGlowStyle};padding:22px;text-align:center;color:#fff}
         #start-card h1{margin:0 0 8px;font-size:${cfg.titleFontSize || 30}px; font-family:${cfg.titleFont || 'inherit'};} #start-card p{font-size:18px;line-height:1.45;opacity:.95;white-space:pre-line}
@@ -694,31 +695,33 @@
         #ans-input:focus{border-color:#ff7e67;}
         #feedback-text{margin-top:15px;font-size:18px;font-weight:bold;min-height:24px} .text-wrong{color:#d9381e}.text-correct{color:#28a745}
         #win-message{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;font-weight:bold;color:#ffca3a;text-shadow:4px 4px 0 #ff595e,8px 8px 15px rgba(0,0,0,.5);display:none;z-index:100;text-transform:uppercase;text-align:center;padding:0 20px; font-family:${cfg.titleFont || 'inherit'};}
-        #piniata-wrapper{position:absolute;width:310px;left:68.35%;top:54.59%;transform:translate(-50%,-50%);z-index:10}
+        #piniata-wrapper{position:absolute;width:24.5%;left:68.35%;top:54.6%;transform:translate(-50%,-50%);z-index:10}
         .piniata-image{width:100%;height:auto;display:block;transform-origin:50% 0%;cursor:pointer;filter:drop-shadow(0 10px 15px rgba(0,0,0,.3))}
         .swing{animation:swingAnim 4s ease-in-out infinite} @keyframes swingAnim{0%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}100%{transform:rotate(-6deg)}}
         .hit-anim{animation:hitAnim .2s ease-out} @keyframes hitAnim{0%{transform:scale(1) rotate(0deg)}50%{transform:scale(.9) rotate(15deg) translateY(-10px)}100%{transform:scale(1) rotate(0deg)}}
         .confetti{position:absolute;top:-20px;z-index:90;animation:fall linear forwards} @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
         @media (max-width:980px){#quiz-panel{left:25%;top:25%;bottom:auto;transform:translate(-50%,-50%);width:min(92vw,420px)}#win-message{font-size:50px}}
       </style>
-      <div id="game-container">
-        <div id="start-screen"><div id="start-card"><h1></h1><p></p><button id="start-btn">▶ Начать</button></div></div>
-        <div id="quiz-panel" style="display:none">
-            <div id="q-media"></div>
-            <div id="question-text">Вопрос загружается...</div>
-            <div id="options-container"></div>
-            <div id="input-container">
-               <input type="text" id="ans-input" placeholder="Введите ответ...">
-               <button id="ans-submit" class="option-btn" style="margin-top:10px;">ОК</button>
-            </div>
-            <div id="feedback-text"></div>
+      <div id="game-wrapper">
+        <div id="game-container">
+          <div id="start-screen"><div id="start-card"><h1></h1><p></p><button id="start-btn">▶ Начать</button></div></div>
+          <div id="quiz-panel" style="display:none">
+              <div id="q-media"></div>
+              <div id="question-text">Вопрос загружается...</div>
+              <div id="options-container"></div>
+              <div id="input-container">
+                 <input type="text" id="ans-input" placeholder="Введите ответ...">
+                 <button id="ans-submit" class="option-btn" style="margin-top:10px;">ОК</button>
+              </div>
+              <div id="feedback-text"></div>
+          </div>
+          <div id="win-message"></div>
+          <div id="piniata-wrapper"><img class="piniata-image swing" id="piniata-img" src="" alt="Пиньята"></div>
+          <a href="https://t.me/interactiv_matematika" target="_blank" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;opacity:.65;pointer-events:auto;z-index:130;text-decoration:none;transition:opacity .3s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.65" title="Перейти в Telegram-канал">
+            <img src="logo.png" alt="Логотип" style="height:26px;width:26px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,174,0,.4);box-shadow:0 0 8px rgba(255,174,0,.35)" onerror="this.style.display='none'">
+            <span style="font-family:'Caveat',cursive;font-size:20px;color:rgba(0,0,0,.85);text-shadow:0 1px 2px rgba(255,255,255,.35);white-space:nowrap;letter-spacing:.5px">Шкатулка математических интерактивов</span>
+          </a>
         </div>
-        <div id="win-message"></div>
-        <div id="piniata-wrapper"><img class="piniata-image swing" id="piniata-img" src="" alt="Пиньята"></div>
-        <a href="https://t.me/interactiv_matematika" target="_blank" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;opacity:.65;pointer-events:auto;z-index:130;text-decoration:none;transition:opacity .3s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.65" title="Перейти в Telegram-канал">
-          <img src="logo.png" alt="Логотип" style="height:26px;width:26px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,174,0,.4);box-shadow:0 0 8px rgba(255,174,0,.35)" onerror="this.style.display='none'">
-          <span style="font-family:'Caveat',cursive;font-size:20px;color:rgba(0,0,0,.85);text-shadow:0 1px 2px rgba(255,255,255,.35);white-space:nowrap;letter-spacing:.5px">Шкатулка математических интерактивов</span>
-        </a>
       </div>`;
 
     const gameContainer = mount.querySelector('#game-container');
