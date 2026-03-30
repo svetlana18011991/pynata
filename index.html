@@ -575,7 +575,6 @@
     const payload = buildPayload(previewWithDraft); 
     const data = encodeGameData(payload); 
     
-    // Предупреждение для случаев, когда размер данных превышен
     const maxLen=3500, curLen=data.length, pct=Math.min(100,(curLen/maxLen)*100); 
     const bar=$("barSize"), lbl=$("lblSizeText"), warn=$("sizeWarning"); 
     bar.style.width=pct+'%'; 
@@ -583,13 +582,16 @@
     else if(curLen <= maxLen){ bar.style.background='var(--neon)'; lbl.textContent='🟡 Код почти достиг лимита'; lbl.style.color='var(--neon)'; warn.style.display='none'; } 
     else { bar.style.background='var(--danger)'; lbl.textContent='🔴 ПРЕВЫШЕН ЛИМИТ'; lbl.style.color='var(--danger)'; warn.style.display='block'; }
 
+    // Разделяем теги script, чтобы парсер HTML не ломался при вставке кода
+    const sTag = "<scr" + "ipt>";
+    const eTag = "</scr" + "ipt>";
+    
     let mathJaxHtml = '';
     if (payload.useLatex) {
-        mathJaxHtml = '<script>window.MathJax = { tex: { inlineMath: [["$", "$"], ["\\\\\\\\(", "\\\\\\\\)"]] } };<\\/script><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"><\\/script>';
+        mathJaxHtml = sTag + 'window.MathJax = { tex: { inlineMath: [["$", "$"], ["\\\\\\\\(", "\\\\\\\\)"]] } };' + eTag + 
+                      sTag + ' id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">' + eTag;
     }
 
-    // Собираем полноценный изолированный HTML-документ для предпросмотра.
-    // Это полностью защищает от ошибки 404 в Genially, так как не использует location.origin.
     const html = `<!doctype html>
     <html lang="ru">
     <head>
@@ -599,15 +601,15 @@
     </head>
     <body>
       <div id="gameRoot" style="width:100vw;height:100vh;"></div>
-      <script>
+      ${sTag}
         const cfg = ${JSON.stringify(payload).replace(/</g, '\\u003c')};
         (${runGame.toString()})(cfg, document.getElementById('gameRoot'));
         ${previewWithDraft ? "setTimeout(()=>document.getElementById('start-btn')?.click(), 100);" : ""}
-      <\\/script>
+      ${eTag}
     </body>
     </html>`;
     
-    $("livePreview").removeAttribute('src'); // Удаляем старый url-based метод, чтобы избежать 404
+    $("livePreview").removeAttribute('src'); 
     $("livePreview").srcdoc = html; 
   }
   
@@ -688,33 +690,30 @@
       else Editor.questions.push(deepClone(q));
       Editor.draft=null; Editor.editingId=null; hideModal(); renderList(); updatePreview(false); toast('Сохранено');
     });
-    
     $("btnCopyCode").addEventListener('click', async()=>{ 
       const payload=buildPayload(false); 
       const iframeCode=buildIframeFromUrl(buildGameUrl(payload)); 
       const ok=await copyToClipboard(iframeCode); 
       toast(ok ? 'Скопировано ✅' : 'Не удалось скопировать'); 
     });
-    
     $("btnResetAll").addEventListener('click',()=>{ Object.assign(Editor, deepClone(DEFAULT_CFG)); Editor.questions=[]; Editor.draft=null; Editor.editingId=null; fillFormFromEditor(); renderList(); updatePreview(false); toast('Сброшено'); });
     renderList(); updatePreview(false);
   }
 
   function runGame(cfg, mount){
+    const sTag = "<scr" + "ipt>";
+    const eTag = "</scr" + "ipt>";
     let mathJaxHtml = '';
     if (cfg.useLatex) {
-        mathJaxHtml = `
-            <script>window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\\\(', '\\\\)']] } };<\/script>
-            <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"><\/script>
-        `;
+        mathJaxHtml = sTag + 'window.MathJax = { tex: { inlineMath: [["$", "$"], ["\\\\(", "\\\\)"]] } };' + eTag +
+                      sTag + ' id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">' + eTag;
     }
 
     const startColor = cfg.instruction?.color || '#ffb703';
     const startGlow = cfg.instruction?.glow !== false;
     const boxGlowStyle = startGlow ? `0 0 20px ${startColor}, inset 0 0 10px ${startColor}` : `0 18px 60px rgba(0,0,0,.38)`;
 
-    mount.innerHTML = `
-      ${mathJaxHtml}
+    mount.innerHTML = mathJaxHtml + `
       <style>
         html,body{height:100%;margin:0;overflow:hidden;font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;background:transparent;}
         #game-wrapper { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
