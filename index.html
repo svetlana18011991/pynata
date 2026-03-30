@@ -681,24 +681,27 @@
         #start-card h1{margin:0 0 8px;font-size:${cfg.titleFontSize || 30}px; font-family:${cfg.titleFont || 'inherit'};} #start-card p{font-size:18px;line-height:1.45;opacity:.95;white-space:pre-line}
         #start-btn{padding:12px 18px;border-radius:14px;border:1px solid rgba(255,183,3,.55);background:linear-gradient(90deg, rgba(255,183,3,.34), rgba(255,140,0,.25));color:#fff;font-weight:900;cursor:pointer;margin-top:15px}
         
-        #quiz-panel { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:rgba(255,255,255,.95); padding:25px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,.3); width:320px; text-align:center; z-index:50; transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; overflow: hidden; max-height: 95vh; }
-        #quiz-panel.draw-mode { width: min(95vw, 850px) !important; flex-direction: row; gap: 20px; align-items: stretch; text-align: left; }
+        #quiz-panel { position:absolute; left:25%; top:25%; transform:translate(-50%,-50%); background:rgba(255,255,255,.95); padding:25px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,.3); width:320px; text-align:center; z-index:50; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; overflow: visible; max-height: 95vh; }
+        
+        /* СОСТОЯНИЕ ЧЕРНОВИКА (КАК В ТИРЕ) */
+        #quiz-panel.draw-mode { width: min(95vw, 1000px) !important; left: 50% !important; top: 50% !important; flex-direction: row; gap: 30px; align-items: stretch; text-align: left; }
         
         #q-content-wrap { width: 100%; flex-shrink: 0; display: flex; flex-direction: column; transition: width 0.4s; overflow-y: auto; align-items: center; }
         #q-content-wrap::-webkit-scrollbar { width: 4px; }
-        #quiz-panel.draw-mode #q-content-wrap { width: 300px; align-items: flex-start; }
+        #quiz-panel.draw-mode #q-content-wrap { width: 350px; align-items: flex-start; }
         #quiz-panel.draw-mode #options-container, #quiz-panel.draw-mode #input-container { display: none !important; }
         
-        #draw-toggle { position: absolute; top: 10px; right: 10px; font-size: 20px; background: rgba(0,0,0,0.05); border: 2px solid #ccc; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; z-index: 60; display: flex; align-items: center; justify-content: center; transition: 0.2s; padding:0; }
+        #draw-toggle { position: absolute; top: 15px; right: 15px; font-size: 20px; background: rgba(0,0,0,0.05); border: 2px solid #ccc; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; z-index: 60; display: flex; align-items: center; justify-content: center; transition: 0.3s; padding:0; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         #draw-toggle:hover { transform: scale(1.1); background: rgba(0,0,0,0.1); }
-        #quiz-panel.draw-mode #draw-toggle { border-color: ${startColor}; background: rgba(255,183,3,0.2); }
+        #quiz-panel.draw-mode #draw-toggle { border-color: ${startColor}; background: rgba(255,183,3,0.2); box-shadow: 0 0 20px ${startColor}; transform: scale(1.1); }
 
-        #draw-area { display: none; flex-grow: 1; border-radius: 12px; border: 2px solid #ccc; background-color: #fdfdfc; background-image: linear-gradient(#b0d4e3 1px, transparent 1px), linear-gradient(90deg, #b0d4e3 1px, transparent 1px); background-size: 25px 25px; position: relative; overflow: hidden; min-height: 350px; }
-        #quiz-panel.draw-mode #draw-area { display: block; animation: drawFade 0.4s ease forwards; }
-        @keyframes drawFade { 0% {opacity:0;} 100% {opacity:1;} }
+        #draw-area { display: none; flex-grow: 1; border-radius: 16px; border: 3px solid ${startColor}; background-color: #fdfdfc; background-image: linear-gradient(#b0d4e3 1px, transparent 1px), linear-gradient(90deg, #b0d4e3 1px, transparent 1px); background-size: 25px 25px; position: relative; z-index: 10; box-shadow: inset 0 0 20px rgba(0,0,0,0.1); overflow: hidden; min-height: 350px; }
+        #quiz-panel.draw-mode #draw-area { display: block; animation: drawAreaFade 0.4s ease forwards; }
+        @keyframes drawAreaFade { 0% {opacity:0; transform:scale(0.95);} 100% {opacity:1; transform:scale(1);} }
         #gCanvas { width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
         
-        .draw-tools-panel { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); padding: 6px 14px; border-radius: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; z-index: 15; border: 1px solid rgba(0,0,0,0.1); user-select: none; flex-wrap: wrap; justify-content: center; width: max-content; max-width: 90%; }
+        .draw-tools-panel { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); padding: 6px 14px; border-radius: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; z-index: 15; border: 1px solid rgba(0,0,0,0.1); user-select: none; flex-wrap: wrap; justify-content: center; width: max-content; max-width: 90%; }
+        @media (max-width: 600px) { .draw-tools-panel { padding: 4px 8px; gap: 6px; width: 95%; justify-content: space-evenly; } }
         .tool-group { display: flex; align-items: center; gap: 4px; }
         .tool-sep { width: 1px; height: 20px; background: #ccc; }
         .d-tool { background: transparent; border: none; font-size: 18px; cursor: pointer; padding: 4px; border-radius: 8px; transition: 0.2s; filter: grayscale(1); opacity: 0.6; display: flex; align-items: center; justify-content: center; }
@@ -710,8 +713,6 @@
         .d-size span { background: #333; border-radius: 50%; display: block; }
         .d-size.active { background: rgba(0,0,0,0.1); }
         .d-size:hover { background: rgba(0,0,0,0.05); }
-        #d-clear { font-size: 12px; background: #ff4d4d; color: white; padding: 4px 8px; opacity: 1; filter: none; font-weight: bold; border-radius: 12px; height: 26px; margin-left: 5px; }
-        #d-clear:hover { background: #ff3333; }
 
         @media (max-width: 800px) {
             #quiz-panel.draw-mode { flex-direction: column; }
@@ -772,7 +773,7 @@
                        <button class="d-size" data-size="8" title="Толсто"><span style="width:14px;height:14px;"></span></button>
                    </div>
                    <div class="tool-sep"></div>
-                   <button id="d-clear" class="d-tool d-clear">🗑 Очистить</button>
+                   <button id="d-clear" class="btn small danger" style="padding:4px 8px; font-size:12px; margin:0; border-radius:10px;">🗑 Очистить</button>
                 </div>
                 <canvas id="gCanvas"></canvas>
               </div>
@@ -802,7 +803,7 @@
     const winMessage = mount.querySelector('#win-message');
     const piniataImg = mount.querySelector('#piniata-img');
 
-    // === ЛОГИКА ЧЕРНОВИКА ===
+    // === ЛОГИКА ЧЕРНОВИКА (ИЗ ТИРА) ===
     const drawToggle = mount.querySelector('#draw-toggle');
     const drawArea = mount.querySelector('#draw-area');
     const canvas = mount.querySelector('#gCanvas');
