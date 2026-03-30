@@ -11,7 +11,6 @@
     :root{
       --text:#eaf0ff;--muted:#a9b6e6;--border:rgba(255,255,255,.10);--shadow2:0 12px 34px rgba(0,0,0,.40);
       --radius:18px;--radius2:22px;
-      /* Улучшенные цвета неона для редактора */
       --neon:#ffb703;
       --neon-glow:rgba(255,183,3,0.65);
       --neon-border:rgba(255,183,3,0.4);
@@ -30,7 +29,6 @@
     .app{display:grid;grid-template-columns:460px 1fr;gap:14px;padding:14px;max-width:1540px;margin:0 auto;height:100%}
     @media (max-width:1020px){.app{display:flex;flex-direction:column;overflow-y:auto}.settings,.preview{height:auto!important;min-height:560px}}
     
-    /* Красивые неоновые рамки панелей */
     .panel{background:var(--bgPanel);border:1px solid var(--neon);border-radius:var(--radius2);box-shadow:0 0 15px var(--neon-border), inset 0 0 8px rgba(255,183,3,0.15), var(--shadow2);backdrop-filter:blur(10px);overflow:hidden;position:relative}
     .panel-header,.preview-top{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.10);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
     .panel-header .h,.preview-top .name{font-weight:950;letter-spacing:.2px;display:flex;align-items:center;gap:10px}
@@ -41,7 +39,6 @@
     .settings .panel-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
     .settings .panel-body::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
     
-    /* Неоновые секции */
     .section{padding:12px;border-radius:16px;border:1px solid rgba(255,183,3,.3);background:rgba(20,10,0,.22);margin-bottom:12px;box-shadow:0 0 10px rgba(255,183,3,.15)}
     .section .title{font-weight:950;font-size:13.5px;margin-bottom:10px;color:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:space-between;gap:8px}
     .muted{color:var(--muted);font-size:12.5px;line-height:1.35}
@@ -50,7 +47,6 @@
     input[type="color"] { padding: 4px; cursor: pointer; height: 38px; }
     textarea{min-height:84px;resize:vertical}
     
-    /* Улучшенное свечение инпутов при фокусе */
     input:focus,textarea:focus,select:focus{border-color:var(--neon);box-shadow:0 0 12px var(--neon-glow), inset 0 0 5px rgba(255,183,3,.25)}
     
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}.row>*{flex:1;min-width:150px}
@@ -684,13 +680,52 @@
         #start-card{width:min(720px, calc(100% - 24px));background:rgba(20,22,30,.82);border:1px solid ${startColor};border-radius:24px;box-shadow:${boxGlowStyle};padding:22px;text-align:center;color:#fff}
         #start-card h1{margin:0 0 8px;font-size:${cfg.titleFontSize || 30}px; font-family:${cfg.titleFont || 'inherit'};} #start-card p{font-size:18px;line-height:1.45;opacity:.95;white-space:pre-line}
         #start-btn{padding:12px 18px;border-radius:14px;border:1px solid rgba(255,183,3,.55);background:linear-gradient(90deg, rgba(255,183,3,.34), rgba(255,140,0,.25));color:#fff;font-weight:900;cursor:pointer;margin-top:15px}
-        #quiz-panel{position:absolute;left:25%;top:25%;transform:translate(-50%,-50%);background:rgba(255,255,255,.95);padding:25px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.3);width:320px;text-align:center;z-index:50}
+        
+        #quiz-panel { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:rgba(255,255,255,.95); padding:25px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,.3); width:320px; text-align:center; z-index:50; transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; overflow: hidden; max-height: 95vh; }
+        #quiz-panel.draw-mode { width: min(95vw, 850px) !important; flex-direction: row; gap: 20px; align-items: stretch; text-align: left; }
+        
+        #q-content-wrap { width: 100%; flex-shrink: 0; display: flex; flex-direction: column; transition: width 0.4s; overflow-y: auto; align-items: center; }
+        #q-content-wrap::-webkit-scrollbar { width: 4px; }
+        #quiz-panel.draw-mode #q-content-wrap { width: 300px; align-items: flex-start; }
+        #quiz-panel.draw-mode #options-container, #quiz-panel.draw-mode #input-container { display: none !important; }
+        
+        #draw-toggle { position: absolute; top: 10px; right: 10px; font-size: 20px; background: rgba(0,0,0,0.05); border: 2px solid #ccc; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; z-index: 60; display: flex; align-items: center; justify-content: center; transition: 0.2s; padding:0; }
+        #draw-toggle:hover { transform: scale(1.1); background: rgba(0,0,0,0.1); }
+        #quiz-panel.draw-mode #draw-toggle { border-color: ${startColor}; background: rgba(255,183,3,0.2); }
+
+        #draw-area { display: none; flex-grow: 1; border-radius: 12px; border: 2px solid #ccc; background-color: #fdfdfc; background-image: linear-gradient(#b0d4e3 1px, transparent 1px), linear-gradient(90deg, #b0d4e3 1px, transparent 1px); background-size: 25px 25px; position: relative; overflow: hidden; min-height: 350px; }
+        #quiz-panel.draw-mode #draw-area { display: block; animation: drawFade 0.4s ease forwards; }
+        @keyframes drawFade { 0% {opacity:0;} 100% {opacity:1;} }
+        #gCanvas { width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+        
+        .draw-tools-panel { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); padding: 6px 14px; border-radius: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; z-index: 15; border: 1px solid rgba(0,0,0,0.1); user-select: none; flex-wrap: wrap; justify-content: center; width: max-content; max-width: 90%; }
+        .tool-group { display: flex; align-items: center; gap: 4px; }
+        .tool-sep { width: 1px; height: 20px; background: #ccc; }
+        .d-tool { background: transparent; border: none; font-size: 18px; cursor: pointer; padding: 4px; border-radius: 8px; transition: 0.2s; filter: grayscale(1); opacity: 0.6; display: flex; align-items: center; justify-content: center; }
+        .d-tool.active { background: rgba(255,183,3,0.3); filter: grayscale(0); opacity: 1; }
+        .d-tool:hover { background: rgba(0,0,0,0.05); }
+        .d-color { width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); padding:0; margin:0 2px; }
+        .d-color.active { transform: scale(1.2); border-color: #000; }
+        .d-size { width: 26px; height: 26px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; padding:0; }
+        .d-size span { background: #333; border-radius: 50%; display: block; }
+        .d-size.active { background: rgba(0,0,0,0.1); }
+        .d-size:hover { background: rgba(0,0,0,0.05); }
+        #d-clear { font-size: 12px; background: #ff4d4d; color: white; padding: 4px 8px; opacity: 1; filter: none; font-weight: bold; border-radius: 12px; height: 26px; margin-left: 5px; }
+        #d-clear:hover { background: #ff3333; }
+
+        @media (max-width: 800px) {
+            #quiz-panel.draw-mode { flex-direction: column; }
+            #quiz-panel.draw-mode #q-content-wrap { width: 100%; height: auto; flex-shrink: 1; align-items: center; }
+            #draw-area { min-height: 250px; }
+        }
+        
         #q-media img{max-width:100%;max-height:160px;border-radius:12px;display:block;margin:0 auto 10px;}
         #q-media audio{width:100%;margin-bottom:10px;height:36px;border-radius:12px;}
         #question-text{font-size:22px;font-weight:bold;margin-bottom:20px;color:#333;white-space:pre-wrap;}
+        #options-container { width: 100%; }
         .option-btn{display:block;width:100%;margin:10px 0;padding:12px;font-size:18px;font-weight:bold;border:none;border-radius:10px;background:#ff7e67;color:white;cursor:pointer;transition:.2s;box-shadow:0 4px 6px rgba(0,0,0,.1)}
         .option-btn:hover{background:#ff5a3d;transform:translateY(-2px)} .option-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;box-shadow:none}
-        #input-container{display:none;margin-top:10px;}
+        #input-container{display:none;margin-top:10px; width: 100%;}
         #ans-input{width:100%;padding:10px;font-size:18px;border-radius:10px;border:2px solid #ccc;outline:none;}
         #ans-input:focus{border-color:#ff7e67;}
         #feedback-text{margin-top:15px;font-size:18px;font-weight:bold;min-height:24px} .text-wrong{color:#d9381e}.text-correct{color:#28a745}
@@ -700,20 +735,47 @@
         .swing{animation:swingAnim 4s ease-in-out infinite} @keyframes swingAnim{0%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}100%{transform:rotate(-6deg)}}
         .hit-anim{animation:hitAnim .2s ease-out} @keyframes hitAnim{0%{transform:scale(1) rotate(0deg)}50%{transform:scale(.9) rotate(15deg) translateY(-10px)}100%{transform:scale(1) rotate(0deg)}}
         .confetti{position:absolute;top:-20px;z-index:90;animation:fall linear forwards} @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
-        @media (max-width:980px){#quiz-panel{left:25%;top:25%;bottom:auto;transform:translate(-50%,-50%);width:min(92vw,420px)}#win-message{font-size:50px}}
+        @media (max-width:980px){#quiz-panel:not(.draw-mode){width:min(92vw,420px)}#win-message{font-size:50px}}
       </style>
       <div id="game-wrapper">
         <div id="game-container">
           <div id="start-screen"><div id="start-card"><h1></h1><p></p><button id="start-btn">▶ Начать</button></div></div>
           <div id="quiz-panel" style="display:none">
-              <div id="q-media"></div>
-              <div id="question-text">Вопрос загружается...</div>
-              <div id="options-container"></div>
-              <div id="input-container">
-                 <input type="text" id="ans-input" placeholder="Введите ответ...">
-                 <button id="ans-submit" class="option-btn" style="margin-top:10px;">ОК</button>
+              <button id="draw-toggle" title="Черновик">✏️</button>
+              <div id="q-content-wrap">
+                  <div id="q-media"></div>
+                  <div id="question-text">Вопрос загружается...</div>
+                  <div id="options-container"></div>
+                  <div id="input-container">
+                     <input type="text" id="ans-input" placeholder="Введите ответ...">
+                     <button id="ans-submit" class="option-btn" style="margin-top:10px;">ОК</button>
+                  </div>
+                  <div id="feedback-text"></div>
               </div>
-              <div id="feedback-text"></div>
+              <div id="draw-area">
+                <div class="draw-tools-panel">
+                   <div class="tool-group">
+                       <button id="d-pen" class="d-tool active" title="Ручка">🖊️</button>
+                       <button id="d-eraser" class="d-tool" title="Ластик">🧽</button>
+                   </div>
+                   <div class="tool-sep"></div>
+                   <div class="tool-group">
+                       <button class="d-color active" data-color="#0f4c81" style="background:#0f4c81;"></button>
+                       <button class="d-color" data-color="#e53935" style="background:#e53935;"></button>
+                       <button class="d-color" data-color="#43a047" style="background:#43a047;"></button>
+                       <button class="d-color" data-color="#212121" style="background:#212121;"></button>
+                   </div>
+                   <div class="tool-sep"></div>
+                   <div class="tool-group">
+                       <button class="d-size" data-size="2" title="Тонко"><span style="width:4px;height:4px;"></span></button>
+                       <button class="d-size active" data-size="4" title="Средне"><span style="width:8px;height:8px;"></span></button>
+                       <button class="d-size" data-size="8" title="Толсто"><span style="width:14px;height:14px;"></span></button>
+                   </div>
+                   <div class="tool-sep"></div>
+                   <button id="d-clear" class="d-tool d-clear">🗑 Очистить</button>
+                </div>
+                <canvas id="gCanvas"></canvas>
+              </div>
           </div>
           <div id="win-message"></div>
           <div id="piniata-wrapper"><img class="piniata-image swing" id="piniata-img" src="" alt="Пиньята"></div>
@@ -739,6 +801,105 @@
     const feedbackText = mount.querySelector('#feedback-text');
     const winMessage = mount.querySelector('#win-message');
     const piniataImg = mount.querySelector('#piniata-img');
+
+    // === ЛОГИКА ЧЕРНОВИКА ===
+    const drawToggle = mount.querySelector('#draw-toggle');
+    const drawArea = mount.querySelector('#draw-area');
+    const canvas = mount.querySelector('#gCanvas');
+    const ctxCanvas = canvas.getContext('2d');
+    
+    drawToggle.addEventListener('click', () => {
+        quizPanel.classList.toggle('draw-mode');
+        if(quizPanel.classList.contains('draw-mode')) { setTimeout(resizeCanvas, 10); }
+    });
+
+    let isDrawing = false, currentTool = 'pen', currentColor = '#0f4c81', currentSize = 4;
+    let canvasRect = null, dpr = 1, pts = [];
+
+    function resizeCanvas() {
+        if (!drawArea.offsetWidth) return;
+        const rect = drawArea.getBoundingClientRect();
+        dpr = window.devicePixelRatio || 1;
+        const newW = Math.round(rect.width * dpr);
+        const newH = Math.round(rect.height * dpr);
+        if(canvas.width !== newW || canvas.height !== newH) {
+            let tempCanvas = null;
+            if (canvas.width > 0 && canvas.height > 0) {
+                tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
+                tempCanvas.getContext('2d').drawImage(canvas, 0, 0);
+            }
+            canvas.width = newW; canvas.height = newH;
+            ctxCanvas.setTransform(dpr, 0, 0, dpr, 0, 0);
+            if (tempCanvas) {
+                ctxCanvas.save(); ctxCanvas.setTransform(1, 0, 0, 1, 0, 0);
+                ctxCanvas.drawImage(tempCanvas, 0, 0); ctxCanvas.restore();
+            }
+        }
+        canvas.style.width = rect.width + 'px'; canvas.style.height = rect.height + 'px';
+        canvasRect = rect; 
+    }
+    
+    const drawResizeObs = new ResizeObserver(() => { if(drawArea.offsetWidth > 0) resizeCanvas(); });
+    drawResizeObs.observe(drawArea);
+    
+    function getPointerPos(e) {
+        if(!canvasRect) canvasRect = canvas.getBoundingClientRect();
+        return { x: e.clientX - canvasRect.left, y: e.clientY - canvasRect.top };
+    }
+    
+    const btnPen = mount.querySelector('#d-pen'), btnEraser = mount.querySelector('#d-eraser');
+    const colorBtns = mount.querySelectorAll('.d-color'), sizeBtns = mount.querySelectorAll('.d-size');
+    const btnClear = mount.querySelector('#d-clear');
+
+    if(btnPen) btnPen.onclick = () => { currentTool = 'pen'; btnPen.classList.add('active'); btnEraser.classList.remove('active'); canvas.style.cursor = 'crosshair'; };
+    if(btnEraser) btnEraser.onclick = () => { currentTool = 'eraser'; btnEraser.classList.add('active'); btnPen.classList.remove('active'); canvas.style.cursor = 'cell'; };
+    colorBtns.forEach(btn => btn.onclick = () => { colorBtns.forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentColor = btn.dataset.color; if(currentTool === 'eraser') btnPen.click(); });
+    sizeBtns.forEach(btn => btn.onclick = () => { sizeBtns.forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentSize = Number(btn.dataset.size); });
+    
+    const startDraw = (e) => {
+        if(e.target.closest('.draw-tools-panel')) return;
+        isDrawing = true; canvas.setPointerCapture(e.pointerId); canvasRect = canvas.getBoundingClientRect();
+        ctxCanvas.lineCap = 'round'; ctxCanvas.lineJoin = 'round';
+        ctxCanvas.lineWidth = currentTool === 'eraser' ? currentSize * 4 : currentSize;
+        ctxCanvas.strokeStyle = currentTool === 'eraser' ? 'rgba(0,0,0,1)' : currentColor;
+        ctxCanvas.fillStyle = ctxCanvas.strokeStyle;
+        ctxCanvas.globalCompositeOperation = currentTool === 'eraser' ? 'destination-out' : 'source-over';
+        pts = [getPointerPos(e)];
+        ctxCanvas.beginPath(); ctxCanvas.arc(pts[0].x, pts[0].y, ctxCanvas.lineWidth / 2, 0, Math.PI * 2); ctxCanvas.fill();
+    };
+    
+    const draw = (e) => {
+        if (!isDrawing) return;
+        if(e.cancelable) e.preventDefault();
+        const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+        for (let ev of events) {
+            pts.push(getPointerPos(ev));
+            ctxCanvas.beginPath();
+            if (pts.length >= 3) {
+                let p0 = pts[pts.length - 3], p1 = pts[pts.length - 2], p2 = pts[pts.length - 1];
+                let mid1 = { x: (p0.x + p1.x) / 2, y: (p0.y + p1.y) / 2 };
+                let mid2 = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+                ctxCanvas.moveTo(mid1.x, mid1.y); ctxCanvas.quadraticCurveTo(p1.x, p1.y, mid2.x, mid2.y); ctxCanvas.stroke();
+            } else if (pts.length === 2) {
+                ctxCanvas.moveTo(pts[0].x, pts[0].y); ctxCanvas.lineTo(pts[1].x, pts[1].y); ctxCanvas.stroke();
+            }
+        }
+    };
+    
+    const stopDraw = (e) => { if (isDrawing) { isDrawing = false; pts = []; try { canvas.releasePointerCapture(e.pointerId); } catch(err){} } };
+    
+    canvas.addEventListener('pointerdown', startDraw);
+    canvas.addEventListener('pointermove', draw, {passive: false});
+    canvas.addEventListener('pointerup', stopDraw);
+    canvas.addEventListener('pointercancel', stopDraw);
+    
+    function clearCanvas() {
+        if(!canvasRect) return;
+        ctxCanvas.save(); ctxCanvas.setTransform(1, 0, 0, 1, 0, 0); ctxCanvas.clearRect(0, 0, canvas.width, canvas.height); ctxCanvas.restore();
+    }
+    btnClear.onclick = clearCanvas;
+    // ========================
 
     const questions = (cfg.questions || []).map(q => ({ 
         type: q.type || 'choice',
@@ -841,6 +1002,12 @@
 
     function loadQuestion(){
       if(currentStage >= questions.length) return;
+      
+      // Сброс и закрытие черновика при новом вопросе
+      quizPanel.classList.remove('draw-mode');
+      if(btnPen) btnPen.click();
+      clearCanvas();
+
       const currentQ = questions[currentStage];
       
       questionText.innerHTML = currentQ.q; 
@@ -874,6 +1041,7 @@
                 playCorrect();
                 feedbackText.innerText = 'Правильно! Ударь пиньяту!'; feedbackText.className='text-correct'; canHit=true;
                 ansSubmit.disabled = true; ansInput.disabled = true;
+                quizPanel.classList.remove('draw-mode'); // закрываем черновик при правильном ответе
              } else {
                 playWrong();
                 feedbackText.innerText = 'Промахнулся! Попробуй еще раз.'; feedbackText.className='text-wrong';
@@ -893,6 +1061,7 @@
                     playCorrect();
                     feedbackText.innerText = 'Правильно! Ударь пиньяту!'; feedbackText.className='text-correct'; canHit=true;
                     optionsContainer.querySelectorAll('.option-btn').forEach(b=>b.disabled=true); btn.style.background='#28a745';
+                    quizPanel.classList.remove('draw-mode'); // закрываем черновик при правильном ответе
                   } else {
                     playWrong();
                     feedbackText.innerText = 'Промахнулся! Попробуй еще раз.'; feedbackText.className='text-wrong'; 
