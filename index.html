@@ -39,14 +39,13 @@
     
     /* LEFT PANEL */
     .panel { width: 450px; background: var(--bg-panel); display: flex; flex-direction: column; border-right: 1px solid var(--border); z-index: 10; box-shadow: 5px 0 25px rgba(0,0,0,0.5); }
-    .panel-hdr { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 15px; }
-    .panel-hdr-left { display: flex; align-items: center; gap: 15px; }
+    .panel-hdr { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
     .panel-hdr img { width: 40px; height: 40px; border-radius: 8px; object-fit: contain; background: rgba(255,255,255,0.05); }
     .panel-hdr h1 { margin: 0; font-size: 18px; }
     .panel-hdr span { font-size: 12px; color: var(--neon); }
     
     .panel-content { flex: 1; overflow-y: auto; padding: 20px; }
-    .panel-footer { padding: 20px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 10px; }
+    .panel-footer { padding: 20px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); }
     
     .section { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
     .section-title { font-size: 14px; font-weight: 700; color: var(--neon); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
@@ -54,11 +53,10 @@
     .field { margin-bottom: 15px; }
     .field label { display: block; font-size: 13px; color: #a9b6e6; margin-bottom: 6px; }
 
-    /* QUESTION LIST (ИСПРАВЛЕНО НАЛЕЗАНИЕ КАРАНДАША) */
-    .q-item { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s; }
+    /* QUESTION LIST */
+    .q-item { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
     .q-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); }
-    .q-item-title { flex: 1; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-    .q-item-actions { flex-shrink: 0; display: flex; gap: 5px; }
+    .q-item-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; }
     .q-item-actions button { padding: 6px; font-size: 12px; }
 
     /* MODAL */
@@ -79,11 +77,10 @@
     .color-row input[type="number"] { width: 70px; padding: 6px; }
     .color-row select { width: 120px; padding: 6px; }
 
-    /* RIGHT PANEL (ИСПРАВЛЕНО ПРЕВЬЮ 16:9) */
-    .preview { flex: 1; background: #1a1e29; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; }
-    .preview-wrapper { width: 100%; max-width: calc(100vh * 1.6); aspect-ratio: 16 / 9; background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.05); position: relative; }
-    .preview-badge { position: absolute; top: -35px; left: 0; background: rgba(214,177,74,0.15); padding: 6px 15px; border-radius: 6px; font-size: 12px; font-weight: bold; color: var(--neon); border: 1px solid rgba(214,177,74,0.3); pointer-events: none; }
+    /* RIGHT PANEL (PREVIEW) */
+    .preview { flex: 1; position: relative; background: #000; }
     iframe { width: 100%; height: 100%; border: none; display: block; }
+    .preview-badge { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; color: var(--neon); pointer-events: none; z-index: 100; border: 1px solid rgba(255,255,255,0.1); }
 
     .export-box { display: flex; gap: 10px; align-items: center; }
     .export-box input { flex: 1; font-family: monospace; color: var(--ok); }
@@ -94,12 +91,10 @@
 <div id="app">
   <div class="panel">
     <div class="panel-hdr">
-      <div class="panel-hdr-left">
-        <img src="logo.png" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%23d6b14a\' viewBox=\'0 0 24 24\'><path d=\'M12 2L2 22h20L12 2z\'/></svg>'">
-        <div>
-          <span>Светлана Быкова</span>
-          <h1 id="uiTitleText">Пиньята</h1>
-        </div>
+      <img src="logo.png" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%23d6b14a\' viewBox=\'0 0 24 24\'><path d=\'M12 2L2 22h20L12 2z\'/></svg>'">
+      <div>
+        <span>Светлана Быкова</span>
+        <h1 id="uiTitleText">Пиньята</h1>
       </div>
     </div>
     
@@ -139,15 +134,12 @@
         <input type="text" id="outLink" readonly onclick="this.select()">
         <button class="btn-outline" onclick="copyIframe()" title="Скопировать код для Genially">&lt;/&gt;</button>
       </div>
-      <button class="btn-outline btn-danger" style="width: 100%; margin-top: 5px;" onclick="resetAll()">🗑 Сбросить все настройки и вопросы</button>
     </div>
   </div>
 
   <div class="preview">
-    <div class="preview-wrapper">
-      <div class="preview-badge">Предпросмотр (16:9 как в Genially)</div>
-      <iframe id="previewFrame"></iframe>
-    </div>
+    <div class="preview-badge">Live Preview</div>
+    <iframe id="previewFrame"></iframe>
   </div>
 </div>
 
@@ -160,11 +152,11 @@
     <div class="modal-body">
       <div class="modal-col" style="border-right:1px solid var(--border); padding-right:20px;">
         <div class="field">
-          <label>Текст вопроса (будет НАД картинкой)</label>
+          <label>Текст вопроса</label>
           <textarea id="modQText" rows="3"></textarea>
         </div>
         <div class="field">
-          <label>URL картинки (появится ПОД текстом)</label>
+          <label>URL картинки (необязательно)</label>
           <input type="text" id="modQImg" placeholder="https://...">
         </div>
         <div class="field">
@@ -237,53 +229,46 @@
         </div>
       </div>
     </div>
-    
     <div class="modal-ftr">
-      <button class="btn-outline btn-danger" onclick="clearModalFields()">Очистить поля</button>
-      <div style="display: flex; gap: 10px;">
-        <button class="btn-outline" onclick="applySettingsToAll()">Применить всем</button>
-        <button class="btn-primary" onclick="saveModal()">Сохранить</button>
+      <button class="btn-outline btn-danger" id="btnApplyAll" onclick="applySettingsToAll()">Применить дизайн ко всем</button>
+      <div>
+        <button class="btn-outline" onclick="closeModal()">Отмена</button>
+        <button class="btn-primary" onclick="saveModal()">Сохранить вопрос</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-  // --- ЗАПУСК ---
   const uid = () => Math.random().toString(36).substr(2, 6);
   const $ = id => document.getElementById(id);
   
-  // Ключ сохранений
-  const SAVE_KEY = "pinata_save_final_v1";
+  // КЛЮЧ АВТОСОХРАНЕНИЯ (обновлен, чтобы избежать конфликтов со старыми кривыми данными)
+  const SAVE_KEY = "pinata_pro_save_v5";
   
+  // DATA MODEL
   let Editor = {
     title: "Праздничная Пиньята", useLatex: false,
     instText: "Ответь на 5 вопросов правильно, чтобы разбить пиньяту и получить сюрприз!",
     winText: "Молодец!",
     questions: [
       {
-        id: uid(), q: "Решите уравнение: 2 + x = 4", img: "", type: "choice", options: ["1", "2", "3"], correctIdx: 1, inputText: "",
+        id: uid(), q: "Сколько будет 2 + 2?", img: "", type: "choice", options: ["3", "4", "5"], correctIdx: 1, inputText: "",
         style: { bg: "#ffffff", text: "#333333", border: "#cccccc", font: "system-ui", size: 22, btnBg: "#ff7e67", btnText: "#ffffff", btnFont: "system-ui" }
       }
     ]
   };
 
   const urlParams = new URLSearchParams(window.location.search);
-  const cfgParam = urlParams.get('cfg');
-  const playParam = urlParams.get('play');
+  const cfgKeyParam = urlParams.get('cfgkey');
 
-  if (cfgParam) {
+  if(cfgKeyParam) {
+    document.body.innerHTML = "";
     try {
-      // ИСПОЛЬЗУЕМ LZSTRING (ЧТОБЫ РАБОТАЛО В GENIALLY БЕЗ ОШИБОК)
-      const raw = JSON.parse(LZString.decompressFromEncodedURIComponent(cfgParam));
-      if (playParam === '1') {
-        document.open();
-        document.write(buildGameHTML(raw));
-        document.close();
-      } else {
-        Editor = Object.assign(Editor, raw);
-        initEditor();
-      }
+      const rawStr = localStorage.getItem(cfgKeyParam) || sessionStorage.getItem(cfgKeyParam);
+      if(!rawStr) throw new Error();
+      document.write(buildGameHTML(JSON.parse(rawStr), true));
+      document.close();
     } catch(e) {
       document.body.innerHTML = '<h2 style="color:red;text-align:center;margin-top:50px;">Ошибка загрузки игры</h2>';
     }
@@ -291,31 +276,14 @@
     initEditor();
   }
 
-  // --- ИНИЦИАЛИЗАЦИЯ И СБРОС ---
   function initEditor() {
-    try { 
-      const saved = localStorage.getItem(SAVE_KEY); 
-      if(saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed && Array.isArray(parsed.questions)) {
-              Editor = parsed;
-          }
-      }
-    } catch(e){}
-    
+    try { const saved = localStorage.getItem(SAVE_KEY); if(saved) Editor = Object.assign(Editor, JSON.parse(saved)); } catch(e){}
     $("inpTitle").value = Editor.title || "Праздничная Пиньята";
     $("inpInst").value = Editor.instText || "Ответь на 5 вопросов правильно...";
     $("inpWin").value = Editor.winText || "Молодец!";
     $("chkLatex").checked = !!Editor.useLatex;
     renderQList();
     saveAll();
-  }
-
-  function resetAll() {
-      if(confirm("Вы уверены, что хотите удалить ВСЕ вопросы и сбросить настройки? Это действие нельзя отменить!")) {
-          localStorage.removeItem(SAVE_KEY);
-          location.href = window.location.pathname; // Убираем параметры, перезапускаем
-      }
   }
 
   function renderQList() {
@@ -389,18 +357,9 @@
     $("modOpts").appendChild(div);
   }
 
-  function clearModalFields() {
-    $("modQText").value = "";
-    $("modQImg").value = "";
-    $("modInputAns").value = "";
-    $("modOpts").innerHTML = "";
-    addModalOpt("", true);
-    addModalOpt("", false);
-  }
-
   function saveModal() {
     const qText = $("modQText").value.trim();
-    if(!qText && !$("modQImg").value.trim()) return alert("Введите вопрос или добавьте картинку!");
+    if(!qText) return alert("Введите вопрос!");
     
     const type = $("modQType").value;
     let options = [], correctIdx = 0, inputText = "";
@@ -464,32 +423,36 @@
     
     $("uiTitleText").innerText = Editor.title || "Пиньята";
 
-    // 100% надежное сохранение в кэш
     localStorage.setItem(SAVE_KEY, JSON.stringify(Editor));
     
-    // Генерация ссылки
-    const comp = LZString.compressToEncodedURIComponent(JSON.stringify(Editor));
-    const link = window.location.origin + window.location.pathname + "?play=1&cfg=" + comp;
-    $("outLink").value = link;
+    const k = "pinata_run_" + uid();
+    localStorage.setItem(k, JSON.stringify(Editor));
+    $("outLink").value = window.location.origin + window.location.pathname + "?cfgkey=" + k;
     
-    // Обновление превью
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
-        $("previewFrame").srcdoc = buildGameHTML(Editor);
+        // НАДЕЖНЫЙ МЕТОД ДЛЯ ЛОКАЛЬНЫХ ФАЙЛОВ (без ошибок CORS)
+        $("previewFrame").srcdoc = buildGameHTML(Editor, false);
     }, 400);
   }
 
   function copyIframe() { navigator.clipboard.writeText(`<iframe src="${$("outLink").value}" width="100%" height="600" frameborder="0" allowfullscreen></iframe>`).then(() => alert("Код Iframe скопирован!")); }
 
   // --- GAME BUILDER ---
-  function buildGameHTML(cfg) {
+  function buildGameHTML(cfg, isStandalone) {
+    let latexScripts = '';
+    if(cfg.useLatex) {
+      latexScripts = `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+                      <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"><\/script>`;
+    }
+
     return `<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>\${cfg.title}</title>
-    \${cfg.useLatex ? '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"><\\/script>' : ''}
+    <title>${cfg.title}</title>
+    ${latexScripts}
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Neucha&display=swap');
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -512,12 +475,9 @@
         .hit-anim { animation: hitAnim 0.2s ease-out; }
         @keyframes hitAnim { 0% { transform: scale(1) rotate(0deg); } 50% { transform: scale(0.9) rotate(15deg) translateY(-10px); } 100% { transform: scale(1) rotate(0deg); } }
 
-        /* ПАНЕЛЬ ВОПРОСОВ */
-        #quiz-panel { position: absolute; left: 4%; top: 50%; transform: translateY(-50%); padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 340px; max-height: 85vh; overflow-y: auto; text-align: center; z-index: 1000; display: none; flex-direction: column; gap: 15px; }
-        
-        /* ПОРЯДОК: ТЕКСТ НАД КАРТИНКОЙ */
+        #quiz-panel { position: absolute; left: 5%; top: 50%; transform: translateY(-50%); padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 360px; text-align: center; z-index: 50; display: none; transition: 0.3s; display: flex; flex-direction: column; gap: 15px; }
+        #q-img { max-width: 100%; border-radius: 10px; display: none; margin: 0 auto; max-height: 150px; object-fit: contain; }
         #question-text-game { font-weight: bold; line-height: 1.3; }
-        #q-img { max-width: 100%; border-radius: 10px; display: none; margin: 0 auto; max-height: 160px; object-fit: contain; }
         
         .option-btn { display: block; width: 100%; padding: 12px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .option-btn:hover { filter: brightness(0.9); transform: translateY(-2px); }
@@ -539,19 +499,19 @@
     <img src="logo.png" class="game-logo" onerror="this.style.display='none'">
     
     <div id="startOverlay">
-        <h1>\${cfg.title}</h1>
-        <p>\${cfg.instText}</p>
+        <h1>${cfg.title}</h1>
+        <p>${cfg.instText}</p>
         <button id="btnStartGame">Начать игру</button>
     </div>
 
     <div id="quiz-panel" style="display:none;">
-        <div id="question-text-game"></div>
         <img id="q-img">
+        <div id="question-text-game"></div>
         <div id="options-container"></div>
         <div id="feedback-text-game"></div>
     </div>
 
-    <div id="win-message">\${cfg.winText}</div>
+    <div id="win-message">${cfg.winText}</div>
     
     <div id="piniata-wrapper">
         <img class="piniata-image swing" id="piniata-img" src="1.png" alt="Пиньята">
@@ -559,7 +519,7 @@
 </div>
 
 <script>
-    const cfg = \${JSON.stringify(cfg)};
+    const cfg = ${JSON.stringify(cfg)};
     
     let baseQs = cfg.questions && cfg.questions.length > 0 ? cfg.questions : [{ q: "Вопросов нет", type: "choice", options: ["Ок"], correctIdx: 0, style: { bg:"#fff", text:"#000", border:"#ccc", font:"system-ui", size:22, btnBg:"#ccc", btnText:"#000", btnFont:"system-ui" } }];
     const gameQs = [];
@@ -614,11 +574,10 @@
         qText.style.fontFamily = st.font || 'system-ui';
         qText.style.fontSize = (st.size || 22) + 'px';
         
-        renderLatex(qText, currentQ.q);
-        
         if (currentQ.img) { qImg.src = currentQ.img; qImg.style.display = 'block'; } 
         else { qImg.style.display = 'none'; }
         
+        renderLatex(qText, currentQ.q);
         optContainer.innerHTML = ''; 
         feedbackText.innerText = ''; 
         canHit = false;
