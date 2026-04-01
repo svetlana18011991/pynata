@@ -609,7 +609,8 @@
         #q-content-wrap::-webkit-scrollbar { width: 4px; }
         #quiz-panel.draw-mode #q-content-wrap { width: 350px; align-items: flex-start; padding-right: 10px; }
         #quiz-panel.draw-mode #options-container, #quiz-panel.draw-mode #input-container { display: none !important; }
-        #draw-toggle { position: absolute; bottom: 10px; right: 10px; font-size: 20px; background: #ffffff; border: 2px solid #ccc; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; z-index: 60; display: flex; align-items: center; justify-content: center; transition: 0.3s; padding: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        /* Кнопка перенесена вниз */
+        #draw-toggle { position: absolute; bottom: 15px; right: 15px; font-size: 20px; background: #ffffff; border: 2px solid #ccc; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center; transition: 0.3s; padding: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         #draw-toggle:hover { transform: scale(1.1); border-color: ${startColor}; }
         #quiz-panel.draw-mode #draw-toggle { display: none !important; }
         #draw-area { display: none; flex: 1; min-height: 150px; border-radius: 16px; border: 3px solid ${startColor}; background-color: #fdfdfc; background-image: linear-gradient(#b0d4e3 1px, transparent 1px), linear-gradient(90deg, #b0d4e3 1px, transparent 1px); background-size: 25px 25px; position: relative; z-index: 10; box-shadow: inset 0 0 20px rgba(0,0,0,0.1); overflow: hidden; }
@@ -632,7 +633,6 @@
         #piniata-wrapper{position:absolute;width:24.5%;left:68.35%;top:54.6%;transform:translate(-50%,-50%);z-index:10}
         .piniata-image{width:100%;height:auto;display:block;transform-origin:50% 0%;cursor:pointer;}
         .swing{animation:swingAnim 4s ease-in-out infinite} @keyframes swingAnim{0%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}100%{transform:rotate(-6deg)}}
-        .confetti{position:absolute;top:-20px;z-index:90;animation:fall linear forwards} @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
       </style>
       <div id="game-wrapper">
         <div id="game-container">
@@ -687,7 +687,7 @@
     const winMessage = mount.querySelector('#win-message'), piniataImg = mount.querySelector('#piniata-img'), drawToggle = mount.querySelector('#draw-toggle'), drawClose = mount.querySelector('#d-close'), drawArea = mount.querySelector('#draw-area'), canvas = mount.querySelector('#gCanvas'), ctxCanvas = canvas.getContext('2d');
     function toggleDrawMode() { quizPanel.classList.toggle('draw-mode'); if(quizPanel.classList.contains('draw-mode')) { setTimeout(resizeCanvas, 10); } }
     drawToggle.addEventListener('click', toggleDrawMode); drawClose.addEventListener('click', toggleDrawMode);
-    let isDrawing = false, currentTool = 'pen', currentColor = '#0f4c81', currentSize = 4, canvasRect = null, dpr = 1, pts = [];
+    let isDrawing = false, currentTool = 'pen', currentColor = '#0f4c81', currentSize = 4, canvasRect = null, dpr = 1;
     function resizeCanvas() { if (!drawArea.offsetWidth) return; const rect = drawArea.getBoundingClientRect(); dpr = window.devicePixelRatio || 1; canvas.width = Math.round(rect.width * dpr); canvas.height = Math.round(rect.height * dpr); ctxCanvas.setTransform(dpr, 0, 0, dpr, 0, 0); canvas.style.width = rect.width + 'px'; canvas.style.height = rect.height + 'px'; canvasRect = rect; }
     new ResizeObserver(() => { if(drawArea.offsetWidth > 0) resizeCanvas(); }).observe(drawArea);
     function getPointerPos(e) { if(!canvasRect) canvasRect = canvas.getBoundingClientRect(); return { x: e.clientX - canvasRect.left, y: e.clientY - canvasRect.top }; }
@@ -696,9 +696,10 @@
     if(btnEraser) btnEraser.onclick = () => { currentTool = 'eraser'; btnEraser.classList.add('active'); btnPen.classList.remove('active'); canvas.style.cursor = 'cell'; };
     colorBtns.forEach(btn => btn.onclick = () => { colorBtns.forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentColor = btn.dataset.color; if(currentTool === 'eraser') btnPen.click(); });
     sizeBtns.forEach(btn => btn.onclick = () => { sizeBtns.forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentSize = Number(btn.dataset.size); });
-    const startDraw = (e) => { if(e.target.closest('.draw-tools-panel')) return; isDrawing = true; canvas.setPointerCapture(e.pointerId); ctxCanvas.lineCap = 'round'; ctxCanvas.lineJoin = 'round'; ctxCanvas.lineWidth = currentTool === 'eraser' ? currentSize * 4 : currentSize; ctxCanvas.strokeStyle = currentTool === 'eraser' ? 'rgba(0,0,0,1)' : currentColor; ctxCanvas.fillStyle = ctxCanvas.strokeStyle; ctxCanvas.globalCompositeOperation = currentTool === 'eraser' ? 'destination-out' : 'source-over'; pts = [getPointerPos(e)]; ctxCanvas.beginPath(); ctxCanvas.arc(pts[0].x, pts[0].y, ctxCanvas.lineWidth / 2, 0, Math.PI * 2); ctxCanvas.fill(); };
-    const draw = (e) => { if (!isDrawing) return; if(e.cancelable) e.preventDefault(); const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e]; for (let ev of events) { pts.push(getPointerPos(ev)); ctxCanvas.beginPath(); if (pts.length >= 3) { let p0 = pts[pts.length - 3], p1 = pts[pts.length - 2], p2 = pts[pts.length - 1]; let mid1 = { x: (p0.x + p1.x) / 2, y: (p0.y + p1.y) / 2 }; let mid2 = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 }; ctxCanvas.moveTo(mid1.x, mid1.y); ctxCanvas.quadraticCurveTo(p1.x, p1.y, mid2.x, mid2.y); ctxCanvas.stroke(); } else if (pts.length === 2) { ctxCanvas.moveTo(pts[0].x, pts[0].y); ctxCanvas.lineTo(pts[1].x, pts[1].y); ctxCanvas.stroke(); } } };
-    const stopDraw = (e) => { if (isDrawing) { isDrawing = false; pts = []; try { canvas.releasePointerCapture(e.pointerId); } catch(err){} } };
+    /* ИСПРАВЛЕННАЯ ЛОГИКА РИСОВАНИЯ */
+    const startDraw = (e) => { if(e.target.closest('.draw-tools-panel')) return; isDrawing = true; try { canvas.setPointerCapture(e.pointerId); } catch(err){} canvasRect = canvas.getBoundingClientRect(); const pos = getPointerPos(e); ctxCanvas.lineCap = 'round'; ctxCanvas.lineJoin = 'round'; ctxCanvas.lineWidth = currentTool === 'eraser' ? currentSize * 4 : currentSize; ctxCanvas.strokeStyle = currentTool === 'eraser' ? 'rgba(0,0,0,1)' : currentColor; ctxCanvas.globalCompositeOperation = currentTool === 'eraser' ? 'destination-out' : 'source-over'; ctxCanvas.beginPath(); ctxCanvas.moveTo(pos.x, pos.y); ctxCanvas.lineTo(pos.x, pos.y); ctxCanvas.stroke(); };
+    const draw = (e) => { if (!isDrawing) return; if(e.cancelable) e.preventDefault(); const pos = getPointerPos(e); ctxCanvas.lineTo(pos.x, pos.y); ctxCanvas.stroke(); };
+    const stopDraw = (e) => { if (isDrawing) { isDrawing = false; ctxCanvas.closePath(); try { canvas.releasePointerCapture(e.pointerId); } catch(err){} } };
     canvas.addEventListener('pointerdown', startDraw); canvas.addEventListener('pointermove', draw, {passive: false}); canvas.addEventListener('pointerup', stopDraw); canvas.addEventListener('pointercancel', stopDraw);
     btnClear.onclick = () => { ctxCanvas.save(); ctxCanvas.setTransform(1, 0, 0, 1, 0, 0); ctxCanvas.clearRect(0, 0, canvas.width, canvas.height); ctxCanvas.restore(); };
     const questions = (cfg.questions || []).map(q => ({ type: q.type || 'choice', q: q.prompt, options: q.options || [], correctIndices: q.correctIndices || [0], accepts: q.accepts || [], font: q.font || '', fontSize: q.fontSize || 20, image: q.image || '', audio: q.audio || '' }));
@@ -709,7 +710,7 @@
     function playSnd(type){ if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state === 'suspended') audioCtx.resume(); const t = audioCtx.currentTime; const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); if(type==='correct'){ osc.type="triangle"; osc.frequency.setValueAtTime(420, t); osc.frequency.exponentialRampToValueAtTime(780, t + 0.12); gain.gain.setValueAtTime(0.2, t); } else { osc.type="sawtooth"; osc.frequency.setValueAtTime(150, t); osc.frequency.exponentialRampToValueAtTime(80, t + 0.2); gain.gain.setValueAtTime(0.2, t); } gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.2); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(t); osc.stop(t + 0.2); }
     function loadQuestion(){
       if(currentStage >= questions.length) return;
-      quizPanel.classList.remove('draw-mode'); clearCanvas();
+      quizPanel.classList.remove('draw-mode');
       const currentQ = questions[currentStage]; questionText.innerHTML = currentQ.q; 
       if(currentQ.font) questionText.style.fontFamily = currentQ.font;
       questionText.style.fontSize = currentQ.fontSize ? currentQ.fontSize + 'px' : '';
@@ -730,7 +731,6 @@
       }
       if(window.MathJax) window.MathJax.typesetPromise([quizPanel]);
     }
-    function clearCanvas() { ctxCanvas.save(); ctxCanvas.setTransform(1, 0, 0, 1, 0, 0); ctxCanvas.clearRect(0, 0, canvas.width, canvas.height); ctxCanvas.restore(); }
     piniataImg.addEventListener('click',()=>{ if(startScreen.style.display !== 'none' || !canHit) return; piniataImg.classList.remove('swing'); piniataImg.classList.add('hit-anim'); setTimeout(()=>{ piniataImg.classList.remove('hit-anim'); piniataImg.classList.add('swing'); },200); currentStage++; piniataImg.src = images[currentStage] || images[images.length-1]; if(currentStage >= images.length - 1 || currentStage >= questions.length){ quizPanel.style.display='none'; winMessage.style.display='block'; } else { setTimeout(loadQuestion,500); } });
     startBtn.addEventListener('click',()=>{ startScreen.style.display='none'; quizPanel.style.display='block'; loadQuestion(); });
   }
