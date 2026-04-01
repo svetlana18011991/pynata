@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Редактор «Пиньята» (с расширенными вопросами)</title>
-  <script type="text/javascript" src="https://me.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js" charset="UTF-8"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Neucha&display=swap');
     html,body{height:100%;margin:0;overflow:hidden;background:#090c16;color:#eaf0ff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
@@ -68,6 +67,7 @@
     .q-item .meta{display:flex;flex-direction:column;gap:4px;min-width:0;padding-top:3px}
     .q-item .meta .t,.q-item .meta .s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.q-item .meta .t{font-weight:900;font-size:13px}.q-item .meta .s{color:var(--muted);font-size:12px}
     .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:999px;font-size:12px;font-weight:900;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.18);color:rgba(255,255,255,.92)}
+  
     .preview{height:100%;display:flex;flex-direction:column;overflow:hidden;min-height:0}
     .preview .panel-body{flex:1;display:flex;flex-direction:column;min-height:0;padding:14px}
     .preview-stage{flex:1;position:relative;border-radius:var(--radius2);border:1px solid rgba(255,255,255,.10);overflow:hidden;background:rgba(0,0,0,.18);box-shadow:var(--shadow2)}
@@ -301,7 +301,6 @@
 (() => {
   "use strict";
   var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-=$";var n={compressToEncodedURIComponent:function(r){return n.compress(r,6,function(r){return o.charAt(r)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:r.replace(/ /g,"+"),n.decompress(r.length,32,function(n){return o.indexOf(r.charAt(n))})},compress:function(o,n,t){if(null==o)return"";var e,i,u,s={},c={},a="",p="",f="",l=2,d=3,h=2,v=[],m=0,g=0,w;for(u=0;u<o.length;u+=1)if(a=o.charAt(u),Object.prototype.hasOwnProperty.call(s,a)||(s[a]=d++,c[a]=!0),p=f+a,Object.prototype.hasOwnProperty.call(s,p))f=p;else{if(Object.prototype.hasOwnProperty.call(c,f)){if(256>f.charCodeAt(0)){for(e=0;h>e;e++)m=m<<1,g==n-1?(g=0,v.push(t(m)),m=0):g++;for(i=f.charCodeAt(0),e=0;8>e;e++)m=m<<1|1&i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i>>=1}else{for(i=1,e=0;h>e;e++)m=m<<1|i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i=0;for(i=f.charCodeAt(0),e=0;16>e;e++)m=m<<1|1&i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i>>=1}l--,0==l&&(l=Math.pow(2,h),h++),delete c[f]}else for(i=s[f],e=0;h>e;e++)m=m<<1|1&i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i>>=1;l--,0==l&&(l=Math.pow(2,h),h++),s[p]=d++,f=String(a)}if(""!==f){if(Object.prototype.hasOwnProperty.call(c,f)){if(256>f.charCodeAt(0)){for(e=0;h>e;e++)m=m<<1,g==n-1?(g=0,v.push(t(m)),m=0):g++;for(i=f.charCodeAt(0),e=0;8>e;e++)m=m<<1|1&i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i>>=1}else{for(i=1,e=0;h>e;e++)m=m<<1|i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i=0;for(i=f.charCodeAt(0),e=0;16>e;e++)m=m<<1|1&i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i>>=1}l--,0==l&&(l=Math.pow(2,h),h++),delete c[f]}else for(i=s[f],e=0;h>e;e++)m=m<<1|1&i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i>>=1;l--,0==l&&(l=Math.pow(2,h),h++)}for(i=2,e=0;h>e;e++)m=m<<1|1&i,g==n-1?(g=0,v.push(t(m)),m=0):g++,i>>=1;for(;;)if(m<<=1,g==n-1){v.push(t(m));break}else g++;return v.join("")},decompress:function(o,n,t){var e,i,u,s,c,a,p,f=[],l=4,d=4,h=3,v="",m=[],g={val:t(0),position:n,index:1};for(e=0;3>e;e+=1)f[e]=e;for(u=0,c=Math.pow(2,2),a=1;a!=c;)s=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=t(g.index++)),u|=(s>0?1:0)*a,a<<=1;switch(u){case 0:for(u=0,c=Math.pow(2,8),a=1;a!=c;)s=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=t(g.index++)),u|=(s>0?1:0)*a,a<<=1;p=r(u);break;case 1:for(u=0,c=Math.pow(2,16),a=1;a!=c;)s=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=t(g.index++)),u|=(s>0?1:0)*a,a<<=1;p=r(u);break;case 2:return""}for(f[3]=p,i=p,m.push(p);;){if(g.index>o)return"";for(u=0,c=Math.pow(2,h),a=1;a!=c;)s=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=t(g.index++)),u|=(s>0?1:0)*a,a<<=1;switch(p=u){case 0:for(u=0,c=Math.pow(2,8),a=1;a!=c;)s=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=t(g.index++)),u|=(s>0?1:0)*a,a<<=1;f[d++]=r(u),p=d-1,l--;break;case 1:for(u=0,c=Math.pow(2,16),a=1;a!=c;)s=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=t(g.index++)),u|=(s>0?1:0)*a,a<<=1;f[d++]=r(u),p=d-1,l--;break;case 2:return m.join("")}if(0==l&&(l=Math.pow(2,h),h++),f[p])v=f[p];else{if(p!==d)return null;v=i+i.charAt(0)}m.push(v),f[d++]=i+v.charAt(0),l--,i=v,0==l&&(l=Math.pow(2,h),h++)}}};return n}();
-
   const $ = id => document.getElementById(id);
   const uid = () => Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4);
   const toastEl = $("toast");
@@ -319,7 +318,6 @@
     const fontSize = Number(raw.fontSize) || 20;
     const image = String(raw.image || "");
     const audio = String(raw.audio || "");
-
     if (type === "text") {
       const accepts = Array.isArray(raw.accepts) ? raw.accepts.map(x=>String(x||"")) : [""];
       return { id: raw.id || uid(), type, prompt, accepts, font, fontSize, image, audio };
@@ -366,10 +364,10 @@
 
   function setCountPill(){ $("pillCount").textContent = String(Editor.questions.length); }
   function qSummary(q){ 
-      const p = String(q.prompt||"").trim(); 
+      const p = String(q.prompt||"").trim();
       let sub = q.type === "choice" ? "Выбор" : "Ввод текста";
       if (q.image || q.audio) sub += " (+ медиа)";
-      return { title: p.length > 52 ? p.slice(0,52)+"…" : p || "(пусто)", sub }; 
+      return { title: p.length > 52 ? p.slice(0,52)+"…" : p || "(пусто)", sub };
   }
 
   window.delQ = id => { Editor.questions = Editor.questions.filter(x=>x.id!==id); renderList(); updatePreview(false); toast("Удалено"); };
@@ -379,18 +377,10 @@
       if(Editor.questions.length >= 5) { toast("Максимум 5 вопросов!"); return; }
       const q = deepClone(Editor.questions[idx]); q.id = uid(); Editor.questions.splice(idx+1,0,q); renderList(); updatePreview(false); toast("Вопрос скопирован"); 
   };
-
   function renderList(){
     const list = $("qList"); list.innerHTML = ""; setCountPill();
-    
-    if(Editor.questions.length >= 5) {
-        $("btnAddQ").disabled = true;
-        $("btnAddQ").title = "Достигнут лимит (5 вопросов)";
-    } else {
-        $("btnAddQ").disabled = false;
-        $("btnAddQ").title = "";
-    }
-
+    if(Editor.questions.length >= 5) { $("btnAddQ").disabled = true; $("btnAddQ").title = "Достигнут лимит (5 вопросов)"; }
+    else { $("btnAddQ").disabled = false; $("btnAddQ").title = ""; }
     if(Editor.questions.length === 0){ list.innerHTML = '<div class="muted">Пока нет вопросов. Нажми «Добавить» и заполни викторину.</div>'; }
     else {
       list.innerHTML = Editor.questions.map((q,i)=>{ const s=qSummary(q); return `
@@ -404,27 +394,18 @@
           </div>
         </div>`; }).join('');
     }
-
     const sel = $("newQTemplate");
     if(sel){
         const val = sel.value;
         sel.innerHTML = '<option value="-1">Стандартные (по умолчанию)</option>';
-        Editor.questions.forEach((q, i) => {
-            sel.innerHTML += '<option value="' + i + '">Как в вопросе #' + (i+1) + '</option>';
-        });
-        if(val && Editor.questions[val]) sel.value = val;
-        else sel.value = "-1";
+        Editor.questions.forEach((q, i) => { sel.innerHTML += '<option value="' + i + '">Как в вопросе #' + (i+1) + '</option>'; });
+        if(val && Editor.questions[val]) sel.value = val; else sel.value = "-1";
     }
   }
 
   function showModal(){ $("modalBackdrop").style.display = 'block'; $("modalBackdrop").setAttribute('aria-hidden','false'); }
   function hideModal(){ $("modalBackdrop").style.display = 'none'; $("modalBackdrop").setAttribute('aria-hidden','true'); }
-
-  function syncModalType(){
-    const ty = $("selType").value;
-    $("choiceWrap").style.display = (ty==="choice") ? "block" : "none";
-    $("textWrap").style.display = (ty==="text") ? "block" : "none";
-  }
+  function syncModalType(){ const ty = $("selType").value; $("choiceWrap").style.display = (ty==="choice") ? "block" : "none"; $("textWrap").style.display = (ty==="text") ? "block" : "none"; }
 
   function renderChoiceUI(){
     const q = Editor.draft;
@@ -435,15 +416,7 @@
                      <input type="text" value="${escapeHtml(opt)}" placeholder="Вариант ${i+1}" />
                      <button class="btn small danger" type="button">✖</button>`;
       const chk=row.children[0], inp=row.children[1], del=row.children[2];
-      
-      chk.addEventListener('change',()=>{
-        if(chk.checked){
-          if(!q.correctIndices.includes(i)) q.correctIndices.push(i);
-        } else {
-          q.correctIndices = q.correctIndices.filter(x => x !== i);
-        }
-        renderChoiceUI();
-      });
+      chk.addEventListener('change',()=>{ if(chk.checked){ if(!q.correctIndices.includes(i)) q.correctIndices.push(i); } else { q.correctIndices = q.correctIndices.filter(x => x !== i); } renderChoiceUI(); });
       inp.addEventListener('input',()=>{ q.options[i]=inp.value; });
       del.addEventListener('click',()=>{
         q.options.splice(i,1);
@@ -465,11 +438,7 @@
                      <button class="btn small danger" type="button">✖</button>`;
       const inp=row.children[0], del=row.children[1];
       inp.addEventListener('input',()=>{ q.accepts[i]=inp.value; });
-      del.addEventListener('click',()=>{
-        q.accepts.splice(i,1);
-        if(q.accepts.length===0) q.accepts.push('');
-        renderTextUI();
-      });
+      del.addEventListener('click',()=>{ q.accepts.splice(i,1); if(q.accepts.length===0) q.accepts.push(''); renderTextUI(); });
       list.appendChild(row);
     });
   }
@@ -477,7 +446,6 @@
   function openModal(existing=null){
     Editor.editingId = existing?.id || null;
     let draft = existing ? deepClone(existing) : null;
-    
     if (!draft) {
        const tplIdx = parseInt($("newQTemplate") ? $("newQTemplate").value : "-1");
        if (tplIdx >= 0 && Editor.questions[tplIdx]) {
@@ -485,24 +453,18 @@
           draft = { type: tq.type, font: tq.font, fontSize: tq.fontSize };
           if (tq.type === 'choice') { draft.options = ["",""]; draft.correctIndices = [0]; }
           else { draft.accepts = [""]; }
-       } else {
-          draft = { type: 'choice', options:['',''], correctIndices:[0] };
-       }
+       } else { draft = { type: 'choice', options:['',''], correctIndices:[0] }; }
     }
-    
     Editor.draft = normalizeQuestion(draft);
     $("modalTitle").textContent = existing ? 'Редактировать вопрос' : 'Добавить вопрос';
-    
     $("selType").value = Editor.draft.type || "choice";
     $("inpPrompt").value = Editor.draft.prompt || '';
     if($("inpQFont")) $("inpQFont").value = Editor.draft.font || '';
     if($("inpQFontSize")) $("inpQFontSize").value = Editor.draft.fontSize || 20;
     if($("inpQImage")) $("inpQImage").value = Editor.draft.image || '';
     if($("inpQAudio")) $("inpQAudio").value = Editor.draft.audio || '';
-
     syncModalType();
     if(Editor.draft.type === "choice") renderChoiceUI(); else renderTextUI();
-    
     showModal(); setTimeout(()=>$("inpPrompt").focus(),40);
   }
 
@@ -560,243 +522,117 @@
 
   function buildPayload(previewWithDraft){ 
     readFormIntoEditor(); 
-    let questions = Editor.questions.map(normalizeQuestion); 
-    if(previewWithDraft && Editor.draft){ 
-        const d=normalizeQuestion(Editor.draft); 
-        if(questions.length===0) questions=[d]; else questions[0]=d; 
-    } 
-    return normalizeCfg({ 
-        title:Editor.title, titleFont:Editor.titleFont, titleFontSize:Editor.titleFontSize, useLatex:Editor.useLatex,
-        winText:Editor.winText, instruction:Editor.instruction, questions 
-    }); 
+    let questions = Editor.questions.map(normalizeQuestion);
+    if(previewWithDraft && Editor.draft){ const d=normalizeQuestion(Editor.draft); if(questions.length===0) questions=[d]; else questions[0]=d; } 
+    return normalizeCfg({ title:Editor.title, titleFont:Editor.titleFont, titleFontSize:Editor.titleFontSize, useLatex:Editor.useLatex, winText:Editor.winText, instruction:Editor.instruction, questions });
   }
 
   function updatePreview(previewWithDraft){ 
     const payload = buildPayload(previewWithDraft); 
     const data = encodeGameData(payload); 
-    
-    const maxLen=3500, curLen=data.length, pct=Math.min(100,(curLen/maxLen)*100); 
+    const maxLen=3500, curLen=data.length, pct=Math.min(100,(curLen/maxLen)*100);
     const bar=$("barSize"), lbl=$("lblSizeText"), warn=$("sizeWarning"); 
     bar.style.width=pct+'%'; 
     if(curLen < maxLen*.75){ bar.style.background='var(--ok)'; lbl.textContent='🟢 Код в норме'; lbl.style.color='var(--ok)'; warn.style.display='none'; } 
     else if(curLen <= maxLen){ bar.style.background='var(--neon)'; lbl.textContent='🟡 Код почти достиг лимита'; lbl.style.color='var(--neon)'; warn.style.display='none'; } 
     else { bar.style.background='var(--danger)'; lbl.textContent='🔴 ПРЕВЫШЕН ЛИМИТ'; lbl.style.color='var(--danger)'; warn.style.display='block'; }
-
-    const sTag = "<scr" + "ipt>";
-    const eTag = "</scr" + "ipt>";
-    
+    const sTag = "<scr" + "ipt>", eTag = "</scr" + "ipt>";
     let mathJaxHtml = '';
-    if (payload.useLatex) {
-        mathJaxHtml = sTag + 'window.MathJax = { tex: { inlineMath: [["$", "$"], ["\\\\\\\\(", "\\\\\\\\)"]] } };' + eTag + 
-                      sTag + ' id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">' + eTag;
-    }
-
-    const html = `<!doctype html>
-    <html lang="ru">
-    <head>
-      <meta charset="utf-8">
-      <style>body{margin:0;overflow:hidden;background:transparent;}</style>
-      ${mathJaxHtml}
-    </head>
-    <body>
-      <div id="gameRoot" style="width:100vw;height:100vh;"></div>
-      ${sTag}
-        const cfg = ${JSON.stringify(payload).replace(/</g, '\\u003c')};
-        (${runGame.toString()})(cfg, document.getElementById('gameRoot'));
-        ${previewWithDraft ? "setTimeout(()=>document.getElementById('start-btn')?.click(), 100);" : ""}
-      ${eTag}
-    </body>
-    </html>`;
-    
-    $("livePreview").removeAttribute('src'); 
-    $("livePreview").srcdoc = html; 
+    if (payload.useLatex) { mathJaxHtml = sTag + 'window.MathJax = { tex: { inlineMath: [["$", "$"], ["\\\\\\\\(", "\\\\\\\\)"]] } };' + eTag + sTag + ' id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">' + eTag; }
+    const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><style>body{margin:0;overflow:hidden;background:transparent;}</style>${mathJaxHtml}</head><body><div id="gameRoot" style="width:100vw;height:100vh;"></div>${sTag}const cfg = ${JSON.stringify(payload).replace(/</g, '\\u003c')};(${runGame.toString()})(cfg, document.getElementById('gameRoot'));${previewWithDraft ? "setTimeout(()=>document.getElementById('start-btn')?.click(), 100);" : ""}${eTag}</body></html>`;
+    $("livePreview").removeAttribute('src'); $("livePreview").srcdoc = html; 
   }
   
   let _previewTid=null; function debouncedPreview(){ clearTimeout(_previewTid); _previewTid=setTimeout(()=>updatePreview(false),300); }
 
   function initEditor(){
     fillFormFromEditor();
-    ["inpTitle", "inpTitleFont", "inpTitleFontSize", "chkUseLatex", "inpWinText", "inpInstruction", "inpInstColor", "chkInstGlow"]
-        .forEach(id=>$(id).addEventListener('input',debouncedPreview));
+    ["inpTitle", "inpTitleFont", "inpTitleFontSize", "chkUseLatex", "inpWinText", "inpInstruction", "inpInstColor", "chkInstGlow"].forEach(id=>$(id).addEventListener('input',debouncedPreview));
     $("chkUseLatex").addEventListener('change', debouncedPreview);
     $("chkInstGlow").addEventListener('change', debouncedPreview);
-    
-    $("btnAddQ").addEventListener('click',()=>{
-        if(Editor.questions.length >= 5) { toast("Достигнут лимит (5 вопросов)"); return; }
-        openModal(null);
-    });
-    
+    $("btnAddQ").addEventListener('click',()=>{ if(Editor.questions.length >= 5) { toast("Достигнут лимит (5 вопросов)"); return; } openModal(null); });
     $("btnClearQs").addEventListener('click',()=>{ Editor.questions=[]; renderList(); updatePreview(false); toast('Очищено'); });
     $("btnCloseModal").addEventListener('click',()=>{ Editor.draft=null; Editor.editingId=null; hideModal(); });
     $("modalBackdrop").addEventListener('click',e=>{ if(e.target === $("modalBackdrop")){ Editor.draft=null; Editor.editingId=null; hideModal(); } });
-    
     $("btnApplyAll").addEventListener("click", () => {
       if(Editor.questions.length === 0) return;
       const tplIdx = parseInt($("newQTemplate").value);
-      
-      if(!confirm("Применить настройки (шрифт, размер, ТИП вопроса) ко всем созданным вопросам?\\n(При смене типа вопроса ответы будут аккуратно сконвертированы)")) return;
-      
+      if(!confirm("Применить настройки (шрифт, размер, ТИП вопроса) ко всем созданным вопросам?")) return;
       let baseQ = { font: "", fontSize: 20, type: "choice" };
-      if (tplIdx >= 0 && Editor.questions[tplIdx]) {
-          const tq = Editor.questions[tplIdx];
-          baseQ = { font: tq.font, fontSize: tq.fontSize, type: tq.type };
-      }
-      
+      if (tplIdx >= 0 && Editor.questions[tplIdx]) { const tq = Editor.questions[tplIdx]; baseQ = { font: tq.font, fontSize: tq.fontSize, type: tq.type }; }
       Editor.questions.forEach(q => {
-          q.font = baseQ.font;
-          q.fontSize = baseQ.fontSize;
-
+          q.font = baseQ.font; q.fontSize = baseQ.fontSize;
           if (q.type !== baseQ.type) {
               q.type = baseQ.type;
-              if (q.type === 'choice') {
-                  let ans = (q.accepts && q.accepts.length > 0) ? q.accepts[0] : "";
-                  q.options = [ans, "Вариант 2"];
-                  q.correctIndices = [0];
-                  delete q.accepts;
-              } else {
-                  let ans = "";
-                  if (q.options && q.correctIndices && q.correctIndices.length > 0) {
-                      ans = q.options[q.correctIndices[0]] || "";
-                  }
-                  q.accepts = [ans];
-                  delete q.options;
-                  delete q.correctIndices;
-              }
+              if (q.type === 'choice') { let ans = (q.accepts && q.accepts.length > 0) ? q.accepts[0] : ""; q.options = [ans, "Вариант 2"]; q.correctIndices = [0]; delete q.accepts; }
+              else { let ans = ""; if (q.options && q.correctIndices && q.correctIndices.length > 0) { ans = q.options[q.correctIndices[0]] || ""; } q.accepts = [ans]; delete q.options; delete q.correctIndices; }
           }
       });
-      renderList();
-      updatePreview(false);
-      toast("Настройки применены!");
+      renderList(); updatePreview(false); toast("Настройки применены!");
     });
-
-    $("selType").addEventListener("change", ()=>{
-      const q = Editor.draft; if(!q) return;
-      q.type = $("selType").value; syncModalType();
-      if(q.type === "choice"){ q.options = q.options || ["",""]; q.correctIndices = q.correctIndices || [0]; renderChoiceUI(); }
-      else { q.accepts = q.accepts || [""]; renderTextUI(); }
-    });
+    $("selType").addEventListener("change", ()=>{ const q = Editor.draft; if(!q) return; q.type = $("selType").value; syncModalType(); if(q.type === "choice"){ q.options = q.options || ["",""]; q.correctIndices = q.correctIndices || [0]; renderChoiceUI(); } else { q.accepts = q.accepts || [""]; renderTextUI(); } });
     $("btnClearImage").addEventListener("click", () => { $("inpQImage").value = ""; });
     $("btnClearAudio").addEventListener("click", () => { $("inpQAudio").value = ""; });
     $("btnAddChoice").addEventListener("click", ()=>{ const q = Editor.draft; if(!q) return; q.options = q.options || ["",""]; q.options.push(""); renderChoiceUI(); });
     $("btnAddText").addEventListener("click", ()=>{ const q = Editor.draft; if(!q) return; q.accepts = q.accepts || [""]; q.accepts.push(""); renderTextUI(); });
-    
     $("inpPrompt").addEventListener('input',()=>{ if(Editor.draft) Editor.draft.prompt = $("inpPrompt").value; });
     $("btnPreviewDraft").addEventListener('click',()=>{ getDraftFromModal(); updatePreview(true); toast('Черновик показан'); });
-    
     $("btnSaveQ").addEventListener('click',()=>{
       const q=getDraftFromModal(); const err=validateQuestion(q); if(err){ toast(err); return; }
       if(Editor.editingId){ const idx=Editor.questions.findIndex(x=>x.id===Editor.editingId); if(idx>=0) Editor.questions[idx]=deepClone(q); }
       else Editor.questions.push(deepClone(q));
       Editor.draft=null; Editor.editingId=null; hideModal(); renderList(); updatePreview(false); toast('Сохранено');
     });
-    $("btnCopyCode").addEventListener('click', async()=>{ 
-      const payload=buildPayload(false); 
-      const iframeCode=buildIframeFromUrl(buildGameUrl(payload)); 
-      const ok=await copyToClipboard(iframeCode); 
-      toast(ok ? 'Скопировано ✅' : 'Не удалось скопировать'); 
-    });
+    $("btnCopyCode").addEventListener('click', async()=>{ const payload=buildPayload(false); const iframeCode=buildIframeFromUrl(buildGameUrl(payload)); const ok=await copyToClipboard(iframeCode); toast(ok ? 'Скопировано ✅' : 'Не удалось скопировать'); });
     $("btnResetAll").addEventListener('click',()=>{ Object.assign(Editor, deepClone(DEFAULT_CFG)); Editor.questions=[]; Editor.draft=null; Editor.editingId=null; fillFormFromEditor(); renderList(); updatePreview(false); toast('Сброшено'); });
     renderList(); updatePreview(false);
   }
 
   function runGame(cfg, mount){
-    const sTag = "<scr" + "ipt>";
-    const eTag = "</scr" + "ipt>";
+    const sTag = "<scr" + "ipt>", eTag = "</scr" + "ipt>";
     let mathJaxHtml = '';
-    if (cfg.useLatex) {
-        mathJaxHtml = sTag + 'window.MathJax = { tex: { inlineMath: [["$", "$"], ["\\\\(", "\\\\)"]] } };' + eTag +
-                      sTag + ' id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">' + eTag;
-    }
-
-    const startColor = cfg.instruction?.color || '#ffb703';
-    const startGlow = cfg.instruction?.glow !== false;
+    if (cfg.useLatex) { mathJaxHtml = sTag + 'window.MathJax = { tex: { inlineMath: [["$", "$"], ["\\\\(", "\\\\)"]] } };' + eTag + sTag + ' id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">' + eTag; }
+    const startColor = cfg.instruction?.color || '#ffb703', startGlow = cfg.instruction?.glow !== false;
     const boxGlowStyle = startGlow ? `0 0 20px ${startColor}, inset 0 0 10px ${startColor}` : `0 18px 60px rgba(0,0,0,.38)`;
-
     mount.innerHTML = mathJaxHtml + `
       <style>
         html,body{height:100%;margin:0;overflow:hidden;font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;background:transparent;}
         #game-wrapper { position: absolute; inset: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
         #game-container{position:relative;width:100%;height:100%;aspect-ratio:16/9;max-width:100%;max-height:100%;background-size:100% 100%;background-position:center;background-repeat:no-repeat;}
-        
         #start-screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center, rgba(0,0,0,.25), rgba(0,0,0,.65));z-index:120}
         #start-card{width:min(720px, 90%);background:rgba(20,22,30,.82);border:1px solid ${startColor};border-radius:24px;box-shadow:${boxGlowStyle};padding:22px;text-align:center;color:#fff}
         #start-card h1{margin:0 0 8px;font-size:${cfg.titleFontSize || 30}px; font-family:${cfg.titleFont || 'inherit'};} #start-card p{font-size:18px;line-height:1.45;opacity:.95;white-space:pre-line}
         #start-btn{padding:12px 18px;border-radius:14px;border:1px solid rgba(255,183,3,.55);background:linear-gradient(90deg, rgba(255,183,3,.34), rgba(255,140,0,.25));color:#fff;font-weight:900;cursor:pointer;margin-top:15px}
-        
-        #quiz-panel { position:absolute; left:25%; top:25%; transform:translate(-50%,-50%); background:rgba(255,255,255,.95); padding:25px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,.3); width:320px; text-align:center; z-index:50; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; overflow: visible; max-height: 95%; max-width: 90%; }
-        
-        /* СОСТОЯНИЕ ЧЕРНОВИКА (СТРОГО В % ЧТОБЫ НЕ ВЫЛЕТАЛО ЗА РАМКИ GENIALLY) */
+        #quiz-panel { position:absolute; left:25%; top:25%; transform:translate(-50%,-50%); background:rgba(255,255,255,.95); padding:25px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,.3); width:320px; text-align:center; z-index:50; transition: all 0.4s; display: flex; flex-direction: column; overflow: visible; max-height: 95%; max-width: 90%; }
         #quiz-panel.draw-mode { width: 95% !important; max-width: 1000px !important; height: 95% !important; max-height: 600px !important; left: 50% !important; top: 50% !important; flex-direction: row; gap: 30px; align-items: stretch; text-align: left; padding: 20px !important; }
-        
         #q-content-wrap { width: 100%; flex-shrink: 0; display: flex; flex-direction: column; transition: width 0.4s; overflow-y: auto; align-items: center; max-height: 100%; }
         #q-content-wrap::-webkit-scrollbar { width: 4px; }
         #quiz-panel.draw-mode #q-content-wrap { width: 350px; align-items: flex-start; padding-right: 10px; }
         #quiz-panel.draw-mode #options-container, #quiz-panel.draw-mode #input-container { display: none !important; }
-        
-        /* КНОПКА КАРАНДАША СТРОГО ВНУТРИ ПАНЕЛИ */
-        #draw-toggle { 
-            position: absolute; 
-            top: 10px; 
-            right: 10px; 
-            font-size: 20px; 
-            background: #ffffff; 
-            border: 2px solid #ccc; 
-            border-radius: 50%; 
-            width: 40px; 
-            height: 40px; 
-            cursor: pointer; 
-            z-index: 60; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            transition: 0.3s; 
-            padding: 0; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-        }
+        #draw-toggle { position: absolute; bottom: 10px; right: 10px; font-size: 20px; background: #ffffff; border: 2px solid #ccc; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; z-index: 60; display: flex; align-items: center; justify-content: center; transition: 0.3s; padding: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         #draw-toggle:hover { transform: scale(1.1); border-color: ${startColor}; }
         #quiz-panel.draw-mode #draw-toggle { display: none !important; }
-
         #draw-area { display: none; flex: 1; min-height: 150px; border-radius: 16px; border: 3px solid ${startColor}; background-color: #fdfdfc; background-image: linear-gradient(#b0d4e3 1px, transparent 1px), linear-gradient(90deg, #b0d4e3 1px, transparent 1px); background-size: 25px 25px; position: relative; z-index: 10; box-shadow: inset 0 0 20px rgba(0,0,0,0.1); overflow: hidden; }
         #quiz-panel.draw-mode #draw-area { display: block; animation: drawAreaFade 0.4s ease forwards; }
         @keyframes drawAreaFade { 0% {opacity:0; transform:scale(0.95);} 100% {opacity:1; transform:scale(1);} }
         #gCanvas { width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
-        
         .draw-tools-panel { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); padding: 6px 14px; border-radius: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; z-index: 15; border: 1px solid rgba(0,0,0,0.1); user-select: none; flex-wrap: wrap; justify-content: center; width: max-content; max-width: 95%; }
-        @media (max-width: 600px) { .draw-tools-panel { padding: 4px 8px; gap: 6px; width: 95%; justify-content: space-evenly; } }
-        .tool-group { display: flex; align-items: center; gap: 4px; }
-        .tool-sep { width: 1px; height: 20px; background: #ccc; }
         .d-tool { background: transparent; border: none; font-size: 18px; cursor: pointer; padding: 4px; border-radius: 8px; transition: 0.2s; filter: grayscale(1); opacity: 0.6; display: flex; align-items: center; justify-content: center; }
         .d-tool.active { background: rgba(255,183,3,0.3); filter: grayscale(0); opacity: 1; }
-        .d-tool:hover { background: rgba(0,0,0,0.05); }
         .d-color { width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); padding:0; margin:0 2px; }
         .d-color.active { transform: scale(1.2); border-color: #000; }
         .d-size { width: 26px; height: 26px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; padding:0; }
         .d-size span { background: #333; border-radius: 50%; display: block; }
-        .d-size.active { background: rgba(0,0,0,0.1); }
-        .d-size:hover { background: rgba(0,0,0,0.05); }
-
-        @media (max-width: 800px) {
-            #quiz-panel.draw-mode { flex-direction: column; }
-            #quiz-panel.draw-mode #q-content-wrap { width: 100%; height: auto; flex-shrink: 1; align-items: center; }
-        }
-        
-        #q-media img{max-width:100%;max-height:160px;border-radius:12px;display:block;margin:0 auto 10px;}
+        #q-media img{max-width:100%;max-height:160px;border-radius:12px;display:block;margin:10px auto;}
         #q-media audio{width:100%;margin-bottom:10px;height:36px;border-radius:12px;}
-        #question-text{font-size:22px;font-weight:bold;margin-bottom:20px;color:#333;white-space:pre-wrap;width:100%;padding-right:35px;}
-        #options-container { width: 100%; }
+        #question-text{font-size:22px;font-weight:bold;margin-bottom:10px;color:#333;white-space:pre-wrap;width:100%;padding: 0 10px;}
         .option-btn{display:block;width:100%;margin:10px 0;padding:12px;font-size:18px;font-weight:bold;border:none;border-radius:10px;background:#ff7e67;color:white;cursor:pointer;transition:.2s;box-shadow:0 4px 6px rgba(0,0,0,.1)}
-        .option-btn:hover{background:#ff5a3d;transform:translateY(-2px)} .option-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;box-shadow:none}
-        #input-container{display:none;margin-top:10px; width: 100%;}
         #ans-input{width:100%;padding:10px;font-size:18px;border-radius:10px;border:2px solid #ccc;outline:none;}
-        #ans-input:focus{border-color:#ff7e67;}
-        #feedback-text{margin-top:15px;font-size:18px;font-weight:bold;min-height:24px} .text-wrong{color:#d9381e}.text-correct{color:#28a745}
         #win-message{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;font-weight:bold;color:#ffca3a;text-shadow:4px 4px 0 #ff595e,8px 8px 15px rgba(0,0,0,.5);display:none;z-index:100;text-transform:uppercase;text-align:center;padding:0 20px; font-family:${cfg.titleFont || 'inherit'};}
         #piniata-wrapper{position:absolute;width:24.5%;left:68.35%;top:54.6%;transform:translate(-50%,-50%);z-index:10}
-        .piniata-image{width:100%;height:auto;display:block;transform-origin:50% 0%;cursor:pointer;filter:drop-shadow(0 10px 15px rgba(0,0,0,.3))}
+        .piniata-image{width:100%;height:auto;display:block;transform-origin:50% 0%;cursor:pointer;}
         .swing{animation:swingAnim 4s ease-in-out infinite} @keyframes swingAnim{0%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}100%{transform:rotate(-6deg)}}
-        .hit-anim{animation:hitAnim .2s ease-out} @keyframes hitAnim{0%{transform:scale(1) rotate(0deg)}50%{transform:scale(.9) rotate(15deg) translateY(-10px)}100%{transform:scale(1) rotate(0deg)}}
         .confetti{position:absolute;top:-20px;z-index:90;animation:fall linear forwards} @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
-        @media (max-width:980px){#quiz-panel:not(.draw-mode){width:min(92%,420px)}#win-message{font-size:50px}}
       </style>
       <div id="game-wrapper">
         <div id="game-container">
@@ -804,21 +640,18 @@
           <div id="quiz-panel" style="display:none">
               <button id="draw-toggle" title="Черновик">✏️</button>
               <div id="q-content-wrap">
-                  <div id="q-media"></div>
                   <div id="question-text">Вопрос загружается...</div>
+                  <div id="q-media"></div>
                   <div id="options-container"></div>
-                  <div id="input-container">
+                  <div id="input-container" style="display:none; width:100%;">
                      <input type="text" id="ans-input" placeholder="Введите ответ...">
                      <button id="ans-submit" class="option-btn" style="margin-top:10px;">ОК</button>
                   </div>
-                  <div id="feedback-text"></div>
+                  <div id="feedback-text" style="margin-top:15px; font-weight:bold; min-height:24px;"></div>
               </div>
               <div id="draw-area">
                 <div class="draw-tools-panel">
-                   <div class="tool-group">
-                       <button id="d-pen" class="d-tool active" title="Ручка">🖊️</button>
-                       <button id="d-eraser" class="d-tool" title="Ластик">🧽</button>
-                   </div>
+                   <div class="tool-group"><button id="d-pen" class="d-tool active">🖊️</button><button id="d-eraser" class="d-tool">🧽</button></div>
                    <div class="tool-sep"></div>
                    <div class="tool-group">
                        <button class="d-color active" data-color="#0f4c81" style="background:#0f4c81;"></button>
@@ -828,344 +661,84 @@
                    </div>
                    <div class="tool-sep"></div>
                    <div class="tool-group">
-                       <button class="d-size" data-size="2" title="Тонко"><span style="width:4px;height:4px;"></span></button>
-                       <button class="d-size active" data-size="4" title="Средне"><span style="width:8px;height:8px;"></span></button>
-                       <button class="d-size" data-size="8" title="Толсто"><span style="width:14px;height:14px;"></span></button>
+                       <button class="d-size" data-size="2"><span style="width:4px;height:4px;"></span></button>
+                       <button class="d-size active" data-size="4"><span style="width:8px;height:8px;"></span></button>
+                       <button class="d-size" data-size="8"><span style="width:14px;height:14px;"></span></button>
                    </div>
                    <div class="tool-sep"></div>
-                   <button id="d-clear" class="btn small" style="padding:4px 8px; font-size:12px; margin:0; border-radius:10px; background:#ddd; color:#333; border:none; font-weight:bold;">🗑 Очистить</button>
-                   <button id="d-close" class="btn small danger" style="padding:4px 8px; font-size:12px; margin:0; border-radius:10px; background:#ff4d4d; color:#fff; border:none; font-weight:bold;">✖ Закрыть</button>
+                   <button id="d-clear" class="btn small" style="background:#ddd; color:#333;">🗑 Очистить</button>
+                   <button id="d-close" class="btn small danger">✖ Закрыть</button>
                 </div>
                 <canvas id="gCanvas"></canvas>
               </div>
           </div>
           <div id="win-message"></div>
           <div id="piniata-wrapper"><img class="piniata-image swing" id="piniata-img" src="" alt="Пиньята"></div>
-          <a href="https://t.me/interactiv_matematika" target="_blank" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;opacity:.65;pointer-events:auto;z-index:130;text-decoration:none;transition:opacity .3s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.65" title="Перейти в Telegram-канал">
-            <img src="logo.png" alt="Логотип" style="height:26px;width:26px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,174,0,.4);box-shadow:0 0 8px rgba(255,174,0,.35)" onerror="this.style.display='none'">
-            <span style="font-family:'Caveat',cursive;font-size:20px;color:rgba(0,0,0,.85);text-shadow:0 1px 2px rgba(255,255,255,.35);white-space:nowrap;letter-spacing:.5px">Шкатулка математических интерактивов</span>
+          <a href="https://t.me/interactiv_matematika" target="_blank" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;opacity:.65;z-index:130;text-decoration:none;">
+            <img src="logo.png" alt="Логотип" style="height:26px;width:26px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,174,0,.4);">
+            <span style="font-family:'Caveat',cursive;font-size:20px;color:rgba(0,0,0,.85);">Шкатулка математических интерактивов</span>
           </a>
         </div>
       </div>`;
-
-    const gameContainer = mount.querySelector('#game-container');
-    const startScreen = mount.querySelector('#start-screen');
-    const startTitle = mount.querySelector('#start-card h1');
-    const startText = mount.querySelector('#start-card p');
-    const startBtn = mount.querySelector('#start-btn');
-    const quizPanel = mount.querySelector('#quiz-panel');
-    const qMedia = mount.querySelector('#q-media');
-    const questionText = mount.querySelector('#question-text');
-    const optionsContainer = mount.querySelector('#options-container');
-    const inputContainer = mount.querySelector('#input-container');
-    const ansInput = mount.querySelector('#ans-input');
-    const ansSubmit = mount.querySelector('#ans-submit');
-    const feedbackText = mount.querySelector('#feedback-text');
-    const winMessage = mount.querySelector('#win-message');
-    const piniataImg = mount.querySelector('#piniata-img');
-
-    // === ЛОГИКА ЧЕРНОВИКА ===
-    const drawToggle = mount.querySelector('#draw-toggle');
-    const drawClose = mount.querySelector('#d-close');
-    const drawArea = mount.querySelector('#draw-area');
-    const canvas = mount.querySelector('#gCanvas');
-    const ctxCanvas = canvas.getContext('2d');
-    
-    function toggleDrawMode() {
-        quizPanel.classList.toggle('draw-mode');
-        if(quizPanel.classList.contains('draw-mode')) { setTimeout(resizeCanvas, 10); }
-    }
-    
-    drawToggle.addEventListener('click', toggleDrawMode);
-    drawClose.addEventListener('click', toggleDrawMode);
-
-    let isDrawing = false, currentTool = 'pen', currentColor = '#0f4c81', currentSize = 4;
-    let canvasRect = null, dpr = 1, pts = [];
-
-    function resizeCanvas() {
-        if (!drawArea.offsetWidth) return;
-        const rect = drawArea.getBoundingClientRect();
-        dpr = window.devicePixelRatio || 1;
-        const newW = Math.round(rect.width * dpr);
-        const newH = Math.round(rect.height * dpr);
-        if(canvas.width !== newW || canvas.height !== newH) {
-            let tempCanvas = null;
-            if (canvas.width > 0 && canvas.height > 0) {
-                tempCanvas = document.createElement('canvas');
-                tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
-                tempCanvas.getContext('2d').drawImage(canvas, 0, 0);
-            }
-            canvas.width = newW; canvas.height = newH;
-            ctxCanvas.setTransform(dpr, 0, 0, dpr, 0, 0);
-            if (tempCanvas) {
-                ctxCanvas.save(); ctxCanvas.setTransform(1, 0, 0, 1, 0, 0);
-                ctxCanvas.drawImage(tempCanvas, 0, 0); ctxCanvas.restore();
-            }
-        }
-        canvas.style.width = rect.width + 'px'; canvas.style.height = rect.height + 'px';
-        canvasRect = rect; 
-    }
-    
-    const drawResizeObs = new ResizeObserver(() => { if(drawArea.offsetWidth > 0) resizeCanvas(); });
-    drawResizeObs.observe(drawArea);
-    
-    function getPointerPos(e) {
-        if(!canvasRect) canvasRect = canvas.getBoundingClientRect();
-        return { x: e.clientX - canvasRect.left, y: e.clientY - canvasRect.top };
-    }
-    
-    const btnPen = mount.querySelector('#d-pen'), btnEraser = mount.querySelector('#d-eraser');
-    const colorBtns = mount.querySelectorAll('.d-color'), sizeBtns = mount.querySelectorAll('.d-size');
-    const btnClear = mount.querySelector('#d-clear');
-
+    const gameContainer = mount.querySelector('#game-container'), startScreen = mount.querySelector('#start-screen');
+    const startTitle = mount.querySelector('#start-card h1'), startText = mount.querySelector('#start-card p'), startBtn = mount.querySelector('#start-btn');
+    const quizPanel = mount.querySelector('#quiz-panel'), qMedia = mount.querySelector('#q-media'), questionText = mount.querySelector('#question-text');
+    const optionsContainer = mount.querySelector('#options-container'), inputContainer = mount.querySelector('#input-container'), ansInput = mount.querySelector('#ans-input'), ansSubmit = mount.querySelector('#ans-submit'), feedbackText = mount.querySelector('#feedback-text');
+    const winMessage = mount.querySelector('#win-message'), piniataImg = mount.querySelector('#piniata-img'), drawToggle = mount.querySelector('#draw-toggle'), drawClose = mount.querySelector('#d-close'), drawArea = mount.querySelector('#draw-area'), canvas = mount.querySelector('#gCanvas'), ctxCanvas = canvas.getContext('2d');
+    function toggleDrawMode() { quizPanel.classList.toggle('draw-mode'); if(quizPanel.classList.contains('draw-mode')) { setTimeout(resizeCanvas, 10); } }
+    drawToggle.addEventListener('click', toggleDrawMode); drawClose.addEventListener('click', toggleDrawMode);
+    let isDrawing = false, currentTool = 'pen', currentColor = '#0f4c81', currentSize = 4, canvasRect = null, dpr = 1, pts = [];
+    function resizeCanvas() { if (!drawArea.offsetWidth) return; const rect = drawArea.getBoundingClientRect(); dpr = window.devicePixelRatio || 1; canvas.width = Math.round(rect.width * dpr); canvas.height = Math.round(rect.height * dpr); ctxCanvas.setTransform(dpr, 0, 0, dpr, 0, 0); canvas.style.width = rect.width + 'px'; canvas.style.height = rect.height + 'px'; canvasRect = rect; }
+    new ResizeObserver(() => { if(drawArea.offsetWidth > 0) resizeCanvas(); }).observe(drawArea);
+    function getPointerPos(e) { if(!canvasRect) canvasRect = canvas.getBoundingClientRect(); return { x: e.clientX - canvasRect.left, y: e.clientY - canvasRect.top }; }
+    const btnPen = mount.querySelector('#d-pen'), btnEraser = mount.querySelector('#d-eraser'), colorBtns = mount.querySelectorAll('.d-color'), sizeBtns = mount.querySelectorAll('.d-size'), btnClear = mount.querySelector('#d-clear');
     if(btnPen) btnPen.onclick = () => { currentTool = 'pen'; btnPen.classList.add('active'); btnEraser.classList.remove('active'); canvas.style.cursor = 'crosshair'; };
     if(btnEraser) btnEraser.onclick = () => { currentTool = 'eraser'; btnEraser.classList.add('active'); btnPen.classList.remove('active'); canvas.style.cursor = 'cell'; };
     colorBtns.forEach(btn => btn.onclick = () => { colorBtns.forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentColor = btn.dataset.color; if(currentTool === 'eraser') btnPen.click(); });
     sizeBtns.forEach(btn => btn.onclick = () => { sizeBtns.forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentSize = Number(btn.dataset.size); });
-    
-    const startDraw = (e) => {
-        if(e.target.closest('.draw-tools-panel')) return;
-        isDrawing = true; canvas.setPointerCapture(e.pointerId); canvasRect = canvas.getBoundingClientRect();
-        ctxCanvas.lineCap = 'round'; ctxCanvas.lineJoin = 'round';
-        ctxCanvas.lineWidth = currentTool === 'eraser' ? currentSize * 4 : currentSize;
-        ctxCanvas.strokeStyle = currentTool === 'eraser' ? 'rgba(0,0,0,1)' : currentColor;
-        ctxCanvas.fillStyle = ctxCanvas.strokeStyle;
-        ctxCanvas.globalCompositeOperation = currentTool === 'eraser' ? 'destination-out' : 'source-over';
-        pts = [getPointerPos(e)];
-        ctxCanvas.beginPath(); ctxCanvas.arc(pts[0].x, pts[0].y, ctxCanvas.lineWidth / 2, 0, Math.PI * 2); ctxCanvas.fill();
-    };
-    
-    const draw = (e) => {
-        if (!isDrawing) return;
-        if(e.cancelable) e.preventDefault();
-        const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
-        for (let ev of events) {
-            pts.push(getPointerPos(ev));
-            ctxCanvas.beginPath();
-            if (pts.length >= 3) {
-                let p0 = pts[pts.length - 3], p1 = pts[pts.length - 2], p2 = pts[pts.length - 1];
-                let mid1 = { x: (p0.x + p1.x) / 2, y: (p0.y + p1.y) / 2 };
-                let mid2 = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
-                ctxCanvas.moveTo(mid1.x, mid1.y); ctxCanvas.quadraticCurveTo(p1.x, p1.y, mid2.x, mid2.y); ctxCanvas.stroke();
-            } else if (pts.length === 2) {
-                ctxCanvas.moveTo(pts[0].x, pts[0].y); ctxCanvas.lineTo(pts[1].x, pts[1].y); ctxCanvas.stroke();
-            }
-        }
-    };
-    
+    const startDraw = (e) => { if(e.target.closest('.draw-tools-panel')) return; isDrawing = true; canvas.setPointerCapture(e.pointerId); ctxCanvas.lineCap = 'round'; ctxCanvas.lineJoin = 'round'; ctxCanvas.lineWidth = currentTool === 'eraser' ? currentSize * 4 : currentSize; ctxCanvas.strokeStyle = currentTool === 'eraser' ? 'rgba(0,0,0,1)' : currentColor; ctxCanvas.fillStyle = ctxCanvas.strokeStyle; ctxCanvas.globalCompositeOperation = currentTool === 'eraser' ? 'destination-out' : 'source-over'; pts = [getPointerPos(e)]; ctxCanvas.beginPath(); ctxCanvas.arc(pts[0].x, pts[0].y, ctxCanvas.lineWidth / 2, 0, Math.PI * 2); ctxCanvas.fill(); };
+    const draw = (e) => { if (!isDrawing) return; if(e.cancelable) e.preventDefault(); const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e]; for (let ev of events) { pts.push(getPointerPos(ev)); ctxCanvas.beginPath(); if (pts.length >= 3) { let p0 = pts[pts.length - 3], p1 = pts[pts.length - 2], p2 = pts[pts.length - 1]; let mid1 = { x: (p0.x + p1.x) / 2, y: (p0.y + p1.y) / 2 }; let mid2 = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 }; ctxCanvas.moveTo(mid1.x, mid1.y); ctxCanvas.quadraticCurveTo(p1.x, p1.y, mid2.x, mid2.y); ctxCanvas.stroke(); } else if (pts.length === 2) { ctxCanvas.moveTo(pts[0].x, pts[0].y); ctxCanvas.lineTo(pts[1].x, pts[1].y); ctxCanvas.stroke(); } } };
     const stopDraw = (e) => { if (isDrawing) { isDrawing = false; pts = []; try { canvas.releasePointerCapture(e.pointerId); } catch(err){} } };
-    
-    canvas.addEventListener('pointerdown', startDraw);
-    canvas.addEventListener('pointermove', draw, {passive: false});
-    canvas.addEventListener('pointerup', stopDraw);
-    canvas.addEventListener('pointercancel', stopDraw);
-    
-    function clearCanvas() {
-        if(!canvasRect) return;
-        ctxCanvas.save(); ctxCanvas.setTransform(1, 0, 0, 1, 0, 0); ctxCanvas.clearRect(0, 0, canvas.width, canvas.height); ctxCanvas.restore();
-    }
-    btnClear.onclick = clearCanvas;
-    // ========================
-
-    const questions = (cfg.questions || []).map(q => ({ 
-        type: q.type || 'choice',
-        q: q.prompt, 
-        options: q.options || [], 
-        correctIndices: q.correctIndices || [q.correctIndex || 0],
-        accepts: q.accepts || [],
-        font: q.font || '',
-        fontSize: q.fontSize || 20,
-        image: q.image || '',
-        audio: q.audio || ''
-    }));
-    
+    canvas.addEventListener('pointerdown', startDraw); canvas.addEventListener('pointermove', draw, {passive: false}); canvas.addEventListener('pointerup', stopDraw); canvas.addEventListener('pointercancel', stopDraw);
+    btnClear.onclick = () => { ctxCanvas.save(); ctxCanvas.setTransform(1, 0, 0, 1, 0, 0); ctxCanvas.clearRect(0, 0, canvas.width, canvas.height); ctxCanvas.restore(); };
+    const questions = (cfg.questions || []).map(q => ({ type: q.type || 'choice', q: q.prompt, options: q.options || [], correctIndices: q.correctIndices || [0], accepts: q.accepts || [], font: q.font || '', fontSize: q.fontSize || 20, image: q.image || '', audio: q.audio || '' }));
     const images = ['1.png','2.png','112.png','3.png','4.png','5.png'];
     let currentStage = 0, canHit = false, audioCtx = null;
-
     gameContainer.style.backgroundImage = "url('bg (2).png')";
-    startTitle.textContent = cfg.title || 'Пиньята знаний';
-    startText.textContent = cfg.instruction?.text || 'Ответь на вопрос правильно, а потом ударь по пиньяте.';
-    winMessage.textContent = cfg.winText || 'Молодец!';
-    piniataImg.src = '1.png';
-
-    function playCrackSound(){
-      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if(audioCtx.state === 'suspended') audioCtx.resume();
-      const t = audioCtx.currentTime;
-      
-      const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.15, audioCtx.sampleRate);
-      const data = buf.getChannelData(0);
-      for(let i=0; i<data.length; i++) data[i] = Math.random() * 2 - 1;
-      const noise = audioCtx.createBufferSource();
-      noise.buffer = buf;
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'highpass';
-      filter.frequency.value = 1500;
-      const gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(0.8, t);
-      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
-      noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
-      noise.start(t);
-      
-      const osc = audioCtx.createOscillator();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(400, t);
-      osc.frequency.exponentialRampToValueAtTime(50, t + 0.08);
-      const oscGain = audioCtx.createGain();
-      oscGain.gain.setValueAtTime(0.8, t);
-      oscGain.gain.exponentialRampToValueAtTime(0.01, t + 0.08);
-      osc.connect(oscGain); oscGain.connect(audioCtx.destination);
-      osc.start(t); osc.stop(t+0.1);
-    }
-
-    function playCorrect(){
-      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if(audioCtx.state === 'suspended') audioCtx.resume();
-      const t = audioCtx.currentTime;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(420, t);
-      osc.frequency.exponentialRampToValueAtTime(780, t + 0.12);
-      gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.exponentialRampToValueAtTime(0.20, t + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(t); osc.stop(t + 0.2);
-    }
-
-    function playWrong(){
-      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if(audioCtx.state === 'suspended') audioCtx.resume();
-      const t = audioCtx.currentTime;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = "sawtooth";
-      osc.frequency.setValueAtTime(150, t);
-      osc.frequency.exponentialRampToValueAtTime(80, t + 0.2);
-      gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.exponentialRampToValueAtTime(0.20, t + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(t); osc.stop(t + 0.2);
-    }
-
-    function launchConfetti(){
-      const colors=['#ff595e','#ffca3a','#8ac926','#1982c4','#6a4c93','#ff924c'];
-      for(let i=0;i<120;i++){
-        const piece=document.createElement('div'); piece.className='confetti';
-        const size = 8 + Math.random()*10; piece.style.width=size+'px'; piece.style.height=(size*1.5)+'px'; piece.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];
-        piece.style.left=Math.random()*100+'vw'; piece.style.animationDuration=(Math.random()*3+2)+'s'; piece.style.animationDelay=(Math.random()*1.5)+'s';
-        mount.appendChild(piece);
-      }
-    }
-
-    function renderMath() {
-        if(window.MathJax && window.MathJax.typesetPromise) {
-            window.MathJax.typesetPromise([quizPanel]).catch((err)=>console.log('MathJax error:', err));
-        }
-    }
-
+    startTitle.textContent = cfg.title || 'Пиньята знаний'; startText.textContent = cfg.instruction?.text || ''; winMessage.textContent = cfg.winText || 'Молодец!'; piniataImg.src = '1.png';
+    function playSnd(type){ if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state === 'suspended') audioCtx.resume(); const t = audioCtx.currentTime; const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); if(type==='correct'){ osc.type="triangle"; osc.frequency.setValueAtTime(420, t); osc.frequency.exponentialRampToValueAtTime(780, t + 0.12); gain.gain.setValueAtTime(0.2, t); } else { osc.type="sawtooth"; osc.frequency.setValueAtTime(150, t); osc.frequency.exponentialRampToValueAtTime(80, t + 0.2); gain.gain.setValueAtTime(0.2, t); } gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.2); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(t); osc.stop(t + 0.2); }
     function loadQuestion(){
       if(currentStage >= questions.length) return;
-      
-      // Сброс и закрытие черновика при новом вопросе
-      quizPanel.classList.remove('draw-mode');
-      if(btnPen) btnPen.click();
-      clearCanvas();
-
-      const currentQ = questions[currentStage];
-      
-      questionText.innerHTML = currentQ.q; 
+      quizPanel.classList.remove('draw-mode'); clearCanvas();
+      const currentQ = questions[currentStage]; questionText.innerHTML = currentQ.q; 
       if(currentQ.font) questionText.style.fontFamily = currentQ.font;
-      if(currentQ.fontSize) questionText.style.fontSize = currentQ.fontSize + 'px';
-      else questionText.style.fontSize = '';
-      
+      questionText.style.fontSize = currentQ.fontSize ? currentQ.fontSize + 'px' : '';
       qMedia.innerHTML = '';
-      if(currentQ.image) {
-          const img = document.createElement('img'); img.src = currentQ.image; qMedia.appendChild(img);
-      }
-      if(currentQ.audio) {
-          const aud = document.createElement('audio'); aud.src = currentQ.audio; aud.controls = true; qMedia.appendChild(aud);
-      }
-
-      optionsContainer.innerHTML=''; feedbackText.innerText=''; feedbackText.className=''; canHit=false;
-      
+      if(currentQ.image) { const img = document.createElement('img'); img.src = currentQ.image; qMedia.appendChild(img); }
+      if(currentQ.audio) { const aud = document.createElement('audio'); aud.src = currentQ.audio; aud.controls = true; qMedia.appendChild(aud); }
+      optionsContainer.innerHTML=''; feedbackText.innerText=''; canHit=false;
       if(currentQ.type === 'text') {
-          optionsContainer.style.display = 'none';
-          inputContainer.style.display = 'block';
-          ansInput.value = '';
-          ansInput.disabled = false;
-          ansSubmit.disabled = false;
-          if(currentQ.font) { ansInput.style.fontFamily = currentQ.font; ansSubmit.style.fontFamily = currentQ.font; }
-          
-          ansSubmit.onclick = () => {
-             if(canHit) return;
-             const userVal = ansInput.value.trim().toLowerCase();
-             const isCorrect = currentQ.accepts.some(a => a.trim().toLowerCase() === userVal);
-             if (isCorrect) {
-                playCorrect();
-                feedbackText.innerText = 'Правильно! Ударь пиньяту!'; feedbackText.className='text-correct'; canHit=true;
-                ansSubmit.disabled = true; ansInput.disabled = true;
-                quizPanel.classList.remove('draw-mode'); // закрываем черновик при правильном ответе
-             } else {
-                playWrong();
-                feedbackText.innerText = 'Промахнулся! Попробуй еще раз.'; feedbackText.className='text-wrong';
-             }
-          };
+          optionsContainer.style.display = 'none'; inputContainer.style.display = 'block'; ansInput.value = ''; ansInput.disabled = false; ansSubmit.disabled = false;
+          ansSubmit.onclick = () => { if(canHit) return; if (currentQ.accepts.some(a => a.trim().toLowerCase() === ansInput.value.trim().toLowerCase())) { playSnd('correct'); feedbackText.innerText = 'Правильно! Ударь пиньяту!'; feedbackText.style.color='#28a745'; canHit=true; ansSubmit.disabled = true; ansInput.disabled = true; quizPanel.classList.remove('draw-mode'); } else { playSnd('wrong'); feedbackText.innerText = 'Промахнулся! Попробуй еще раз.'; feedbackText.style.color='#d9381e'; } };
       } else {
-          optionsContainer.style.display = 'block';
-          inputContainer.style.display = 'none';
-          
+          optionsContainer.style.display = 'block'; inputContainer.style.display = 'none';
           currentQ.options.forEach((opt,index)=>{ 
-              const btn=document.createElement('button'); btn.className='option-btn'; btn.innerHTML=opt; 
-              if(currentQ.font) btn.style.fontFamily = currentQ.font;
-              
-              btn.onclick=()=> {
-                  if(canHit) return;
-                  if(currentQ.correctIndices.includes(index)){
-                    playCorrect();
-                    feedbackText.innerText = 'Правильно! Ударь пиньяту!'; feedbackText.className='text-correct'; canHit=true;
-                    optionsContainer.querySelectorAll('.option-btn').forEach(b=>b.disabled=true); btn.style.background='#28a745';
-                    quizPanel.classList.remove('draw-mode'); // закрываем черновик при правильном ответе
-                  } else {
-                    playWrong();
-                    feedbackText.innerText = 'Промахнулся! Попробуй еще раз.'; feedbackText.className='text-wrong'; 
-                    btn.style.transform='translateX(-5px)'; setTimeout(()=>btn.style.transform='translateX(5px)',50); setTimeout(()=>btn.style.transform='translateX(0)',100); 
-                  }
-              }; 
+              const btn=document.createElement('button'); btn.className='option-btn'; btn.innerHTML=opt; if(currentQ.font) btn.style.fontFamily = currentQ.font;
+              btn.onclick=()=> { if(canHit) return; if(currentQ.correctIndices.includes(index)){ playSnd('correct'); feedbackText.innerText = 'Правильно! Ударь пиньяту!'; feedbackText.style.color='#28a745'; canHit=true; optionsContainer.querySelectorAll('.option-btn').forEach(b=>b.disabled=true); btn.style.background='#28a745'; quizPanel.classList.remove('draw-mode'); } else { playSnd('wrong'); feedbackText.innerText = 'Промахнулся! Попробуй еще раз.'; feedbackText.style.color='#d9381e'; } }; 
               optionsContainer.appendChild(btn); 
           });
       }
-      renderMath();
+      if(window.MathJax) window.MathJax.typesetPromise([quizPanel]);
     }
-
-    piniataImg.addEventListener('click',()=>{
-      if(startScreen.style.display !== 'none') return;
-      if(!canHit){ if(feedbackText.innerText === ''){ feedbackText.innerText='Сначала ответь на вопрос!'; feedbackText.className='text-wrong'; } return; }
-      playCrackSound(); piniataImg.classList.remove('swing'); piniataImg.classList.add('hit-anim');
-      setTimeout(()=>{ piniataImg.classList.remove('hit-anim'); if(currentStage < images.length - 1) piniataImg.classList.add('swing'); },200);
-      currentStage++; piniataImg.src = images[currentStage] || images[images.length-1];
-      if(currentStage === images.length - 1 || currentStage >= questions.length){ quizPanel.style.display='none'; winMessage.style.display='block'; launchConfetti(); }
-      else { setTimeout(loadQuestion,500); }
-    });
-
+    function clearCanvas() { ctxCanvas.save(); ctxCanvas.setTransform(1, 0, 0, 1, 0, 0); ctxCanvas.clearRect(0, 0, canvas.width, canvas.height); ctxCanvas.restore(); }
+    piniataImg.addEventListener('click',()=>{ if(startScreen.style.display !== 'none' || !canHit) return; piniataImg.classList.remove('swing'); piniataImg.classList.add('hit-anim'); setTimeout(()=>{ piniataImg.classList.remove('hit-anim'); piniataImg.classList.add('swing'); },200); currentStage++; piniataImg.src = images[currentStage] || images[images.length-1]; if(currentStage >= images.length - 1 || currentStage >= questions.length){ quizPanel.style.display='none'; winMessage.style.display='block'; } else { setTimeout(loadQuestion,500); } });
     startBtn.addEventListener('click',()=>{ startScreen.style.display='none'; quizPanel.style.display='block'; loadQuestion(); });
-    if(new URLSearchParams(location.search).get('autostart') === '1'){ startBtn.click(); }
   }
 
-  function initGameMode(){
-    document.body.classList.add('gameOnly');
-    $("editorRoot").style.display = 'none';
-    const root=$("gameRoot"); root.style.display='block';
-    const params = new URLSearchParams(location.search);
-    const gameData = params.get('game');
-    if(!gameData){ root.innerHTML='<div style="padding:24px;color:white">Нет данных игры.</div>'; return; }
-    let cfg; try{ cfg = decodeGameData(decodeURIComponent(gameData)); }catch(e){ root.innerHTML='<div style="padding:24px;color:white">Не удалось прочитать конфиг.</div>'; return; }
-    runGame(cfg, root);
-  }
-
-  if(new URLSearchParams(location.search).has('game')) initGameMode(); else initEditor();
+  if(new URLSearchParams(location.search).has('game')) {
+    document.body.classList.add('gameOnly'); $("editorRoot").style.display = 'none'; const root=$("gameRoot"); root.style.display='block';
+    try { const cfg = decodeGameData(decodeURIComponent(new URLSearchParams(location.search).get('game'))); runGame(cfg, root); } catch(e) { root.innerHTML='<div style="color:white">Ошибка данных.</div>'; }
+  } else initEditor();
 })();
 </script>
 </body>
