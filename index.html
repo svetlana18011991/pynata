@@ -69,6 +69,7 @@
     .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:999px;font-size:12px;font-weight:900;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.18);color:rgba(255,255,255,.92)}
 
     .preview{height:100%;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+  
     .preview .panel-body{flex:1;display:flex;flex-direction:column;min-height:0;padding:14px}
     .preview-stage{flex:1;position:relative;border-radius:var(--radius2);border:1px solid rgba(255,255,255,.10);overflow:hidden;background:rgba(0,0,0,.18);box-shadow:var(--shadow2)}
     .toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.14);color:var(--text);padding:10px 12px;border-radius:14px;backdrop-filter:blur(10px);box-shadow:var(--shadow2);opacity:0;pointer-events:none;transition:opacity .18s ease, transform .18s ease;z-index:999999}
@@ -97,12 +98,14 @@
       <div class="panel-header">
         <div class="h">
           <a href="https://t.me/interactiv_matematika" target="_blank" title="Перейти в Telegram-канал" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;transition:opacity .2s" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">
+    
             <img src="logo.png" alt="Логотип" style="height:42px;width:42px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,174,0,.5);box-shadow:0 0 10px rgba(255,174,0,.35)" onerror="this.style.display='none'" />
             <div style="display:flex;flex-direction:column;justify-content:center">
               <span style="font-size:16px;font-weight:900;line-height:1.2">Шкатулка математических интерактивов</span>
               <span style="font-size:11px;color:rgba(255,255,255,.7);line-height:1.2">Светлана Быкова</span>
               <span style="font-size:12px;color:var(--neon);font-weight:700;line-height:1.2;margin-top:2px">Редактор «Пиньята»</span>
             </div>
+        
           </a>
         </div>
         <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
@@ -123,21 +126,25 @@
           <div class="row">
             <div>
               <label>Шрифт заголовка</label>
+  
               <select id="inpTitleFont">
                 <option value="" style="font-family: system-ui, sans-serif;">Стандартный</option>
                 <option value="Arial, sans-serif" style="font-family: Arial, sans-serif;">Arial</option>
                 <option value="Verdana, sans-serif" style="font-family: Verdana, sans-serif;">Verdana</option>
                 <option value="Tahoma, sans-serif" style="font-family: Tahoma, sans-serif;">Tahoma</option>
+    
                 <option value="'Trebuchet MS', sans-serif" style="font-family: 'Trebuchet MS', sans-serif;">Trebuchet MS</option>
                 <option value="'Times New Roman', serif" style="font-family: 'Times New Roman', serif;">Times New Roman</option>
                 <option value="Georgia, serif" style="font-family: Georgia, serif;">Georgia</option>
                 <option value="'Courier New', monospace" style="font-family: 'Courier New', monospace;">Courier New</option>
+        
                 <option value="'Caveat', cursive" style="font-family: 'Caveat', cursive;">Caveat (Рукописный 1)</option>
                 <option value="'Neucha', cursive" style="font-family: 'Neucha', cursive;">Neucha (Рукописный 2)</option>
               </select>
             </div>
             <div>
               <label>Размер (px)</label>
+         
               <input id="inpTitleFontSize" type="number" min="16" max="80" step="1" value="30" />
             </div>
           </div>
@@ -157,6 +164,7 @@
         <div class="section">
           <div class="title">Стартовый экран</div>
           <label>Текст инструкции</label>
+          
           <textarea id="inpInstruction">Ответь на вопрос правильно, а потом ударь по пиньяте. Каждый правильный ответ открывает один удар.</textarea>
 
           <div class="row" style="margin-top:10px">
@@ -165,6 +173,7 @@
               <input type="color" id="inpInstColor" value="#ffb703" />
             </div>
             <div style="flex:2">
+             
               <label class="toggle" style="margin-top:28px">
                 <input type="checkbox" id="chkInstGlow" checked />
                 <span>Неоновое свечение рамки</span>
@@ -174,6 +183,7 @@
         </div>
 
         <div class="section">
+      
           <div class="title">Вопросы <span class="pill" id="pillCount">0</span></div>
           <div class="row" style="margin-bottom:12px;align-items:center">
             <button class="btn primary" id="btnAddQ" type="button">➕ Добавить</button>
@@ -197,6 +207,7 @@
 
           <div class="q-list" id="qList"></div>
         </div>
+     
       </div>
     </div>
 
@@ -210,6 +221,7 @@
       </div>
       <div class="panel-body">
         <div class="preview-stage">
+    
           <iframe id="livePreview" title="Preview" style="width:100%;height:100%;border:0;background:transparent;overflow:hidden" allow="autoplay; fullscreen" allowfullscreen></iframe>
         </div>
       </div>
@@ -227,6 +239,7 @@
       <div class="modal-body">
         <label>Тип вопроса</label>
         <select id="selType">
+ 
           <option value="choice" selected>С выбором ответа</option>
           <option value="text">С вводом ответа</option>
         </select>
@@ -242,16 +255,19 @@
               <select id="inpQFont">
                 <option value="" style="font-family: system-ui, sans-serif;">Стандартный</option>
                 <option value="Arial, sans-serif" style="font-family: Arial, sans-serif;">Arial</option>
+               
                 <option value="Verdana, sans-serif" style="font-family: Verdana, sans-serif;">Verdana</option>
                 <option value="Tahoma, sans-serif" style="font-family: Tahoma, sans-serif;">Tahoma</option>
                 <option value="'Trebuchet MS', sans-serif" style="font-family: 'Trebuchet MS', sans-serif;">Trebuchet MS</option>
                 <option value="'Times New Roman', serif" style="font-family: 'Times New Roman', serif;">Times New Roman</option>
                 <option value="Georgia, serif" style="font-family: Georgia, serif;">Georgia</option>
+ 
                 <option value="'Courier New', monospace" style="font-family: 'Courier New', monospace;">Courier New</option>
                 <option value="'Caveat', cursive" style="font-family: 'Caveat', cursive;">Caveat (Рукописный 1)</option>
                 <option value="'Neucha', cursive" style="font-family: 'Neucha', cursive;">Neucha (Рукописный 2)</option>
               </select>
             </div>
+     
             <div>
               <label>Размер шрифта вопроса (px)</label>
               <input id="inpQFontSize" type="number" min="12" max="60" step="1" value="20" />
@@ -261,6 +277,7 @@
 
         <div class="choiceBlock" style="margin-top:10px">
           <div style="font-weight:900">Медиа (ссылки)</div>
+   
           <div class="muted">Вставьте прямую ссылку (URL) на картинку или аудиофайл.</div>
           <div class="answerRow">
             <span style="font-size:20px; line-height:1; cursor:help;" title="Ссылка на картинку">🖼️</span>
@@ -523,12 +540,18 @@
   function buildPayload(previewWithDraft){
     readFormIntoEditor();
     let questions = Editor.questions.map(normalizeQuestion);
-    if(previewWithDraft && Editor.draft){ const d=normalizeQuestion(Editor.draft); if(questions.length===0) questions=[d]; else questions[0]=d; }
+    if(previewWithDraft && Editor.draft){ const d=normalizeQuestion(Editor.draft);
+    if(questions.length===0) questions=[d]; else questions[0]=d; }
     return normalizeCfg({ title:Editor.title, titleFont:Editor.titleFont, titleFontSize:Editor.titleFontSize, useLatex:Editor.useLatex, winText:Editor.winText, instruction:Editor.instruction, questions });
   }
 
   function updatePreview(previewWithDraft){
     const payload = buildPayload(previewWithDraft);
+    
+    if (!previewWithDraft) {
+      localStorage.setItem('pinataEditorData', JSON.stringify(payload));
+    }
+
     const data = encodeGameData(payload);
     const maxLen=3500, curLen=data.length, pct=Math.min(100,(curLen/maxLen)*100);
     const bar=$("barSize"), lbl=$("lblSizeText"), warn=$("sizeWarning");
@@ -538,14 +561,26 @@
     else { bar.style.background='var(--danger)'; lbl.textContent='🔴 ПРЕВЫШЕН ЛИМИТ'; lbl.style.color='var(--danger)'; warn.style.display='block'; }
     const sTag = "<scr" + "ipt>", eTag = "</scr" + "ipt>";
     let mathJaxHtml = '';
-    if (payload.useLatex) { mathJaxHtml = sTag + 'window.MathJax = { tex: { inlineMath: [["$", "$"], ["\\\\(", "\\\\)"]] } };' + eTag + sTag + ' id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">' + eTag; }
-    const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><style>body{margin:0;overflow:hidden;background:transparent;}</style>${mathJaxHtml}</head><body><div id="gameRoot" style="width:100vw;height:100vh;"></div>${sTag}const cfg = ${JSON.stringify(payload).replace(/</g, '\\u003c')};(${runGame.toString()})(cfg, document.getElementById('gameRoot'));${previewWithDraft ? "setTimeout(()=>document.getElementById('start-btn')?.click(), 100);" : ""}${eTag}</body></html>`;
+    if (payload.useLatex) { mathJaxHtml = sTag + 'window.MathJax = { tex: { inlineMath: [["$", "$"], ["\\\\(", "\\\\)"]] } };'
+    + eTag + sTag + ' id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">' + eTag; }
+    const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><style>body{margin:0;overflow:hidden;background:transparent;}</style>${mathJaxHtml}</head><body><div id="gameRoot" style="width:100vw;height:100vh;"></div>${sTag}const cfg = ${JSON.stringify(payload).replace(/</g, '\\u003c')};(${runGame.toString()})(cfg, document.getElementById('gameRoot'));${previewWithDraft ?
+    "setTimeout(()=>document.getElementById('start-btn')?.click(), 100);" : ""}${eTag}</body></html>`;
     $("livePreview").removeAttribute('src'); $("livePreview").srcdoc = html;
   }
 
   let _previewTid=null; function debouncedPreview(){ clearTimeout(_previewTid); _previewTid=setTimeout(()=>updatePreview(false),300); }
 
   function initEditor(){
+    try {
+      const savedData = localStorage.getItem('pinataEditorData');
+      if (savedData) {
+        const parsed = JSON.parse(savedData);
+        Object.assign(Editor, normalizeCfg(parsed)); 
+      }
+    } catch(e) {
+      console.error("Ошибка загрузки сохранений", e);
+    }
+
     fillFormFromEditor();
     ["inpTitle", "inpTitleFont", "inpTitleFontSize", "chkUseLatex", "inpWinText", "inpInstruction", "inpInstColor", "chkInstGlow"].forEach(id=>$(id).addEventListener('input',debouncedPreview));
     $("chkUseLatex").addEventListener('change', debouncedPreview);
@@ -568,7 +603,8 @@
               else { let ans = ""; if (q.options && q.correctIndices && q.correctIndices.length > 0) { ans = q.options[q.correctIndices[0]] || ""; } q.accepts = [ans]; delete q.options; delete q.correctIndices; }
           }
       });
-      renderList(); updatePreview(false); toast("Настройки применены!");
+      renderList(); updatePreview(false);
+      toast("Настройки применены!");
     });
     $("selType").addEventListener("change", ()=>{ const q = Editor.draft; if(!q) return; q.type = $("selType").value; syncModalType(); if(q.type === "choice"){ q.options = q.options || ["",""]; q.correctIndices = q.correctIndices || [0]; renderChoiceUI(); } else { q.accepts = q.accepts || [""]; renderTextUI(); } });
     $("btnClearImage").addEventListener("click", () => { $("inpQImage").value = ""; });
@@ -584,14 +620,18 @@
       Editor.draft=null; Editor.editingId=null; hideModal(); renderList(); updatePreview(false); toast('Сохранено');
     });
     $("btnCopyCode").addEventListener('click', async()=>{ const payload=buildPayload(false); const iframeCode=buildIframeFromUrl(buildGameUrl(payload)); const ok=await copyToClipboard(iframeCode); toast(ok ? 'Скопировано ✅' : 'Не удалось скопировать'); });
-    $("btnResetAll").addEventListener('click',()=>{ Object.assign(Editor, deepClone(DEFAULT_CFG)); Editor.questions=[]; Editor.draft=null; Editor.editingId=null; fillFormFromEditor(); renderList(); updatePreview(false); toast('Сброшено'); });
+    $("btnResetAll").addEventListener('click',()=>{ 
+      localStorage.removeItem('pinataEditorData'); 
+      Object.assign(Editor, deepClone(DEFAULT_CFG)); Editor.questions=[]; Editor.draft=null; Editor.editingId=null; fillFormFromEditor(); renderList(); updatePreview(false); toast('Сброшено'); 
+    });
     renderList(); updatePreview(false);
   }
 
   function runGame(cfg, mount){
     const sTag = "<scr" + "ipt>", eTag = "</scr" + "ipt>";
     let mathJaxHtml = '';
-    if (cfg.useLatex) { mathJaxHtml = sTag + 'window.MathJax = { tex: { inlineMath: [["$", "$"], ["\\(", "\\)"]] } };' + eTag + sTag + ' id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">' + eTag; }
+    if (cfg.useLatex) { mathJaxHtml = sTag + 'window.MathJax = { tex: { inlineMath: [["$", "$"], ["\\(", "\\)"]] } };'
+    + eTag + sTag + ' id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">' + eTag; }
     const startColor = cfg.instruction?.color || '#ffb703', startGlow = cfg.instruction?.glow !== false;
     const boxGlowStyle = startGlow ? `0 0 20px ${startColor}, inset 0 0 10px ${startColor}` : `0 18px 60px rgba(0,0,0,.38)`;
     mount.innerHTML = mathJaxHtml + `
@@ -640,12 +680,14 @@
       <div id="game-wrapper">
         <div id="game-container">
           <div id="start-screen"><div id="start-card"><h1></h1><p></p><button id="start-btn">▶ Начать</button></div></div>
+   
           <div id="quiz-panel" style="display:none">
               <button id="draw-toggle" title="Черновик">✏️</button>
               <div id="q-content-wrap">
                   <div id="question-text">Вопрос загружается...</div>
                   <div id="q-media"></div>
                   <div id="options-container"></div>
+  
                   <div id="input-container" style="display:none; width:100%;">
                      <input type="text" id="ans-input" placeholder="Введите ответ...">
                      <button id="ans-submit" class="option-btn" style="margin-top:10px;">ОК</button>
@@ -656,10 +698,12 @@
                 <div class="draw-tools-panel">
                    <div class="tool-group"><button id="d-pen" class="d-tool active">🖊️</button><button id="d-eraser" class="d-tool">🧽</button></div>
                    <div class="tool-sep"></div>
+        
                    <div class="tool-group">
                        <button class="d-color active" data-color="#0f4c81" style="background:#0f4c81;"></button>
                        <button class="d-color" data-color="#e53935" style="background:#e53935;"></button>
                        <button class="d-color" data-color="#43a047" style="background:#43a047;"></button>
+         
                        <button class="d-color" data-color="#212121" style="background:#212121;"></button>
                    </div>
                    <div class="tool-sep"></div>
@@ -669,6 +713,7 @@
                        <button class="d-size" data-size="8"><span style="width:14px;height:14px;"></span></button>
                    </div>
                    <div class="tool-sep"></div>
+      
                    <button id="d-clear" class="btn small" style="background:#ddd; color:#333;">🗑 Очистить</button>
                    <button id="d-close" class="btn small danger">✖ Закрыть</button>
                 </div>
@@ -676,6 +721,7 @@
               </div>
           </div>
           <div id="win-message"></div>
+       
           <div id="piniata-wrapper"><img class="piniata-image swing" id="piniata-img" src="" alt="Пиньята"></div>
           <a href="https://t.me/interactiv_matematika" target="_blank" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;opacity:.65;z-index:130;text-decoration:none;">
             <img src="logo.png" alt="Логотип" style="height:26px;width:26px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,174,0,.4);">
@@ -689,7 +735,6 @@
     const quizPanel = mount.querySelector('#quiz-panel'), qMedia = mount.querySelector('#q-media'), questionText = mount.querySelector('#question-text');
     const optionsContainer = mount.querySelector('#options-container'), inputContainer = mount.querySelector('#input-container'), ansInput = mount.querySelector('#ans-input'), ansSubmit = mount.querySelector('#ans-submit'), feedbackText = mount.querySelector('#feedback-text');
     const winMessage = mount.querySelector('#win-message'), piniataImg = mount.querySelector('#piniata-img'), drawToggle = mount.querySelector('#draw-toggle'), drawClose = mount.querySelector('#d-close'), drawArea = mount.querySelector('#draw-area'), canvas = mount.querySelector('#gCanvas'), ctxCanvas = canvas.getContext('2d');
-
     let isDrawing = false;
     let currentTool = 'pen';
     let currentColor = '#0f4c81';
@@ -697,11 +742,9 @@
     let dpr = Math.max(1, window.devicePixelRatio || 1);
     let lastPoint = null;
     let currentStroke = [];
-
     function resizeCanvas() {
       const rect = drawArea.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
-
       const prev = document.createElement('canvas');
       prev.width = canvas.width;
       prev.height = canvas.height;
@@ -713,11 +756,9 @@
       canvas.height = Math.round(rect.height * dpr);
       canvas.style.width = rect.width + 'px';
       canvas.style.height = rect.height + 'px';
-
       ctxCanvas.setTransform(1, 0, 0, 1, 0, 0);
       ctxCanvas.clearRect(0, 0, canvas.width, canvas.height);
       ctxCanvas.setTransform(dpr, 0, 0, dpr, 0, 0);
-
       if (prev.width && prev.height) {
         ctxCanvas.drawImage(prev, 0, 0, prev.width, prev.height, 0, 0, rect.width, rect.height);
       }
@@ -829,7 +870,6 @@
 
     drawToggle.addEventListener('click', () => toggleDrawMode(true));
     drawClose.addEventListener('click', () => toggleDrawMode(false));
-
     const resizeObserver = new ResizeObserver(() => {
       if (quizPanel.classList.contains('draw-mode')) resizeCanvas();
     });
@@ -837,46 +877,39 @@
     window.addEventListener('resize', () => {
       if (quizPanel.classList.contains('draw-mode')) resizeCanvas();
     });
-
     const btnPen = mount.querySelector('#d-pen'),
           btnEraser = mount.querySelector('#d-eraser'),
           colorBtns = mount.querySelectorAll('.d-color'),
           sizeBtns = mount.querySelectorAll('.d-size'),
           btnClear = mount.querySelector('#d-clear');
-
     if(btnPen) btnPen.onclick = () => {
       currentTool = 'pen';
       btnPen.classList.add('active');
       btnEraser.classList.remove('active');
       canvas.style.cursor = 'crosshair';
     };
-
     if(btnEraser) btnEraser.onclick = () => {
       currentTool = 'eraser';
       btnEraser.classList.add('active');
       btnPen.classList.remove('active');
       canvas.style.cursor = 'cell';
     };
-
     colorBtns.forEach(btn => btn.onclick = () => {
       colorBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentColor = btn.dataset.color;
       if(currentTool === 'eraser') btnPen.click();
     });
-
     sizeBtns.forEach(btn => btn.onclick = () => {
       sizeBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentSize = Number(btn.dataset.size);
     });
-
     canvas.addEventListener('pointerdown', startDraw, { passive:false });
     canvas.addEventListener('pointermove', draw, { passive:false });
     canvas.addEventListener('pointerup', stopDraw);
     canvas.addEventListener('pointercancel', stopDraw);
     canvas.addEventListener('pointerleave', stopDraw);
-
     btnClear.onclick = () => {
       ctxCanvas.save();
       ctxCanvas.setTransform(1, 0, 0, 1, 0, 0);
@@ -884,7 +917,6 @@
       ctxCanvas.restore();
       ctxCanvas.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
-
     const questions = (cfg.questions || []).map(q => ({
       type: q.type || 'choice',
       q: q.prompt,
@@ -896,7 +928,6 @@
       image: q.image || '',
       audio: q.audio || ''
     }));
-
     const images = ['1.png','2.png','112.png','3.png','4.png','5.png'];
     let currentStage = 0, canHit = false, audioCtx = null;
 
@@ -905,7 +936,6 @@
     startText.textContent = cfg.instruction?.text || '';
     winMessage.textContent = cfg.winText || 'Молодец!';
     piniataImg.src = '1.png';
-
     function playSnd(type){
       if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if(audioCtx.state === 'suspended') audioCtx.resume();
@@ -954,7 +984,6 @@
       optionsContainer.innerHTML='';
       feedbackText.innerText='';
       canHit=false;
-
       if(currentQ.type === 'text') {
           optionsContainer.style.display = 'none';
           inputContainer.style.display = 'block';
@@ -987,17 +1016,20 @@
               if(currentQ.font) btn.style.fontFamily = currentQ.font;
               btn.onclick=()=> {
                 if(canHit) return;
+        
                 if(currentQ.correctIndices.includes(index)){
                   playSnd('correct');
                   feedbackText.innerText = 'Правильно! Ударь пиньяту!';
                   feedbackText.style.color='#28a745';
                   canHit=true;
+                
                   optionsContainer.querySelectorAll('.option-btn').forEach(b=>b.disabled=true);
                   btn.style.background='#28a745';
                   quizPanel.classList.remove('draw-mode');
                 } else {
                   playSnd('wrong');
                   feedbackText.innerText = 'Промахнулся! Попробуй еще раз.';
+   
                   feedbackText.style.color='#d9381e';
                 }
               };
@@ -1018,13 +1050,13 @@
       currentStage++;
       piniataImg.src = images[currentStage] || images[images.length-1];
       if(currentStage >= images.length - 1 || currentStage >= questions.length){
+      
         quizPanel.style.display='none';
         winMessage.style.display='block';
       } else {
         setTimeout(loadQuestion,500);
       }
     });
-
     startBtn.addEventListener('click',()=>{
       startScreen.style.display='none';
       quizPanel.style.display='block';
