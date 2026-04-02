@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Редактор «Пиньята» (с расширенными вопросами)</title>
-  <script type="text/javascript" src="https://me.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=fWtRVFfn0MOjeRAAZWGJYuqRYUsN1tRvCPlmqF_grEP6twiR1LkNc5Cvu7pScqxaZyDVi3VTlzcHsN-od3-CKSOlxfT0A0wMGd5uJ4ObeJb7J2GLPclcjC0Kr2CQhxb5a7nEjfyL1XLwEqeQJ5yflIF7He6O0MiXqb64QS3RNttSdGBIAJtzdVZI5vwxDAVXS1LSEmaAsxbtABpoxOF1KHRbXbBVC-cSgt0RlMVVhGD65xYC-aaGbV8tUIggJ4XQueek89b979TDrIouqzrQVw" charset="UTF-8"></script><style>
+  <script type="text/javascript" src="https://me.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=SWFvcwXmpNBSurl2Cm6pfujhyzfAHW-1B3LigbZc8PQX2I9ER-SwVBu5mq7gmYR50Q41-ypJ-8hGGaa4xplaFTA0M4XV486c1PJmjG7gvNg4B0n17czglvMeo0-5uXtModsg13jy1ypUvQ4mxtDgEI6C5BGo-LXv-cnJQCSW2NGdqUEw7GOaaZIU2fUSyQ8T5dYMkI12mg2a9OttHTg-3rTieDpezRkDrOCQ9Jb7U2LajeZ6p46tHIrffK8WrWRN_ewJA0aXO1mqR-YhQhAV_w" charset="UTF-8"></script><style>
     @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Neucha&display=swap');
     html,body{height:100%;margin:0;overflow:hidden;background:#090c16;color:#eaf0ff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
     :root{
@@ -912,7 +912,7 @@
       if(audioCtx.state === 'suspended') audioCtx.resume();
       const t = audioCtx.currentTime;
 
-      const noiseBuffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * 0.12), audioCtx.sampleRate);
+      const noiseBuffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * 0.10), audioCtx.sampleRate);
       const data = noiseBuffer.getChannelData(0);
       for(let i = 0; i < data.length; i++){
         data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
@@ -923,35 +923,35 @@
 
       const bandpass = audioCtx.createBiquadFilter();
       bandpass.type = 'bandpass';
-      bandpass.frequency.setValueAtTime(1800, t);
-      bandpass.Q.setValueAtTime(0.9, t);
+      bandpass.frequency.setValueAtTime(2200, t);
+      bandpass.Q.setValueAtTime(1.2, t);
 
-      const gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(0.001, t);
-      gain.gain.exponentialRampToValueAtTime(0.42, t + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+      const noiseGain = audioCtx.createGain();
+      noiseGain.gain.setValueAtTime(0.001, t);
+      noiseGain.gain.exponentialRampToValueAtTime(0.28, t + 0.008);
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.10);
 
-      const low = audioCtx.createOscillator();
-      low.type = 'triangle';
-      low.frequency.setValueAtTime(170, t);
-      low.frequency.exponentialRampToValueAtTime(95, t + 0.08);
+      const thump = audioCtx.createOscillator();
+      thump.type = 'triangle';
+      thump.frequency.setValueAtTime(190, t);
+      thump.frequency.exponentialRampToValueAtTime(90, t + 0.08);
 
-      const lowGain = audioCtx.createGain();
-      lowGain.gain.setValueAtTime(0.001, t);
-      lowGain.gain.exponentialRampToValueAtTime(0.18, t + 0.01);
-      lowGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
+      const thumpGain = audioCtx.createGain();
+      thumpGain.gain.setValueAtTime(0.001, t);
+      thumpGain.gain.exponentialRampToValueAtTime(0.12, t + 0.01);
+      thumpGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
 
       noise.connect(bandpass);
-      bandpass.connect(gain);
-      gain.connect(audioCtx.destination);
+      bandpass.connect(noiseGain);
+      noiseGain.connect(audioCtx.destination);
 
-      low.connect(lowGain);
-      lowGain.connect(audioCtx.destination);
+      thump.connect(thumpGain);
+      thumpGain.connect(audioCtx.destination);
 
       noise.start(t);
-      noise.stop(t + 0.12);
-      low.start(t);
-      low.stop(t + 0.1);
+      noise.stop(t + 0.10);
+      thump.start(t);
+      thump.stop(t + 0.09);
     }
 
 function playSnd(type){
